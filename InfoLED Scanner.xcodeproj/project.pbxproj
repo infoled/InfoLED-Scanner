@@ -1,0 +1,527 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747551C99921100EDDF23 /* AppDelegate.swift */; };
+		8C3747581C99921100EDDF23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747571C99921100EDDF23 /* ViewController.swift */; };
+		8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747591C99921100EDDF23 /* Main.storyboard */; };
+		8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */; };
+		8C3747601C99921100EDDF23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C37475F1C99921100EDDF23 /* Assets.xcassets */; };
+		8C3747631C99921100EDDF23 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */; };
+		8C37476E1C99921200EDDF23 /* InfoLED_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */; };
+		8C3747791C99921200EDDF23 /* InfoLED_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8C37476A1C99921200EDDF23 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C37474A1C99921100EDDF23 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8C3747511C99921100EDDF23;
+			remoteInfo = "InfoLED Scanner";
+		};
+		8C3747751C99921200EDDF23 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C37474A1C99921100EDDF23 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8C3747511C99921100EDDF23;
+			remoteInfo = "InfoLED Scanner";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		8C3747571C99921100EDDF23 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		8C37475A1C99921100EDDF23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8C37475D1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = InfoLED_Scanner.xcdatamodel; sourceTree = "<group>"; };
+		8C37475F1C99921100EDDF23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8C3747621C99921100EDDF23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8C3747641C99921100EDDF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C3747691C99921200EDDF23 /* InfoLED ScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "InfoLED ScannerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLED_ScannerTests.swift; sourceTree = "<group>"; };
+		8C37476F1C99921200EDDF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C3747741C99921200EDDF23 /* InfoLED ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "InfoLED ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLED_ScannerUITests.swift; sourceTree = "<group>"; };
+		8C37477A1C99921200EDDF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8C37474F1C99921100EDDF23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747661C99921200EDDF23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747711C99921200EDDF23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8C3747491C99921100EDDF23 = {
+			isa = PBXGroup;
+			children = (
+				8C3747541C99921100EDDF23 /* InfoLED Scanner */,
+				8C37476C1C99921200EDDF23 /* InfoLED ScannerTests */,
+				8C3747771C99921200EDDF23 /* InfoLED ScannerUITests */,
+				8C3747531C99921100EDDF23 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8C3747531C99921100EDDF23 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8C3747521C99921100EDDF23 /* InfoLED Scanner.app */,
+				8C3747691C99921200EDDF23 /* InfoLED ScannerTests.xctest */,
+				8C3747741C99921200EDDF23 /* InfoLED ScannerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8C3747541C99921100EDDF23 /* InfoLED Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				8C3747551C99921100EDDF23 /* AppDelegate.swift */,
+				8C3747571C99921100EDDF23 /* ViewController.swift */,
+				8C3747591C99921100EDDF23 /* Main.storyboard */,
+				8C37475F1C99921100EDDF23 /* Assets.xcassets */,
+				8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */,
+				8C3747641C99921100EDDF23 /* Info.plist */,
+				8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */,
+			);
+			path = "InfoLED Scanner";
+			sourceTree = "<group>";
+		};
+		8C37476C1C99921200EDDF23 /* InfoLED ScannerTests */ = {
+			isa = PBXGroup;
+			children = (
+				8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */,
+				8C37476F1C99921200EDDF23 /* Info.plist */,
+			);
+			path = "InfoLED ScannerTests";
+			sourceTree = "<group>";
+		};
+		8C3747771C99921200EDDF23 /* InfoLED ScannerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */,
+				8C37477A1C99921200EDDF23 /* Info.plist */,
+			);
+			path = "InfoLED ScannerUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8C3747511C99921100EDDF23 /* InfoLED Scanner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C37477D1C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED Scanner" */;
+			buildPhases = (
+				8C37474E1C99921100EDDF23 /* Sources */,
+				8C37474F1C99921100EDDF23 /* Frameworks */,
+				8C3747501C99921100EDDF23 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "InfoLED Scanner";
+			productName = "InfoLED Scanner";
+			productReference = 8C3747521C99921100EDDF23 /* InfoLED Scanner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8C3747681C99921200EDDF23 /* InfoLED ScannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C3747801C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerTests" */;
+			buildPhases = (
+				8C3747651C99921200EDDF23 /* Sources */,
+				8C3747661C99921200EDDF23 /* Frameworks */,
+				8C3747671C99921200EDDF23 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8C37476B1C99921200EDDF23 /* PBXTargetDependency */,
+			);
+			name = "InfoLED ScannerTests";
+			productName = "InfoLED ScannerTests";
+			productReference = 8C3747691C99921200EDDF23 /* InfoLED ScannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8C3747731C99921200EDDF23 /* InfoLED ScannerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C3747831C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerUITests" */;
+			buildPhases = (
+				8C3747701C99921200EDDF23 /* Sources */,
+				8C3747711C99921200EDDF23 /* Frameworks */,
+				8C3747721C99921200EDDF23 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8C3747761C99921200EDDF23 /* PBXTargetDependency */,
+			);
+			name = "InfoLED ScannerUITests";
+			productName = "InfoLED ScannerUITests";
+			productReference = 8C3747741C99921200EDDF23 /* InfoLED ScannerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8C37474A1C99921100EDDF23 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = yangjunrui;
+				TargetAttributes = {
+					8C3747511C99921100EDDF23 = {
+						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = F499E6K8ZV;
+					};
+					8C3747681C99921200EDDF23 = {
+						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = F499E6K8ZV;
+						TestTargetID = 8C3747511C99921100EDDF23;
+					};
+					8C3747731C99921200EDDF23 = {
+						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = F499E6K8ZV;
+						TestTargetID = 8C3747511C99921100EDDF23;
+					};
+				};
+			};
+			buildConfigurationList = 8C37474D1C99921100EDDF23 /* Build configuration list for PBXProject "InfoLED Scanner" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8C3747491C99921100EDDF23;
+			productRefGroup = 8C3747531C99921100EDDF23 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8C3747511C99921100EDDF23 /* InfoLED Scanner */,
+				8C3747681C99921200EDDF23 /* InfoLED ScannerTests */,
+				8C3747731C99921200EDDF23 /* InfoLED ScannerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8C3747501C99921100EDDF23 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C3747631C99921100EDDF23 /* LaunchScreen.storyboard in Resources */,
+				8C3747601C99921100EDDF23 /* Assets.xcassets in Resources */,
+				8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747671C99921200EDDF23 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747721C99921200EDDF23 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8C37474E1C99921100EDDF23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
+				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
+				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747651C99921200EDDF23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C37476E1C99921200EDDF23 /* InfoLED_ScannerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C3747701C99921200EDDF23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C3747791C99921200EDDF23 /* InfoLED_ScannerUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8C37476B1C99921200EDDF23 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8C3747511C99921100EDDF23 /* InfoLED Scanner */;
+			targetProxy = 8C37476A1C99921200EDDF23 /* PBXContainerItemProxy */;
+		};
+		8C3747761C99921200EDDF23 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8C3747511C99921100EDDF23 /* InfoLED Scanner */;
+			targetProxy = 8C3747751C99921200EDDF23 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		8C3747591C99921100EDDF23 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8C37475A1C99921100EDDF23 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8C3747621C99921100EDDF23 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		8C37477B1C99921200EDDF23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8C37477C1C99921200EDDF23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8C37477E1C99921200EDDF23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8C37477F1C99921200EDDF23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		8C3747811C99921200EDDF23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "InfoLED ScannerTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-ScannerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InfoLED Scanner.app/InfoLED Scanner";
+			};
+			name = Debug;
+		};
+		8C3747821C99921200EDDF23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "InfoLED ScannerTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-ScannerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InfoLED Scanner.app/InfoLED Scanner";
+			};
+			name = Release;
+		};
+		8C3747841C99921200EDDF23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "InfoLED ScannerUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-ScannerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "InfoLED Scanner";
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		8C3747851C99921200EDDF23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "InfoLED ScannerUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-ScannerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "InfoLED Scanner";
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8C37474D1C99921100EDDF23 /* Build configuration list for PBXProject "InfoLED Scanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C37477B1C99921200EDDF23 /* Debug */,
+				8C37477C1C99921200EDDF23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8C37477D1C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED Scanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C37477E1C99921200EDDF23 /* Debug */,
+				8C37477F1C99921200EDDF23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		8C3747801C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C3747811C99921200EDDF23 /* Debug */,
+				8C3747821C99921200EDDF23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		8C3747831C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C3747841C99921200EDDF23 /* Debug */,
+				8C3747851C99921200EDDF23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				8C37475D1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodel */,
+			);
+			currentVersion = 8C37475D1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodel */;
+			path = InfoLED_Scanner.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 8C37474A1C99921100EDDF23 /* Project object */;
+}
