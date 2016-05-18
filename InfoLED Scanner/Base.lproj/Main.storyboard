@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6211" systemVersion="14A298i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="InfoLED_Scanner" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -15,11 +15,62 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="14B-jm-ksX">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="square" translatesAutoresizingMaskIntoConstraints="NO" id="JsE-Lp-LDa">
+                                <rect key="frame" x="50" y="50" width="500" height="500"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="500" id="FoG-2e-rhi"/>
+                                    <constraint firstAttribute="width" constant="500" id="uxp-ao-39A"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kvJ-8w-qf1">
+                                <rect key="frame" x="280" y="550" width="39" height="30"/>
+                                <state key="normal" title="Scan!"/>
+                                <connections>
+                                    <action selector="startScanning:" destination="BYZ-38-t0r" eventType="touchUpInside" id="rs8-Fl-5hT"/>
+                                </connections>
+                            </button>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tbr-EC-vRm">
+                                <rect key="frame" x="50" y="550" width="500" height="2"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="2" id="SvQ-SO-jYE"/>
+                                    <constraint firstAttribute="width" constant="500" id="f0V-ag-W5m"/>
+                                </constraints>
+                            </progressView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="0ZO-Uq-kD4"/>
+                            <constraint firstItem="14B-jm-ksX" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="CuU-rM-Vqu"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="14B-jm-ksX" secondAttribute="bottom" id="RFM-iR-fma"/>
+                            <constraint firstAttribute="trailing" secondItem="14B-jm-ksX" secondAttribute="trailing" id="TOc-Fs-qjF"/>
+                            <constraint firstItem="Tbr-EC-vRm" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Yod-cf-h25"/>
+                            <constraint firstItem="14B-jm-ksX" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="cCH-Wb-kxm"/>
+                            <constraint firstItem="Tbr-EC-vRm" firstAttribute="top" secondItem="JsE-Lp-LDa" secondAttribute="bottom" id="fHv-0w-o1G"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="kvJ-8w-qf1" secondAttribute="bottom" constant="20" id="p0R-EP-nsY"/>
+                            <constraint firstItem="kvJ-8w-qf1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="tUr-2h-K8U"/>
+                            <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="whq-JO-oy9"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="poiProgressWidth" destination="f0V-ag-W5m" id="9zD-8M-PWH"/>
+                        <outlet property="poiSquareHeight" destination="FoG-2e-rhi" id="BSE-qr-4X7"/>
+                        <outlet property="poiSquareWidth" destination="uxp-ao-39A" id="Lon-WL-wJY"/>
+                        <outlet property="scanButton" destination="kvJ-8w-qf1" id="GjU-qi-Kl6"/>
+                        <outlet property="scanningProgress" destination="Tbr-EC-vRm" id="buP-IU-nvZ"/>
+                        <outlet property="videoPreviewView" destination="14B-jm-ksX" id="i3f-ro-lO3"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="146" y="144"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="square" width="500" height="500"/>
+    </resources>
 </document>
