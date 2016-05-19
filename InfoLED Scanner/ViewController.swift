@@ -18,6 +18,28 @@ extension CIImage {
     }
 }
 
+extension CVPixelBuffer {
+    func deepcopy() -> CVPixelBuffer {
+        let width = CVPixelBufferGetWidth(self)
+        let height = CVPixelBufferGetHeight(self)
+        let format = CVPixelBufferGetPixelFormatType(self)
+        var pixelBufferCopyOptional:CVPixelBuffer?
+        CVPixelBufferCreate(nil, width, height, format, nil, &pixelBufferCopyOptional)
+        if let pixelBufferCopy = pixelBufferCopyOptional {
+            CVPixelBufferLockBaseAddress(self, kCVPixelBufferLock_ReadOnly)
+            CVPixelBufferLockBaseAddress(pixelBufferCopy, 0)
+            let baseAddress = CVPixelBufferGetBaseAddress(self)
+            let dataSize = CVPixelBufferGetDataSize(self)
+            let target = CVPixelBufferGetBaseAddress(pixelBufferCopy)
+            memcpy(target, baseAddress, dataSize)
+            print(dataSize)
+            CVPixelBufferUnlockBaseAddress(pixelBufferCopy, 0)
+            CVPixelBufferUnlockBaseAddress(self, kCVPixelBufferLock_ReadOnly)
+        }
+        return pixelBufferCopyOptional!
+    }
+}
+
 func + (tuple1: (Int, Int, Int), tuple2: (Int, Int, Int)) -> (Int, Int, Int) {
     return (tuple1.0 + tuple2.0, tuple1.1 + tuple2.1, tuple1.2 + tuple2.2)
 }
@@ -165,7 +187,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         history = []
         print("=====START SCANNING=====")
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(100) * Int64(NSEC_PER_MSEC)), dispatch_get_main_queue(), {
-//            dispatch_suspend(self.imageProcessingQueue)
+            dispatch_suspend(self.imageProcessingQueue)
             self.scanning = true
         })
     }
@@ -176,7 +198,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         unlockCameraSettings()
         scanButton.enabled = true
         scanningProgress.progress = 0.0
-//        dispatch_resume(self.imageProcessingQueue)
+        dispatch_resume(self.imageProcessingQueue)
     }
 
     func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
@@ -188,37 +210,42 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
         }
         if self.scanning {
-            dispatch_async(imageProcessingQueue) {
-                let image = CIImage(buffer: sampleBuffer)
-                let imageWidth = image.extent.size.width
-                let imageHeight = image.extent.size.height
-                let poiHeightSize = Int(PoiHeight)
-                let poiWidthSize = Int(PoiWidth)
-                let poiOriginX = imageWidth / 2 - PoiWidth / 2
-                let poiOriginY = imageHeight / 2 - PoiHeight / 2
-                let byteCount = poiHeightSize * poiWidthSize * 4
+            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
+            CVPixelBufferLockBaseAddress(localBuffer, kCVPixelBufferLock_ReadOnly)
+            let imageWidth  = CVPixelBufferGetWidth(localBuffer)
+            let imageHeight = CVPixelBufferGetHeight(localBuffer)
+            let poiHeight = Int(PoiHeight)
+            let poiWidth = Int(PoiWidth)
 
-                let bitmap = calloc(byteCount, sizeof(UInt8))
+            let baseAddr = CVPixelBufferGetBaseAddress(localBuffer)
+            let byteCount = CVPixelBufferGetDataSize(localBuffer)
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(localBuffer)
+            let bytesPerPixel = bytesPerRow / imageWidth
 
-                self.ciContext.render(image,
-                                      toBitmap: bitmap,
-                                      rowBytes: poiWidthSize*4,
-                                      bounds: CGRect(x: poiOriginX, y: poiOriginY, width: PoiWidth, height: PoiHeight),
-                                      format: kCIFormatRGBA8,
-                                      colorSpace: CGColorSpaceCreateDeviceRGB())
+            let startx = imageWidth / 2 - poiWidth / 2
+            let endx = imageWidth / 2 + poiWidth / 2
+            let starty = imageHeight / 2 - poiHeight / 2
+            let endy = imageHeight / 2 + poiHeight / 2
 
-                let rgba = UnsafeBufferPointer<UInt8>(
-                    start: UnsafePointer<UInt8>(bitmap),
-                    count: byteCount)
+            var red = 0, green = 0, blue = 0;
 
-                var red = 0, green = 0, blue = 0;
+            let rgba = UnsafeBufferPointer<UInt8>(
+                start: UnsafePointer<UInt8>(baseAddr),
+                count: byteCount)
 
-                for i in 0...byteCount / 4 - 1 {
-                    red   += Int(rgba[i << 2 + 0])
-                    green += Int(rgba[i << 2 + 1])
-                    blue  += Int(rgba[i << 2 + 2])
+            for i in startx...endx{
+                for j in starty...endy {
+                    let offset = j * bytesPerRow + i * bytesPerPixel
+                    red   += Int(rgba[offset + 0])
+                    green += Int(rgba[offset + 1])
+                    blue  += Int(rgba[offset + 2])
                 }
-//                NSLog("\(red)\t\(green)\t\(blue)")
+            }
+
+            CVPixelBufferUnlockBaseAddress(localBuffer, kCVPixelBufferLock_ReadOnly)
+
+            NSLog("\(red)\t\(green)\t\(blue)")
+            dispatch_async(imageProcessingQueue) {
                 self.history += [(red, green, blue)]
                 self.processCount += 1
                 if self.processCount == ViewController.cycleLimit {
@@ -227,7 +254,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
             self.cycleCount += 1;
             if self.cycleCount == ViewController.cycleLimit {
-                self.endScanning(captureOutput)
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.endScanning(captureOutput)
+                }
             }
         }
     }
@@ -325,9 +354,34 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 }
             }
             print(genaratedHistory)
-            
+
+            let preamble = [0, 0, 1, 1, 1, 0];
+            let indices = Array(genaratedHistory.startIndex...genaratedHistory.endIndex - preamble.count)
+
+            let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
+                let subarray = genaratedHistory[index ... (index + preamble.count - 1)]
+                if (subarray == ArraySlice<Int>(preamble)) {
+                    return result + [index];
+                } else {
+                    return result;
+                }
+            }
+
+            var filteredHistory: [Int]?
+            if(preamblePos.count < 2) {
+                print("unsolvable")
+            } else {
+                filteredHistory = genaratedHistory[(preamblePos[0] + preamble.count) ... preamblePos[1] - 1].enumerate().filter({ (index, element) in
+                    return index % 2 == 0;
+                }).map({ (index, element) in
+                    return element
+                })
+                print(filteredHistory!)
+            }
+
+
             dispatch_async(dispatch_get_main_queue()) {
-                let alert = UIAlertController(title: "Scan Result", message: "\(genaratedHistory)", preferredStyle: UIAlertControllerStyle.Alert)
+                let alert = UIAlertController(title: "Scan Result", message: "\(filteredHistory)", preferredStyle: UIAlertControllerStyle.Alert)
                 let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
                 alert.addAction(action)
                 self.presentViewController(alert, animated: true, completion: {})
