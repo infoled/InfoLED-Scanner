@@ -38,11 +38,13 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var poiSquareHeight: NSLayoutConstraint!
     @IBOutlet weak var poiSquareWidth: NSLayoutConstraint!
     @IBOutlet weak var poiProgressWidth: NSLayoutConstraint!
+    @IBOutlet weak var fpsLabel: UILabel!
     var previewLayer:AVCaptureVideoPreviewLayer?;
     let captureSession = AVCaptureSession()
     var cameraDevice:AVCaptureDevice?;
     let ciContext = CIContext();
     lazy var imageProcessingQueue = dispatch_queue_create("me.jackieyang.processing-queue", DISPATCH_QUEUE_SERIAL);
+    let fpsCounter = FpsCounter();
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -147,6 +149,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     var cycleCount = 0
+    var processCount = 0
     static let cycleLimit = 360
     static let windowFrameSize = 5
     static let samplesPerFrame = 240/60
@@ -158,9 +161,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         scanButton.enabled = false
         lockCameraSettings()
         cycleCount = 0
+        processCount = 0
         history = []
         print("=====START SCANNING=====")
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(100) * Int64(NSEC_PER_MSEC)), dispatch_get_main_queue(), {
+//            dispatch_suspend(self.imageProcessingQueue)
             self.scanning = true
         })
     }
@@ -171,11 +176,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         unlockCameraSettings()
         scanButton.enabled = true
         scanningProgress.progress = 0.0
+//        dispatch_resume(self.imageProcessingQueue)
     }
 
     func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
-        dispatch_async(imageProcessingQueue) {
+        self.fpsCounter.call()
+        dispatch_async(dispatch_get_main_queue()) {
+            self.fpsLabel.text = "\(self.fpsCounter.getFps())";
             if self.scanning {
+                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
+            }
+        }
+        if self.scanning {
+            dispatch_async(imageProcessingQueue) {
                 let image = CIImage(buffer: sampleBuffer)
                 let imageWidth = image.extent.size.width
                 let imageHeight = image.extent.size.height
@@ -188,11 +201,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 let bitmap = calloc(byteCount, sizeof(UInt8))
 
                 self.ciContext.render(image,
-                                 toBitmap: bitmap,
-                                 rowBytes: poiWidthSize*4,
-                                 bounds: CGRect(x: poiOriginX, y: poiOriginY, width: PoiWidth, height: PoiHeight),
-                                 format: kCIFormatRGBA8,
-                                 colorSpace: CGColorSpaceCreateDeviceRGB())
+                                      toBitmap: bitmap,
+                                      rowBytes: poiWidthSize*4,
+                                      bounds: CGRect(x: poiOriginX, y: poiOriginY, width: PoiWidth, height: PoiHeight),
+                                      format: kCIFormatRGBA8,
+                                      colorSpace: CGColorSpaceCreateDeviceRGB())
 
                 let rgba = UnsafeBufferPointer<UInt8>(
                     start: UnsafePointer<UInt8>(bitmap),
@@ -205,17 +218,16 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     green += Int(rgba[i << 2 + 1])
                     blue  += Int(rgba[i << 2 + 2])
                 }
-                NSLog("\(red)\t\(green)\t\(blue)")
+//                NSLog("\(red)\t\(green)\t\(blue)")
                 self.history += [(red, green, blue)]
-
-                self.cycleCount += 1;
-                //            dispatch_async(dispatch_get_main_queue()) {
-                //                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
-                //            }
-                if self.cycleCount == ViewController.cycleLimit {
+                self.processCount += 1
+                if self.processCount == ViewController.cycleLimit {
                     self.processHistory(self.history)
-                    self.endScanning(captureOutput)
                 }
+            }
+            self.cycleCount += 1;
+            if self.cycleCount == ViewController.cycleLimit {
+                self.endScanning(captureOutput)
             }
         }
     }
@@ -243,49 +255,79 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 average = average / (2 * windowSampleSize + 1)
                 adaptiveHistory += [history[i] - average]
             }
-            print(adaptiveHistory)
 
-            // Find which sample to dump
-            var dump = 0;
-            var maxDev = 0.0;
-            for i in 0...(ViewController.samplesPerFrame - 1) {
-                let curDev = stdDev(adaptiveHistory.enumerate().filter({
-                    return $0.index % ViewController.samplesPerFrame != i
-                }).map({
-                    return $0.element.0 + $0.element.1 + $0.element.2
-                }))
-                if (curDev > maxDev) {
-                    dump = i
-                    maxDev = curDev
+            // Map adaptiveHistory to adaptiveGrayHistory
+            let adaptiveGrayHistory = adaptiveHistory.map({ (r,g,b) in
+                return r + g + b;
+            })
+
+            print(adaptiveGrayHistory)
+
+            // Reduce adaptiveGrayHistory to signal level and duration
+            var lastLevel = 0;
+            var duration = 0;
+            var levelDuration = [(Int, Int)]()
+
+            for level in adaptiveGrayHistory {
+                switch (lastLevel, level) {
+                case (let x, let y) where x < 0 && y <= 0:
+                    duration = duration + 1
+                case (let x, let y) where x < 0 && y > 0:
+                    levelDuration += [(lastLevel, duration)]
+                    lastLevel = 1
+                    duration = 1
+                case (let x, let y) where x > 0 && y > 0:
+                    duration = duration + 1
+                case (let x, let y) where x > 0 && y <= 0:
+                    levelDuration += [(lastLevel, duration)]
+                    lastLevel = -1
+                    duration = 1
+                case (0, let y) where y > 0:
+                    lastLevel = 1
+                    duration = 1
+                case (0, let y) where y <= 0:
+                    lastLevel = -1
+                    duration = 1
+                default: break
                 }
             }
-            print("dump = \(dump), maxDev = \(maxDev)")
-            var combinedHistory = adaptiveHistory.enumerate().reduce([(0, 0, 0)], combine: {
-                var result: [(Int, Int, Int)] = $0;
-                if($1.index % ViewController.samplesPerFrame == dump) {
-                    result += [(0, 0, 0)];
-                } else {
-                    result[result.count - 1] = result[result.count - 1] + $1.element;
-                }
-                return result
-            })
-            combinedHistory.removeFirst()
-            combinedHistory.removeLast()
-            print("combinedHistory = \(combinedHistory)")
+            levelDuration += [(lastLevel, duration)]
 
-            // Binarylize the result
-            let binaryHistory = combinedHistory.map({
-                return ($0.0 + $0.1 + $0.2) > 0 ? 1 : 0
-            })
-            print("binaryHistory = \(binaryHistory)")
-            let filteredHistory = binaryHistory.enumerate().filter({ (index, element) -> Bool in
-                return index % 2 == 0
-            }).map({ (index, element) in
-                return element
-            })
-            print("filteredHistory = \(filteredHistory)")
+            print(levelDuration)
+
+            //Convert level Duration to actual history
+            var genaratedHistory = [Int]()
+            for (level, duration) in levelDuration {
+                if level == -1 {
+                    switch duration {
+                    case 1...4:
+                        genaratedHistory += [0]
+                    case 5...8:
+                        genaratedHistory += [0, 0]
+                    case 9...12:
+                        genaratedHistory += [0, 0, 0]
+                    default:
+                        print("This seems strange?")
+                    }
+                } else if level == 1 {
+                    switch duration {
+                    case 1...5:
+                        genaratedHistory += [1]
+                    case 6...9:
+                        genaratedHistory += [1, 1]
+                    case 10...13:
+                        genaratedHistory += [1, 1, 1]
+                    default:
+                        print("This seems strange?")
+                    }
+                } else {
+                    assert(false)
+                }
+            }
+            print(genaratedHistory)
+            
             dispatch_async(dispatch_get_main_queue()) {
-                let alert = UIAlertController(title: "Scan Result", message: "\(binaryHistory)", preferredStyle: UIAlertControllerStyle.Alert)
+                let alert = UIAlertController(title: "Scan Result", message: "\(genaratedHistory)", preferredStyle: UIAlertControllerStyle.Alert)
                 let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
                 alert.addAction(action)
                 self.presentViewController(alert, animated: true, completion: {})

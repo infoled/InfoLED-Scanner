@@ -15,6 +15,8 @@
 		8C3747631C99921100EDDF23 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */; };
 		8C37476E1C99921200EDDF23 /* InfoLED_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */; };
 		8C3747791C99921200EDDF23 /* InfoLED_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */; };
+		8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */; };
+		8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BE11CED5A2D00C2C280 /* Queue.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		8C3747741C99921200EDDF23 /* InfoLED ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "InfoLED ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLED_ScannerUITests.swift; sourceTree = "<group>"; };
 		8C37477A1C99921200EDDF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
+		8CBB8BE11CED5A2D00C2C280 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +105,13 @@
 			children = (
 				8C3747551C99921100EDDF23 /* AppDelegate.swift */,
 				8C3747571C99921100EDDF23 /* ViewController.swift */,
+				8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */,
 				8C3747591C99921100EDDF23 /* Main.storyboard */,
 				8C37475F1C99921100EDDF23 /* Assets.xcassets */,
 				8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */,
 				8C3747641C99921100EDDF23 /* Info.plist */,
 				8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */,
+				8CBB8BE11CED5A2D00C2C280 /* Queue.swift */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -262,6 +268,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */,
+				8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */,
 				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
 				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,

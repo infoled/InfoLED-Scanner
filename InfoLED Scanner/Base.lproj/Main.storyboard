@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -41,11 +42,19 @@
                                     <constraint firstAttribute="width" constant="500" id="f0V-ag-W5m"/>
                                 </constraints>
                             </progressView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UDb-mP-1sA">
+                                <rect key="frame" x="20" y="0.0" width="42" height="21"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="0ZO-Uq-kD4"/>
                             <constraint firstItem="14B-jm-ksX" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="CuU-rM-Vqu"/>
+                            <constraint firstItem="UDb-mP-1sA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="Kr8-zB-mmx"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="14B-jm-ksX" secondAttribute="bottom" id="RFM-iR-fma"/>
                             <constraint firstAttribute="trailing" secondItem="14B-jm-ksX" secondAttribute="trailing" id="TOc-Fs-qjF"/>
                             <constraint firstItem="Tbr-EC-vRm" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Yod-cf-h25"/>
@@ -54,9 +63,11 @@
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="kvJ-8w-qf1" secondAttribute="bottom" constant="20" id="p0R-EP-nsY"/>
                             <constraint firstItem="kvJ-8w-qf1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="tUr-2h-K8U"/>
                             <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="whq-JO-oy9"/>
+                            <constraint firstItem="UDb-mP-1sA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="xfV-Zv-FkI"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="fpsLabel" destination="UDb-mP-1sA" id="Fy9-FS-WmP"/>
                         <outlet property="poiProgressWidth" destination="f0V-ag-W5m" id="9zD-8M-PWH"/>
                         <outlet property="poiSquareHeight" destination="FoG-2e-rhi" id="BSE-qr-4X7"/>
                         <outlet property="poiSquareWidth" destination="uxp-ao-39A" id="Lon-WL-wJY"/>
@@ -67,7 +78,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="146" y="144"/>
+            <point key="canvasLocation" x="149" y="171"/>
         </scene>
     </scenes>
     <resources>
