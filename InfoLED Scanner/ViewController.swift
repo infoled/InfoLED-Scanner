@@ -14,7 +14,7 @@ let PoiHeight = CGFloat(50)
 
 extension CIImage {
     convenience init(buffer: CMSampleBuffer) {
-        self.init(CVPixelBuffer: CMSampleBufferGetImageBuffer(buffer)!)
+        self.init(cvPixelBuffer: CMSampleBufferGetImageBuffer(buffer)!)
     }
 }
 
@@ -26,15 +26,15 @@ extension CVPixelBuffer {
         var pixelBufferCopyOptional:CVPixelBuffer?
         CVPixelBufferCreate(nil, width, height, format, nil, &pixelBufferCopyOptional)
         if let pixelBufferCopy = pixelBufferCopyOptional {
-            CVPixelBufferLockBaseAddress(self, kCVPixelBufferLock_ReadOnly)
-            CVPixelBufferLockBaseAddress(pixelBufferCopy, 0)
+            CVPixelBufferLockBaseAddress(self, CVPixelBufferLockFlags.readOnly)
+            CVPixelBufferLockBaseAddress(pixelBufferCopy, CVPixelBufferLockFlags(rawValue: 0))
             let baseAddress = CVPixelBufferGetBaseAddress(self)
             let dataSize = CVPixelBufferGetDataSize(self)
             let target = CVPixelBufferGetBaseAddress(pixelBufferCopy)
             memcpy(target, baseAddress, dataSize)
             print(dataSize)
-            CVPixelBufferUnlockBaseAddress(pixelBufferCopy, 0)
-            CVPixelBufferUnlockBaseAddress(self, kCVPixelBufferLock_ReadOnly)
+            CVPixelBufferUnlockBaseAddress(pixelBufferCopy, CVPixelBufferLockFlags(rawValue: 0))
+            CVPixelBufferUnlockBaseAddress(self, CVPixelBufferLockFlags.readOnly)
         }
         return pixelBufferCopyOptional!
     }
@@ -65,7 +65,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     let captureSession = AVCaptureSession()
     var cameraDevice:AVCaptureDevice?;
     let ciContext = CIContext();
-    lazy var imageProcessingQueue = dispatch_queue_create("me.jackieyang.processing-queue", DISPATCH_QUEUE_SERIAL);
+    lazy var imageProcessingQueue : DispatchQueue = DispatchQueue(label: "me.jackieyang.processing-queue");
     let fpsCounter = FpsCounter();
 
     override func viewDidLoad() {
@@ -80,7 +80,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         // Adjust video settings
         captureSession.sessionPreset = AVCaptureSessionPresetInputPriority
-        cameraDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)!;
+        cameraDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)!;
         do {
             let cameraDeviceInput = try AVCaptureDeviceInput.init(device: cameraDevice);
             if (captureSession.canAddInput(cameraDeviceInput)) {
@@ -91,10 +91,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
 
         let dataOutput = AVCaptureVideoDataOutput()
-        dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey: Int(kCVPixelFormatType_32BGRA)]
+        dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as AnyHashable: Int(kCVPixelFormatType_32BGRA)]
         dataOutput.alwaysDiscardsLateVideoFrames = false
 
-        dataOutput.setSampleBufferDelegate(self, queue: dispatch_queue_create("videoProcessingQueue", DISPATCH_QUEUE_SERIAL))
+        dataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoProcessingQueue", attributes: []))
 
         if captureSession.canAddOutput(dataOutput) {
             captureSession.addOutput(dataOutput)
@@ -135,7 +135,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         captureSession.startRunning()
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         previewLayer?.frame = videoPreviewView.frame
         print(videoPreviewView.frame)
     }
@@ -143,13 +143,13 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func unlockCameraSettings() {
         do {
             try cameraDevice!.lockForConfiguration()
-            let center = CGPointMake(0.5, 0.5)
+            let center = CGPoint(x: 0.5, y: 0.5)
             cameraDevice!.focusPointOfInterest = center
-            cameraDevice!.focusMode = AVCaptureFocusMode.ContinuousAutoFocus
+            cameraDevice!.focusMode = AVCaptureFocusMode.continuousAutoFocus
             cameraDevice!.exposurePointOfInterest = center
-            cameraDevice!.exposureMode = AVCaptureExposureMode.ContinuousAutoExposure
-            cameraDevice!.flashMode = AVCaptureFlashMode.Off
-            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.ContinuousAutoWhiteBalance
+            cameraDevice!.exposureMode = AVCaptureExposureMode.continuousAutoExposure
+            cameraDevice!.flashMode = AVCaptureFlashMode.off
+            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.continuousAutoWhiteBalance
             cameraDevice!.unlockForConfiguration()
         } catch _ {
             print("Cannot unlock camera settings!")
@@ -159,10 +159,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func lockCameraSettings() {
         do {
             try cameraDevice!.lockForConfiguration()
-            cameraDevice!.focusMode = AVCaptureFocusMode.Locked
-            cameraDevice!.exposureMode = AVCaptureExposureMode.Locked
-            cameraDevice!.flashMode = AVCaptureFlashMode.Off
-            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.Locked
+            cameraDevice!.focusMode = AVCaptureFocusMode.locked
+            cameraDevice!.exposureMode = AVCaptureExposureMode.locked
+            cameraDevice!.flashMode = AVCaptureFlashMode.off
+            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.locked
 //            cameraDevice!.setFocusModeLockedWithLensPosition(0.0, completionHandler: nil)
             cameraDevice!.unlockForConfiguration()
         } catch _ {
@@ -179,31 +179,31 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     var scanning = false
     var history = [(Int, Int, Int)]()
 
-    @IBAction func startScanning(sender: AnyObject) {
-        scanButton.enabled = false
+    @IBAction func startScanning(_ sender: AnyObject) {
+        scanButton.isEnabled = false
         lockCameraSettings()
         cycleCount = 0
         processCount = 0
         history = []
         print("=====START SCANNING=====")
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(100) * Int64(NSEC_PER_MSEC)), dispatch_get_main_queue(), {
-            dispatch_suspend(self.imageProcessingQueue)
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(100) * Int64(NSEC_PER_MSEC)) / Double(NSEC_PER_SEC), execute: {
+            self.imageProcessingQueue.suspend()
             self.scanning = true
         })
     }
 
-    func endScanning(dataOutput: AVCaptureOutput) {
+    func endScanning(_ dataOutput: AVCaptureOutput) {
         print("===== END SCANNING =====")
         scanning = false;
         unlockCameraSettings()
-        scanButton.enabled = true
+        scanButton.isEnabled = true
         scanningProgress.progress = 0.0
-        dispatch_resume(self.imageProcessingQueue)
+        self.imageProcessingQueue.resume()
     }
 
-    func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
+    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
         self.fpsCounter.call()
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             self.fpsLabel.text = "\(self.fpsCounter.getFps())";
             if self.scanning {
                 self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
@@ -211,7 +211,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
         if self.scanning {
             let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-            CVPixelBufferLockBaseAddress(localBuffer, kCVPixelBufferLock_ReadOnly)
+            CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
             let imageWidth  = CVPixelBufferGetWidth(localBuffer)
             let imageHeight = CVPixelBufferGetHeight(localBuffer)
             let poiHeight = Int(PoiHeight)
@@ -230,7 +230,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             var red = 0, green = 0, blue = 0;
 
             let rgba = UnsafeBufferPointer<UInt8>(
-                start: UnsafePointer<UInt8>(baseAddr),
+                start: baseAddr?.assumingMemoryBound(to: UInt8.self),
                 count: byteCount)
 
             for i in startx...endx{
@@ -242,10 +242,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 }
             }
 
-            CVPixelBufferUnlockBaseAddress(localBuffer, kCVPixelBufferLock_ReadOnly)
+            CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
 
             NSLog("\(red)\t\(green)\t\(blue)")
-            dispatch_async(imageProcessingQueue) {
+            imageProcessingQueue.async {
                 self.history += [(red, green, blue)]
                 self.processCount += 1
                 if self.processCount == ViewController.cycleLimit {
@@ -254,14 +254,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
             self.cycleCount += 1;
             if self.cycleCount == ViewController.cycleLimit {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self.endScanning(captureOutput)
                 }
             }
         }
     }
 
-    func processHistory(history: [(Int, Int, Int)]) {
+    func processHistory(_ history: [(Int, Int, Int)]) {
 
         print("history: \(history)")
 
@@ -372,7 +372,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
 
             let filteredHistorys = preambleRanges.map({ (start, end) in
-                return genaratedHistory[start ... end].enumerate().filter({ (index, element) -> Bool in
+                return genaratedHistory[start ... end].enumerated().filter({ (index, element) -> Bool in
                     return index % 2 == 0
                 }).map({ (_, element) in
                     element
@@ -390,7 +390,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
 
 
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 var notification: String?;
                 if filteredHistory?.count == 8 {
                     let statuscode = filteredHistory![filteredHistory!.startIndex...(filteredHistory!.startIndex + 1)];
@@ -413,10 +413,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 } else {
                     notification = "The device might not be supported, please retry."
                 }
-                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
-                let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.alert)
+                let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil)
                 alert.addAction(action)
-                self.presentViewController(alert, animated: true, completion: {})
+                self.present(alert, animated: true, completion: {})
             }
         } else {
             print("History is too short or window size is too long!")
