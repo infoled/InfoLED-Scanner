@@ -9,8 +9,8 @@
 import UIKit
 import AVFoundation
 
-let PoiWidth = CGFloat(30)
-let PoiHeight = CGFloat(30)
+let PoiWidth = CGFloat(50)
+let PoiHeight = CGFloat(50)
 
 extension CIImage {
     convenience init(buffer: CMSampleBuffer) {
@@ -263,15 +263,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func processHistory(history: [(Int, Int, Int)]) {
 
-        func stdDev(array: [Int]) -> Double {
-            let length = array.count
-            var average = array.reduce(0, combine: +)
-            average /= length
-            let sumOfSquareDiff = array.map {
-                pow(Double($0 - average), 2.0)
-                }.reduce(0, combine: +)
-            return sumOfSquareDiff / Double(length)
-        }
+        print("history: \(history)")
 
         if (history.count > 2 * windowSampleSize) {
             // Use adaptive threshold to process history captured
@@ -289,6 +281,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             let adaptiveGrayHistory = adaptiveHistory.map({ (r,g,b) in
                 return r + g + b;
             })
+            print("adaptiveGrayHistory: \(adaptiveGrayHistory)")
 
             print(adaptiveGrayHistory)
 
@@ -322,29 +315,29 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
             levelDuration += [(lastLevel, duration)]
 
-            print(levelDuration)
+            print("levelDuration: \(levelDuration)")
 
             //Convert level Duration to actual history
             var genaratedHistory = [Int]()
             for (level, duration) in levelDuration {
                 if level == -1 {
                     switch duration {
-                    case 1...4:
+                    case 1...2:
                         genaratedHistory += [0]
-                    case 5...8:
+                    case 3...4:
                         genaratedHistory += [0, 0]
-                    case 9...12:
+                    case 5...6:
                         genaratedHistory += [0, 0, 0]
                     default:
                         print("This seems strange?")
                     }
                 } else if level == 1 {
                     switch duration {
-                    case 1...5:
+                    case 1...3:
                         genaratedHistory += [1]
-                    case 6...9:
+                    case 3...5:
                         genaratedHistory += [1, 1]
-                    case 10...13:
+                    case 5...7:
                         genaratedHistory += [1, 1, 1]
                     default:
                         print("This seems strange?")
@@ -353,7 +346,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     assert(false)
                 }
             }
-            print(genaratedHistory)
+            print("genaratedHistory: \(genaratedHistory)")
 
             let preamble = [0, 0, 1, 1, 1, 0];
             let indices = Array(genaratedHistory.startIndex...genaratedHistory.endIndex - preamble.count)
@@ -367,21 +360,60 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 }
             }
 
-            var filteredHistory: [Int]?
-            if(preamblePos.count < 2) {
-                print("unsolvable")
-            } else {
-                filteredHistory = genaratedHistory[(preamblePos[0] + preamble.count) ... preamblePos[1] - 1].enumerate().filter({ (index, element) in
-                    return index % 2 == 0;
-                }).map({ (index, element) in
-                    return element
+            var preambleRanges = [(Int, Int)]();
+            if preamblePos.count > 1 {
+                for i in 1..<preamblePos.count {
+                    let start = preamblePos[i - 1] + preamble.count
+                    let end = preamblePos[i] - 1
+                    if start < end {
+                        preambleRanges += [(preamblePos[i - 1] + preamble.count, preamblePos[i] - 1)]
+                    }
+                }
+            }
+
+            let filteredHistorys = preambleRanges.map({ (start, end) in
+                return genaratedHistory[start ... end].enumerate().filter({ (index, element) -> Bool in
+                    return index % 2 == 0
+                }).map({ (_, element) in
+                    element
                 })
-                print(filteredHistory!)
+            })
+
+            print(filteredHistorys)
+
+            var filteredHistory: [Int]?
+            for history in filteredHistorys {
+                if history.count == 8 && history[history.startIndex...history.startIndex + 1] != [1, 1] {
+                    filteredHistory = history;
+                    break;
+                }
             }
 
 
             dispatch_async(dispatch_get_main_queue()) {
-                let alert = UIAlertController(title: "Scan Result", message: "\(filteredHistory)", preferredStyle: UIAlertControllerStyle.Alert)
+                var notification: String?;
+                if filteredHistory?.count == 8 {
+                    let statuscode = filteredHistory![filteredHistory!.startIndex...(filteredHistory!.startIndex + 1)];
+                    let speedArray = filteredHistory![(filteredHistory!.startIndex + 2)...(filteredHistory!.startIndex + 7)]
+                    let speed = (speedArray[speedArray.startIndex + 0] << 0)
+                        + (speedArray[speedArray.startIndex + 1] << 1)
+                        + (speedArray[speedArray.startIndex + 2] << 2)
+                        + (speedArray[speedArray.startIndex + 3] << 3)
+                        + (speedArray[speedArray.startIndex + 4] << 4)
+                        + (speedArray[speedArray.startIndex + 5] << 5)
+                    if statuscode == [0, 0] {
+                        notification = "Everything is fine :) Speed: \(speed)Mbps"
+                    } else if statuscode == [0, 1] {
+                        notification = "Network port is unplugged :("
+                    } else if statuscode == [1, 0] {
+                        notification = "No charge left in your account, please recharge."
+                    } else {
+                        notification = "The device might not be supported, please retry."
+                    }
+                } else {
+                    notification = "The device might not be supported, please retry."
+                }
+                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
                 let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
                 alert.addAction(action)
                 self.presentViewController(alert, animated: true, completion: {})
