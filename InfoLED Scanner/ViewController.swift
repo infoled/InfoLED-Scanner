@@ -8,6 +8,8 @@
 
 import UIKit
 import AVFoundation
+import Metal
+import MetalKit
 
 let PoiWidth = CGFloat(50)
 let PoiHeight = CGFloat(50)
@@ -24,7 +26,8 @@ extension CVPixelBuffer {
         let height = CVPixelBufferGetHeight(self)
         let format = CVPixelBufferGetPixelFormatType(self)
         var pixelBufferCopyOptional:CVPixelBuffer?
-        CVPixelBufferCreate(nil, width, height, format, nil, &pixelBufferCopyOptional)
+        let options = [(kCVPixelBufferMetalCompatibilityKey as AnyHashable): true]
+        CVPixelBufferCreate(kCFAllocatorDefault, width, height, format, options as NSDictionary, &pixelBufferCopyOptional)
         if let pixelBufferCopy = pixelBufferCopyOptional {
             CVPixelBufferLockBaseAddress(self, CVPixelBufferLockFlags.readOnly)
             CVPixelBufferLockBaseAddress(pixelBufferCopy, CVPixelBufferLockFlags(rawValue: 0))
@@ -32,7 +35,6 @@ extension CVPixelBuffer {
             let dataSize = CVPixelBufferGetDataSize(self)
             let target = CVPixelBufferGetBaseAddress(pixelBufferCopy)
             memcpy(target, baseAddress, dataSize)
-            print(dataSize)
             CVPixelBufferUnlockBaseAddress(pixelBufferCopy, CVPixelBufferLockFlags(rawValue: 0))
             CVPixelBufferUnlockBaseAddress(self, CVPixelBufferLockFlags.readOnly)
         }
@@ -54,6 +56,9 @@ func / (tuple: (Int, Int, Int), val: Int) -> (Int, Int, Int) {
 
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 
+    private let videoWidth = 1280
+    private let videoHeight = 720
+
     @IBOutlet weak var videoPreviewView: UIView!
     @IBOutlet weak var scanButton: UIButton!
     @IBOutlet weak var scanningProgress: UIProgressView!
@@ -61,12 +66,51 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var poiSquareWidth: NSLayoutConstraint!
     @IBOutlet weak var poiProgressWidth: NSLayoutConstraint!
     @IBOutlet weak var fpsLabel: UILabel!
+    @IBOutlet weak var metalPreviewLayer: MTKView!
+    @IBOutlet weak var metalPreviewLayerHeight: NSLayoutConstraint!
+    @IBOutlet weak var metalPreviewLayerWidth: NSLayoutConstraint!
+
     var previewLayer:AVCaptureVideoPreviewLayer?;
     let captureSession = AVCaptureSession()
     var cameraDevice:AVCaptureDevice?;
     let ciContext = CIContext();
     lazy var imageProcessingQueue : DispatchQueue = DispatchQueue(label: "me.jackieyang.processing-queue");
     let fpsCounter = FpsCounter();
+
+    lazy var metalDevice : MTLDevice! = MTLCreateSystemDefaultDevice()
+
+    let computeQueue = DispatchQueue(label: "me.jackieyang.infoled.computeQueue")
+    let captureQueue = DispatchQueue(label: "me.jackieyang.infoled.captureQueue", qos: .userInitiated, attributes: .concurrent)
+    let renderQueue = DispatchQueue(label: "me.jackieyang.infoled.renderQueue")
+
+    fileprivate lazy var displayTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: self.videoWidth, height: self.videoHeight, mipmapped: false)
+        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)
+        return newTexture
+    }()
+
+    fileprivate lazy var captureCommandQueue : MTLCommandQueue! = {
+        NSLog("\(self.metalDevice.name!)")
+        return self.metalDevice.makeCommandQueue()
+    }()
+
+    fileprivate lazy var computeCommandQueue : MTLCommandQueue! = {
+        NSLog("\(self.metalDevice.name!)")
+        return self.metalDevice.makeCommandQueue()
+    }()
+
+    fileprivate lazy var renderCommandQueue : MTLCommandQueue! = {
+        NSLog("\(self.metalDevice.name!)")
+        return self.metalDevice.makeCommandQueue()
+    }()
+
+    fileprivate lazy var textureCache : CVMetalTextureCache! = {
+        var _textureCache : CVMetalTextureCache?
+        let error = CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, self.metalDevice, nil, &_textureCache)
+        assert(error == kCVReturnSuccess)
+        return _textureCache
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,7 +138,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as AnyHashable: Int(kCVPixelFormatType_32BGRA)]
         dataOutput.alwaysDiscardsLateVideoFrames = false
 
-        dataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoProcessingQueue", attributes: []))
+        dataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoProcessingQueue", qos: .userInitiated))
 
         if captureSession.canAddOutput(dataOutput) {
             captureSession.addOutput(dataOutput)
@@ -107,7 +151,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             for format in cameraDevice!.formats as! [AVCaptureDeviceFormat] {
                 let videoDimention = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
-                if videoDimention.width == 1280 && videoDimention.height == 720 {
+                if videoDimention.width == Int32(videoWidth) &&
+                    videoDimention.height == Int32(videoHeight) {
                     for range in format.videoSupportedFrameRateRanges as! [AVFrameRateRange] {
                         if CMTimeCompare(range.minFrameDuration, frameDuration) <= 0 {
                             cameraFormat = format;
@@ -128,9 +173,22 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             print("error in acquiring device!");
         }
 
-        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer?.videoGravity = AVLayerVideoGravityResize;
-        videoPreviewView.layer.addSublayer(previewLayer!)
+        metalPreviewLayer.delegate = self
+        metalPreviewLayer.device = self.metalDevice
+        metalPreviewLayer.colorPixelFormat = .bgra8Unorm
+
+        metalPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale
+        metalPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale
+
+        let viewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height
+
+        metalPreviewLayer.transform =
+            CGAffineTransform.init(rotationAngle: .pi / 2)
+            .scaledBy(x: viewScaleFactor, y: viewScaleFactor)
+
+//        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+//        previewLayer?.videoGravity = AVLayerVideoGravityResize;
+//        videoPreviewView.layer.addSublayer(previewLayer!)
 
         captureSession.startRunning()
     }
@@ -203,12 +261,68 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
         self.fpsCounter.call()
-        DispatchQueue.main.async {
-            self.fpsLabel.text = "\(self.fpsCounter.getFps())";
-            if self.scanning {
-                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
-            }
+
+        var samplebufferPtr = sampleBuffer
+
+//        withUnsafePointer(to: &samplebufferPtr) { (ptr) -> Void in
+//            print(ptr)
+//        }
+//        print("Start: " + String(CACurrentMediaTime()))
+
+        captureQueue.async {
+        let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!.deepcopy()
+        let imageWidth  = CVPixelBufferGetWidth(localBuffer)
+        let imageHeight = CVPixelBufferGetHeight(localBuffer)
+        var cvImageTexture: CVMetalTexture?
+
+        CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                  self.textureCache,
+                                                  localBuffer,
+                                                  nil,
+                                                  MTLPixelFormat.bgra8Unorm,
+                                                  imageWidth,
+                                                  imageHeight,
+                                                  0,
+                                                  &cvImageTexture)
+
+        let imageTexture = CVMetalTextureGetTexture(cvImageTexture!)!
+
+//        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+//        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+
+        self.renderQueue.async {
+//            print("Complete: " + String(CACurrentMediaTime()))
+            self.displayTexture = imageTexture
         }
+        }
+//        captureQueue.async {
+//            print("Issue: " + String(CACurrentMediaTime()))
+//            let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()
+//            let blitEncoder = captureCommandBuffer.makeBlitCommandEncoder()
+//            let copySize =
+//                MTLSize(width: imageTexture.width,
+//                        height: imageTexture.height,
+//                        depth: imageTexture.depth)
+//            blitEncoder.copy(from: imageTexture,
+//                             sourceSlice: 0,
+//                             sourceLevel: 0,
+//                             sourceOrigin: MTLOrigin(),
+//                             sourceSize: copySize,
+//                             to: self.displayTexture,
+//                             destinationSlice: 0,
+//                             destinationLevel: 0,
+//                             destinationOrigin: MTLOrigin())
+//            blitEncoder.endEncoding()
+//            captureCommandBuffer.addCompletedHandler() { (_) in
+//                print("Complete: " + String(CACurrentMediaTime()))
+//                CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+//            }
+//            captureCommandBuffer.commit()
+////            self.renderQueue.async {
+////                self.displayTexture = imageTexture
+////            }
+//        }
+
         if self.scanning {
             let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
             CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
@@ -431,3 +545,42 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
 }
 
+extension ViewController : MTKViewDelegate {
+    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        NSLog("MTKView drawable size will change to \(size)")
+    }
+
+    func draw(in view: MTKView) {
+        DispatchQueue.main.async {
+//            self.fpsLabel.text = "\(self.fpsCounter.getFps())";
+//            if self.scanning {
+//                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
+//            }
+            print("\(self.fpsCounter.getFps())")
+        }
+        if let currentDrawable = metalPreviewLayer.currentDrawable {
+            renderQueue.sync {
+                let renderCommandBuffer = self.renderCommandQueue.makeCommandBuffer()
+                let blitEncoder = renderCommandBuffer.makeBlitCommandEncoder()
+                let copySize =
+                    MTLSize(width: min(displayTexture.width,
+                                       currentDrawable.texture.width),
+                            height: min(displayTexture.height,
+                                        currentDrawable.texture.height),
+                            depth: displayTexture.depth)
+                blitEncoder.copy(from: displayTexture,
+                                 sourceSlice: 0,
+                                 sourceLevel: 0,
+                                 sourceOrigin: MTLOrigin(),
+                                 sourceSize: copySize,
+                                 to: currentDrawable.texture,
+                                 destinationSlice: 0,
+                                 destinationLevel: 0,
+                                 destinationOrigin: MTLOrigin())
+                blitEncoder.endEncoding()
+                renderCommandBuffer.present(currentDrawable)
+                renderCommandBuffer.commit()
+            }
+        }
+    }
+}

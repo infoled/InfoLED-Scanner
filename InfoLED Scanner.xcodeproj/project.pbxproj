@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */; };
+		8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */; };
+		8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */; };
 		8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747551C99921100EDDF23 /* AppDelegate.swift */; };
 		8C3747581C99921100EDDF23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747571C99921100EDDF23 /* ViewController.swift */; };
 		8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747591C99921100EDDF23 /* Main.storyboard */; };
@@ -37,6 +40,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILSImageDiff.swift; sourceTree = "<group>"; };
+		8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
+		8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLDeviceExtension.swift; sourceTree = "<group>"; };
 		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3747571C99921100EDDF23 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -105,13 +111,16 @@
 			children = (
 				8C3747551C99921100EDDF23 /* AppDelegate.swift */,
 				8C3747571C99921100EDDF23 /* ViewController.swift */,
+				8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */,
 				8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */,
+				8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */,
 				8C3747591C99921100EDDF23 /* Main.storyboard */,
 				8C37475F1C99921100EDDF23 /* Assets.xcassets */,
 				8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */,
 				8C3747641C99921100EDDF23 /* Info.plist */,
 				8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */,
 				8CBB8BE11CED5A2D00C2C280 /* Queue.swift */,
+				8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -202,7 +211,7 @@
 				TargetAttributes = {
 					8C3747511C99921100EDDF23 = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = H4758Q57R4;
+						DevelopmentTeam = 38RXH56U3G;
 						LastSwiftMigration = 0830;
 					};
 					8C3747681C99921200EDDF23 = {
@@ -272,9 +281,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */,
+				8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */,
 				8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */,
 				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
+				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,
+				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
 				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -422,7 +434,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = H4758Q57R4;
+				DEVELOPMENT_TEAM = 38RXH56U3G;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -436,7 +448,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = H4758Q57R4;
+				DEVELOPMENT_TEAM = 38RXH56U3G;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
