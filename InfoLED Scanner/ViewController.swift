@@ -230,7 +230,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     var cycleCount = 0
     var processCount = 0
-    static let cycleLimit = 360
+    static let cycleLimit = 240
     static let windowFrameSize = 5
     static let samplesPerFrame = 240/60
     let windowSampleSize = windowFrameSize * samplesPerFrame
@@ -449,9 +449,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     switch duration {
                     case 1...3:
                         genaratedHistory += [1]
-                    case 3...5:
+                    case 4...5:
                         genaratedHistory += [1, 1]
-                    case 5...7:
+                    case 6...7:
                         genaratedHistory += [1, 1, 1]
                     default:
                         print("This seems strange?")
@@ -462,7 +462,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
             print("genaratedHistory: \(genaratedHistory)")
 
-            let preamble = [0, 0, 1, 1, 1, 0];
+            let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
             let indices = Array(genaratedHistory.startIndex...genaratedHistory.endIndex - preamble.count)
 
             let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
@@ -493,44 +493,17 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 })
             })
 
-            print(filteredHistorys)
+            print("filteredHistorys: \(filteredHistorys)")
 
-            var filteredHistory: [Int]?
-            for history in filteredHistorys {
-                if history.count == 8 && history[history.startIndex...history.startIndex + 1] != [1, 1] {
-                    filteredHistory = history;
-                    break;
+            for sequence in filteredHistorys {
+                DispatchQueue.main.async {
+                    var notification: String?;
+                    notification = "\(sequence)"
+                    let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.alert)
+                    let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil)
+                    alert.addAction(action)
+                    self.present(alert, animated: true, completion: {})
                 }
-            }
-
-
-            DispatchQueue.main.async {
-                var notification: String?;
-                if filteredHistory?.count == 8 {
-                    let statuscode = filteredHistory![filteredHistory!.startIndex...(filteredHistory!.startIndex + 1)];
-                    let speedArray = filteredHistory![(filteredHistory!.startIndex + 2)...(filteredHistory!.startIndex + 7)]
-                    let speed = (speedArray[speedArray.startIndex + 0] << 0)
-                        + (speedArray[speedArray.startIndex + 1] << 1)
-                        + (speedArray[speedArray.startIndex + 2] << 2)
-                        + (speedArray[speedArray.startIndex + 3] << 3)
-                        + (speedArray[speedArray.startIndex + 4] << 4)
-                        + (speedArray[speedArray.startIndex + 5] << 5)
-                    if statuscode == [0, 0] {
-                        notification = "Everything is fine :) Speed: \(speed)Mbps"
-                    } else if statuscode == [0, 1] {
-                        notification = "Network port is unplugged :("
-                    } else if statuscode == [1, 0] {
-                        notification = "No charge left in your account, please recharge."
-                    } else {
-                        notification = "The device might not be supported, please retry."
-                    }
-                } else {
-                    notification = "The device might not be supported, please retry."
-                }
-                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.alert)
-                let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil)
-                alert.addAction(action)
-                self.present(alert, animated: true, completion: {})
             }
         } else {
             print("History is too short or window size is too long!")
