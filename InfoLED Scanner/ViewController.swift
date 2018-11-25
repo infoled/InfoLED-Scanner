@@ -270,30 +270,30 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 //        print("Start: " + String(CACurrentMediaTime()))
 
         captureQueue.async {
-        let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!.deepcopy()
-        let imageWidth  = CVPixelBufferGetWidth(localBuffer)
-        let imageHeight = CVPixelBufferGetHeight(localBuffer)
-        var cvImageTexture: CVMetalTexture?
+            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!.deepcopy()
+            let imageWidth  = CVPixelBufferGetWidth(localBuffer)
+            let imageHeight = CVPixelBufferGetHeight(localBuffer)
+            var cvImageTexture: CVMetalTexture?
 
-        CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                  self.textureCache,
-                                                  localBuffer,
-                                                  nil,
-                                                  MTLPixelFormat.bgra8Unorm,
-                                                  imageWidth,
-                                                  imageHeight,
-                                                  0,
-                                                  &cvImageTexture)
+            CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                      self.textureCache,
+                                                      localBuffer,
+                                                      nil,
+                                                      MTLPixelFormat.bgra8Unorm,
+                                                      imageWidth,
+                                                      imageHeight,
+                                                      0,
+                                                      &cvImageTexture)
 
-        let imageTexture = CVMetalTextureGetTexture(cvImageTexture!)!
+            let imageTexture = CVMetalTextureGetTexture(cvImageTexture!)!
 
-//        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-//        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+    //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+    //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
 
-        self.renderQueue.async {
-//            print("Complete: " + String(CACurrentMediaTime()))
-            self.displayTexture = imageTexture
-        }
+            self.renderQueue.async {
+    //            print("Complete: " + String(CACurrentMediaTime()))
+                self.displayTexture = imageTexture
+            }
         }
 //        captureQueue.async {
 //            print("Issue: " + String(CACurrentMediaTime()))
@@ -525,10 +525,10 @@ extension ViewController : MTKViewDelegate {
 
     func draw(in view: MTKView) {
         DispatchQueue.main.async {
-//            self.fpsLabel.text = "\(self.fpsCounter.getFps())";
-//            if self.scanning {
-//                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
-//            }
+            self.fpsLabel.text = "\(self.fpsCounter.getFps())";
+            if self.scanning {
+                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
+            }
             print("\(self.fpsCounter.getFps())")
         }
         if let currentDrawable = metalPreviewLayer.currentDrawable {
