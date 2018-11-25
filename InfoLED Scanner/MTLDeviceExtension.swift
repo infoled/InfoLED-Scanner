@@ -23,7 +23,8 @@ extension MTLDevice {
 
         let textureLoader = MTKTextureLoader(device: self)
         do {
-            let textureOut = try textureLoader.newTexture(with: cgImage)
+            let textureOut = try
+                textureLoader.newTexture(cgImage: cgImage, options: nil)
             return textureOut
         }
         catch {
@@ -35,6 +36,6 @@ extension MTLDevice {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: texture.pixelFormat, width: texture.width, height: texture.height, mipmapped: false)
         textureDescriptor.usage = MTLTextureUsage.shaderWrite
         let newTexture = self.makeTexture(descriptor: textureDescriptor)
-        return newTexture
+        return newTexture!
     }
 }

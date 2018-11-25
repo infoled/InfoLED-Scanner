@@ -86,22 +86,22 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     fileprivate lazy var displayTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: self.videoWidth, height: self.videoHeight, mipmapped: false)
         textureDescriptor.usage = MTLTextureUsage.shaderWrite
-        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var captureCommandQueue : MTLCommandQueue! = {
-        NSLog("\(self.metalDevice.name!)")
+        NSLog("\(self.metalDevice.name)")
         return self.metalDevice.makeCommandQueue()
     }()
 
     fileprivate lazy var computeCommandQueue : MTLCommandQueue! = {
-        NSLog("\(self.metalDevice.name!)")
+        NSLog("\(self.metalDevice.name)")
         return self.metalDevice.makeCommandQueue()
     }()
 
     fileprivate lazy var renderCommandQueue : MTLCommandQueue! = {
-        NSLog("\(self.metalDevice.name!)")
+        NSLog("\(self.metalDevice.name)")
         return self.metalDevice.makeCommandQueue()
     }()
 
@@ -123,10 +123,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         // Create processing queue
 
         // Adjust video settings
-        captureSession.sessionPreset = AVCaptureSessionPresetInputPriority
-        cameraDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)!;
+        captureSession.sessionPreset = AVCaptureSession.Preset(rawValue: convertFromAVCaptureSessionPreset(AVCaptureSession.Preset.inputPriority))
+        cameraDevice = AVCaptureDevice.default(for: AVMediaType(rawValue: convertFromAVMediaType(AVMediaType.video)))!;
         do {
-            let cameraDeviceInput = try AVCaptureDeviceInput.init(device: cameraDevice);
+            let cameraDeviceInput = try AVCaptureDeviceInput.init(device: cameraDevice!);
             if (captureSession.canAddInput(cameraDeviceInput)) {
                 captureSession.addInput(cameraDeviceInput);
             }
@@ -135,7 +135,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
 
         let dataOutput = AVCaptureVideoDataOutput()
-        dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as AnyHashable: Int(kCVPixelFormatType_32BGRA)]
+        dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA] as [String : Any]
         dataOutput.alwaysDiscardsLateVideoFrames = false
 
         dataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoProcessingQueue", qos: .userInitiated))
@@ -146,14 +146,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         do {
             try cameraDevice!.lockForConfiguration()
-            let frameDuration = CMTimeMake(1, 240);
-            var cameraFormat: AVCaptureDeviceFormat?;
+            let frameDuration = CMTimeMake(value: 1, timescale: 240);
+            var cameraFormat: AVCaptureDevice.Format?;
 
-            for format in cameraDevice!.formats as! [AVCaptureDeviceFormat] {
+            for format in cameraDevice!.formats {
                 let videoDimention = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
                 if videoDimention.width == Int32(videoWidth) &&
                     videoDimention.height == Int32(videoHeight) {
-                    for range in format.videoSupportedFrameRateRanges as! [AVFrameRateRange] {
+                    for range in format.videoSupportedFrameRateRanges {
                         if CMTimeCompare(range.minFrameDuration, frameDuration) <= 0 {
                             cameraFormat = format;
                             break;
@@ -161,7 +161,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     }
                 }
             }
-            cameraDevice!.activeFormat = cameraFormat
+            cameraDevice!.activeFormat = cameraFormat!
             cameraDevice!.activeVideoMaxFrameDuration = frameDuration
             cameraDevice!.activeVideoMinFrameDuration = frameDuration
 
@@ -203,11 +203,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             try cameraDevice!.lockForConfiguration()
             let center = CGPoint(x: 0.5, y: 0.5)
             cameraDevice!.focusPointOfInterest = center
-            cameraDevice!.focusMode = AVCaptureFocusMode.continuousAutoFocus
+            cameraDevice!.focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
             cameraDevice!.exposurePointOfInterest = center
-            cameraDevice!.exposureMode = AVCaptureExposureMode.continuousAutoExposure
-            cameraDevice!.flashMode = AVCaptureFlashMode.off
-            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.continuousAutoWhiteBalance
+            cameraDevice!.exposureMode = AVCaptureDevice.ExposureMode.continuousAutoExposure
+            cameraDevice!.whiteBalanceMode = AVCaptureDevice.WhiteBalanceMode.continuousAutoWhiteBalance
             cameraDevice!.unlockForConfiguration()
         } catch _ {
             print("Cannot unlock camera settings!")
@@ -217,10 +216,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func lockCameraSettings() {
         do {
             try cameraDevice!.lockForConfiguration()
-            cameraDevice!.focusMode = AVCaptureFocusMode.locked
-            cameraDevice!.exposureMode = AVCaptureExposureMode.locked
-            cameraDevice!.flashMode = AVCaptureFlashMode.off
-            cameraDevice!.whiteBalanceMode = AVCaptureWhiteBalanceMode.locked
+            cameraDevice!.focusMode = AVCaptureDevice.FocusMode.locked
+            cameraDevice!.exposureMode = AVCaptureDevice.ExposureMode.locked
+            cameraDevice!.whiteBalanceMode = AVCaptureDevice.WhiteBalanceMode.locked
 //            cameraDevice!.setFocusModeLockedWithLensPosition(0.0, completionHandler: nil)
             cameraDevice!.unlockForConfiguration()
         } catch _ {
@@ -259,7 +257,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         self.imageProcessingQueue.resume()
     }
 
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         self.fpsCounter.call()
 
         var samplebufferPtr = sampleBuffer
@@ -499,8 +497,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 DispatchQueue.main.async {
                     var notification: String?;
                     notification = "\(sequence)"
-                    let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertControllerStyle.alert)
-                    let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil)
+                    let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
+                    let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
                     alert.addAction(action)
                     self.present(alert, animated: true, completion: {})
                 }
@@ -533,8 +531,8 @@ extension ViewController : MTKViewDelegate {
         }
         if let currentDrawable = metalPreviewLayer.currentDrawable {
             renderQueue.sync {
-                let renderCommandBuffer = self.renderCommandQueue.makeCommandBuffer()
-                let blitEncoder = renderCommandBuffer.makeBlitCommandEncoder()
+                let renderCommandBuffer = self.renderCommandQueue.makeCommandBuffer()!
+                let blitEncoder = renderCommandBuffer.makeBlitCommandEncoder()!
                 let copySize =
                     MTLSize(width: min(displayTexture.width,
                                        currentDrawable.texture.width),
@@ -556,4 +554,14 @@ extension ViewController : MTKViewDelegate {
             }
         }
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromAVCaptureSessionPreset(_ input: AVCaptureSession.Preset) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromAVMediaType(_ input: AVMediaType) -> String {
+	return input.rawValue
 }

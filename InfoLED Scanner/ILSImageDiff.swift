@@ -46,14 +46,14 @@ class IFLImageDiff : MPSKernel {
                 throw IFLImageDiffError.TextureTypeNotValid
             }
         }
-        let defaultLibrary = self.device.newDefaultLibrary()!
+        let defaultLibrary = self.device.makeDefaultLibrary()!
         let kernelFunction = defaultLibrary.makeFunction(name: "image_diff_2d")!
         let pipelineState = try! device.makeComputePipelineState(function: kernelFunction)
-        let commandEncoder = commandBuffer.makeComputeCommandEncoder()
+        let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(pipelineState)
-        commandEncoder.setTexture(sourceTextureLhs, at: 0)
-        commandEncoder.setTexture(sourceTextureRhs, at: 1)
-        commandEncoder.setTexture(destinationTexture, at: 2)
+        commandEncoder.setTexture(sourceTextureLhs, index: 0)
+        commandEncoder.setTexture(sourceTextureRhs, index: 1)
+        commandEncoder.setTexture(destinationTexture, index: 2)
 
         let threadGroupCount = MTLSizeMake(16, 16, 1)
 
