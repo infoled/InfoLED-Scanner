@@ -233,17 +233,17 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     static let samplesPerFrame = 240/60
     let windowSampleSize = windowFrameSize * samplesPerFrame
     var scanning = false
-    var history = [(Int, Int, Int)]()
+    var historyProcessor : HistoryProcessor?
 
     @IBAction func startScanning(_ sender: AnyObject) {
         scanButton.isEnabled = false
         lockCameraSettings()
         cycleCount = 0
         processCount = 0
-        history = []
+        historyProcessor = HistoryProcessor(windowSampleSize: windowSampleSize)
         print("=====START SCANNING=====")
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(100) * Int64(NSEC_PER_MSEC)) / Double(NSEC_PER_SEC), execute: {
-            self.imageProcessingQueue.suspend()
+//            self.imageProcessingQueue.suspend()
             self.scanning = true
         })
     }
@@ -254,7 +254,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         unlockCameraSettings()
         scanButton.isEnabled = true
         scanningProgress.progress = 0.0
-        self.imageProcessingQueue.resume()
+//        self.imageProcessingQueue.resume()
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
@@ -358,153 +358,24 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             NSLog("\(red)\t\(green)\t\(blue)")
             imageProcessingQueue.async {
-                self.history += [(red, green, blue)]
-                self.processCount += 1
-                if self.processCount == ViewController.cycleLimit {
-                    self.processHistory(self.history)
+                if (self.historyProcessor!.processNewPixel(pixel: (red, green, blue)) || self.processCount == 2000) {
+                    DispatchQueue.main.async {
+                        var notification: String?;
+                        if (self.historyProcessor?.decodedPackets.count != 0) {
+                            notification = "\(self.historyProcessor!.decodedPackets[0])"
+                        } else {
+                            notification = "tag not found"
+                        }
+                        let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
+                        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+                        alert.addAction(action)
+                        self.present(alert, animated: true, completion: {})
+                        self.endScanning(captureOutput)
+                    }
                 }
+                self.processCount += 1
             }
             self.cycleCount += 1;
-            if self.cycleCount == ViewController.cycleLimit {
-                DispatchQueue.main.async {
-                    self.endScanning(captureOutput)
-                }
-            }
-        }
-    }
-
-    func processHistory(_ history: [(Int, Int, Int)]) {
-
-        print("history: \(history)")
-
-        if (history.count > 2 * windowSampleSize) {
-            // Use adaptive threshold to process history captured
-            var adaptiveHistory = [(Int, Int, Int)]()
-            for i in windowSampleSize ... (history.count - windowSampleSize - 1) {
-                var average = (0, 0, 0)
-                for entry in history[(i - windowSampleSize)...(i + windowSampleSize)] {
-                    average = average + entry
-                }
-                average = average / (2 * windowSampleSize + 1)
-                adaptiveHistory += [history[i] - average]
-            }
-
-            // Map adaptiveHistory to adaptiveGrayHistory
-            let adaptiveGrayHistory = adaptiveHistory.map({ (r,g,b) in
-                return r + g + b;
-            })
-            print("adaptiveGrayHistory: \(adaptiveGrayHistory)")
-
-            print(adaptiveGrayHistory)
-
-            // Reduce adaptiveGrayHistory to signal level and duration
-            var lastLevel = 0;
-            var duration = 0;
-            var levelDuration = [(Int, Int)]()
-
-            for level in adaptiveGrayHistory {
-                switch (lastLevel, level) {
-                case (let x, let y) where x < 0 && y <= 0:
-                    duration = duration + 1
-                case (let x, let y) where x < 0 && y > 0:
-                    levelDuration += [(lastLevel, duration)]
-                    lastLevel = 1
-                    duration = 1
-                case (let x, let y) where x > 0 && y > 0:
-                    duration = duration + 1
-                case (let x, let y) where x > 0 && y <= 0:
-                    levelDuration += [(lastLevel, duration)]
-                    lastLevel = -1
-                    duration = 1
-                case (0, let y) where y > 0:
-                    lastLevel = 1
-                    duration = 1
-                case (0, let y) where y <= 0:
-                    lastLevel = -1
-                    duration = 1
-                default: break
-                }
-            }
-            levelDuration += [(lastLevel, duration)]
-
-            print("levelDuration: \(levelDuration)")
-
-            //Convert level Duration to actual history
-            var genaratedHistory = [Int]()
-            for (level, duration) in levelDuration {
-                if level == -1 {
-                    switch duration {
-                    case 1...2:
-                        genaratedHistory += [0]
-                    case 3...4:
-                        genaratedHistory += [0, 0]
-                    case 5...6:
-                        genaratedHistory += [0, 0, 0]
-                    default:
-                        print("This seems strange?")
-                    }
-                } else if level == 1 {
-                    switch duration {
-                    case 1...3:
-                        genaratedHistory += [1]
-                    case 4...5:
-                        genaratedHistory += [1, 1]
-                    case 6...7:
-                        genaratedHistory += [1, 1, 1]
-                    default:
-                        print("This seems strange?")
-                    }
-                } else {
-                    assert(false)
-                }
-            }
-            print("genaratedHistory: \(genaratedHistory)")
-
-            let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
-            let indices = Array(genaratedHistory.startIndex...genaratedHistory.endIndex - preamble.count)
-
-            let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
-                let subarray = genaratedHistory[index ... (index + preamble.count - 1)]
-                if (subarray == ArraySlice<Int>(preamble)) {
-                    return result + [index];
-                } else {
-                    return result;
-                }
-            }
-
-            var preambleRanges = [(Int, Int)]();
-            if preamblePos.count > 1 {
-                for i in 1..<preamblePos.count {
-                    let start = preamblePos[i - 1] + preamble.count
-                    let end = preamblePos[i] - 1
-                    if start < end {
-                        preambleRanges += [(preamblePos[i - 1] + preamble.count, preamblePos[i] - 1)]
-                    }
-                }
-            }
-
-            let filteredHistorys = preambleRanges.map({ (start, end) in
-                return genaratedHistory[start ... end].enumerated().filter({ (index, element) -> Bool in
-                    return index % 2 == 0
-                }).map({ (_, element) in
-                    element
-                })
-            })
-
-            print("filteredHistorys: \(filteredHistorys)")
-
-            for sequence in filteredHistorys {
-                DispatchQueue.main.async {
-                    var notification: String?;
-                    notification = "\(sequence)"
-                    let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
-                    let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
-                    alert.addAction(action)
-                    self.present(alert, animated: true, completion: {})
-                }
-            }
-        } else {
-            print("History is too short or window size is too long!")
         }
     }
 

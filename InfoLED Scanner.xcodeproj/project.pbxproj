@@ -10,6 +10,7 @@
 		8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */; };
 		8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */; };
 		8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */; };
+		8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */; };
 		8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747551C99921100EDDF23 /* AppDelegate.swift */; };
 		8C3747581C99921100EDDF23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747571C99921100EDDF23 /* ViewController.swift */; };
 		8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747591C99921100EDDF23 /* Main.storyboard */; };
@@ -43,6 +44,7 @@
 		8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILSImageDiff.swift; sourceTree = "<group>"; };
 		8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
 		8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLDeviceExtension.swift; sourceTree = "<group>"; };
+		8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
 		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3747571C99921100EDDF23 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				8C37475C1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld */,
 				8CBB8BE11CED5A2D00C2C280 /* Queue.swift */,
 				8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */,
+				8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */,
 				8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */,
 				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
+				8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
 				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,
 				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
