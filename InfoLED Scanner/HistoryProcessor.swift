@@ -25,6 +25,7 @@ class HistoryProcessor {
     let offThreshold = 2.75
     let onThreshold = 3.6
     let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
+    let epilogue = [1, 0, 0, 1, 0, 0, 1, 1, 0, 1];
 
     init(windowSampleSize : Int) {
         self.windowSampleSize = windowSampleSize
@@ -100,25 +101,43 @@ class HistoryProcessor {
         if (frameLevels.count > 2 * preamble.count) {
             let indices = Array(frameLevels.startIndex...frameLevels.endIndex - preamble.count)
 
-            let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
-                let subarray = frameLevels[index ... (index + preamble.count - 1)]
-                if (subarray == ArraySlice<Int>(preamble)) {
-                    return result + [index];
-                } else {
-                    return result;
-                }
-            }
+//            let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
+//                let subarray = frameLevels[index ... (index + preamble.count - 1)]
+//                if (subarray == ArraySlice<Int>(preamble)) {
+//                    return result + [index];
+//                } else {
+//                    return result;
+//                }
+//            }
+//
+//            var preambleRanges = [(Int, Int)]();
+//            if preamblePos.count > 1 {
+//                for i in 1..<preamblePos.count {
+//                    let start = preamblePos[i - 1] + preamble.count
+//                    let end = preamblePos[i] - 1
+//                    if start < end {
+//                        preambleRanges += [(preamblePos[i - 1] + preamble.count, preamblePos[i] - 1)]
+//                    }
+//                }
+//            }
 
-            var preambleRanges = [(Int, Int)]();
-            if preamblePos.count > 1 {
-                for i in 1..<preamblePos.count {
-                    let start = preamblePos[i - 1] + preamble.count
-                    let end = preamblePos[i] - 1
-                    if start < end {
-                        preambleRanges += [(preamblePos[i - 1] + preamble.count, preamblePos[i] - 1)]
+            var find_preamble = true;
+            var last_preamble = 0;
+            var result = [(Int, Int)]();
+            for index in 1..<indices.count {
+                let subarray = frameLevels[index ... (index + preamble.count - 1)]
+                if (find_preamble) {
+                    if (subarray == ArraySlice<Int>(preamble)) {
+                        last_preamble = index
+                        find_preamble = false
+                    }
+                } else {
+                    if (subarray == ArraySlice<Int>(preamble)) {
+                        result += [(last_preamble + preamble.count, index - 1)];
                     }
                 }
             }
+            let preambleRanges = result
 
             decodedPackets = preambleRanges.map({ (start, end) in
                 return frameLevels[start ... end].enumerated().filter({ (index, element) -> Bool in

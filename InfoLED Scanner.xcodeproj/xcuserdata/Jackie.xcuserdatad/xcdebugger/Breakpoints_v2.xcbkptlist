@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "InfoLED Scanner/HistoryProcessor.swift"
-            timestampString = "564828133.174306"
+            timestampString = "565230386.245997"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "133"
-            endingLineNumber = "133"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "decodeFrameLevels()"
             landmarkType = "7">
          </BreakpointContent>
