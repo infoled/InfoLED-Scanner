@@ -12,9 +12,9 @@ class HistoryProcessor {
         case LevelError
     }
 
-    var pixelHistory = [(Int, Int, Int)]()
-    var adaptivePixelHistory = [(Int, Int, Int)]()
-    var adaptiveGrayHistory = [Int]()
+    var pixelHistory = [((Int, Int, Int), Double?)]()
+    var adaptivePixelHistory = [((Int, Int, Int), Double?)]()
+    var adaptiveGrayHistory = [(Int, Double?)]()
     var levelDurationHistory = [(Int, Double)]()
     var frameLevels = [Int]();
     var decodedPackets = [[Int]]();
@@ -31,15 +31,17 @@ class HistoryProcessor {
         self.windowSampleSize = windowSampleSize
     }
 
-    func processNewPixel(pixel: (Int, Int, Int)) -> Bool {
-        pixelHistory += [pixel]
+    func processNewPixel(pixel: (Int, Int, Int), frameDuration: Double?) -> Bool {
+        pixelHistory += [(pixel, frameDuration)]
         if pixelHistory.count >= 2 * windowSampleSize + 1 {
             let centerIndex = pixelHistory.count - windowSampleSize - 1
             let windowRange = (centerIndex - windowSampleSize)...(centerIndex + windowSampleSize)
             let sum = pixelHistory[windowRange].reduce((0, 0, 0)
-                , +)
+                , {(sum: (Int, Int, Int), nextPixel: ((Int, Int, Int), Double?)) -> (Int, Int, Int) in
+                    return sum + nextPixel.0
+            })
             let average = sum / (windowSampleSize * 2 + 1)
-            let adaptivePixel = pixelHistory[centerIndex] - average;
+            let adaptivePixel = (pixelHistory[centerIndex].0 - average, pixelHistory[centerIndex].1);
             if (try! processNewAdativePixel(adaptivePixel:adaptivePixel)) {
                 return true
             }
@@ -47,10 +49,10 @@ class HistoryProcessor {
         return false
     }
 
-    func processNewAdativePixel(adaptivePixel: (Int, Int, Int)) throws -> Bool {
+    func processNewAdativePixel(adaptivePixel: ((Int, Int, Int), Double?)) throws -> Bool {
         adaptivePixelHistory.append(adaptivePixel)
-        let adaptiveGray = adaptivePixel.0 + adaptivePixel.1 + adaptivePixel.2
-        adaptiveGrayHistory.append(adaptiveGray)
+        let adaptiveGray = adaptivePixel.0.0 + adaptivePixel.0.1 + adaptivePixel.0.2
+        adaptiveGrayHistory.append((adaptiveGray, adaptivePixel.1))
         let newLevel = adaptiveGray;
         if (newLevel == 0 && currentLevel == 0) {
             throw HistoryProcessorError.LevelError
@@ -132,8 +134,11 @@ class HistoryProcessor {
                         find_preamble = false
                     }
                 } else {
-                    if (subarray == ArraySlice<Int>(preamble)) {
-                        result += [(last_preamble + preamble.count, index - 1)];
+                    if (subarray == ArraySlice<Int>(epilogue)) {
+                        let length = index - (last_preamble + preamble.count);
+                        if length == 32 {
+                            result += [(last_preamble + preamble.count, index)];
+                        }
                     }
                 }
             }

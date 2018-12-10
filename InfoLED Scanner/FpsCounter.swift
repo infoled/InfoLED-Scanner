@@ -7,14 +7,22 @@
 //
 
 import UIKit
+import os
 
 open class FpsCounter {
-    let callTimeQueue = Queue<TimeInterval>();
-    open func call () {
-        callTimeQueue.enqueue(Date().timeIntervalSince1970)
+    let callTimeQueue = Queue<Double>();
+    open func call (time: Double) -> Double? {
+//        os_log("FpsCounter: time %f", time)
+        let currentTime = time;
+        var frameDuration: Double? = nil;
+        if let lastTime = callTimeQueue.back() {
+            frameDuration = currentTime - lastTime;
+        }
+        callTimeQueue.enqueue(currentTime)
         if callTimeQueue.count() > 100 {
             _ = callTimeQueue.dequeue()
         }
+        return frameDuration
     }
 
     open func getFps() -> Double {

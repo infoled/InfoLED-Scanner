@@ -165,6 +165,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             cameraDevice!.activeVideoMaxFrameDuration = frameDuration
             cameraDevice!.activeVideoMinFrameDuration = frameDuration
 
+            cameraDevice!.setExposureTargetBias(-3.0, completionHandler: nil)
+
             unlockCameraSettings()
 
             print("Select format: " + cameraFormat!.description)
@@ -258,7 +260,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        self.fpsCounter.call()
+        let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+        let frameDuration = self.fpsCounter.call(time: presentationTime.seconds)
 
         var samplebufferPtr = sampleBuffer
 
@@ -358,7 +361,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             NSLog("\(red)\t\(green)\t\(blue)")
             imageProcessingQueue.async {
-                if (self.historyProcessor!.processNewPixel(pixel: (red, green, blue)) || self.processCount == 2000) {
+                if (self.historyProcessor!.processNewPixel(pixel: (red, green, blue), frameDuration: frameDuration) || self.processCount == 2000) {
                     DispatchQueue.main.async {
                         var notification: String?;
                         if (self.historyProcessor?.decodedPackets.count != 0) {
