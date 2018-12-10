@@ -6,10 +6,12 @@
 //  Copyright © 2016 yangjunrui. All rights reserved.
 //
 
+import os
 import UIKit
 import AVFoundation
 import Metal
 import MetalKit
+import MetalPerformanceShaders
 
 let PoiWidth = CGFloat(50)
 let PoiHeight = CGFloat(50)
@@ -58,6 +60,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     private let videoWidth = 1280
     private let videoHeight = 720
+    private let decimation = 0.25
 
     @IBOutlet weak var videoPreviewView: UIView!
     @IBOutlet weak var scanButton: UIButton!
@@ -83,8 +86,29 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     let captureQueue = DispatchQueue(label: "me.jackieyang.infoled.captureQueue", qos: .userInitiated, attributes: .concurrent)
     let renderQueue = DispatchQueue(label: "me.jackieyang.infoled.renderQueue")
 
+    fileprivate lazy var captureTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var oldCaptureTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var diffTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
     fileprivate lazy var displayTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: self.videoWidth, height: self.videoHeight, mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
         textureDescriptor.usage = MTLTextureUsage.shaderWrite
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
@@ -165,7 +189,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             cameraDevice!.activeVideoMaxFrameDuration = frameDuration
             cameraDevice!.activeVideoMinFrameDuration = frameDuration
 
-            cameraDevice!.setExposureTargetBias(-3.0, completionHandler: nil)
+            cameraDevice!.setExposureTargetBias(-5.0, completionHandler: nil)
 
             unlockCameraSettings()
 
@@ -179,10 +203,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         metalPreviewLayer.device = self.metalDevice
         metalPreviewLayer.colorPixelFormat = .bgra8Unorm
 
-        metalPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale
-        metalPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale
+        metalPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale * CGFloat(decimation)
+        metalPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale * CGFloat(decimation)
 
-        let viewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height
+        let viewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height / CGFloat(decimation)
 
         metalPreviewLayer.transform =
             CGAffineTransform.init(rotationAngle: .pi / 2)
@@ -260,7 +284,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+        let currentProcessCount = processCount
+        os_log("catpure id: %d", currentProcessCount)
+        let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let frameDuration = self.fpsCounter.call(time: presentationTime.seconds)
 
         var samplebufferPtr = sampleBuffer
@@ -271,6 +297,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 //        print("Start: " + String(CACurrentMediaTime()))
 
         captureQueue.async {
+            swap(&self.captureTexture, &self.oldCaptureTexture)
+
             let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!.deepcopy()
             let imageWidth  = CVPixelBufferGetWidth(localBuffer)
             let imageHeight = CVPixelBufferGetHeight(localBuffer)
@@ -290,11 +318,23 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
     //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+            let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()!
+            let resize = MPSImageLanczosScale(device: self.metalDevice)
+            var transform = MPSScaleTransform(scaleX: self.decimation, scaleY: self.decimation, translateX: 0, translateY: 0)
 
-            self.renderQueue.async {
-    //            print("Complete: " + String(CACurrentMediaTime()))
-                self.displayTexture = imageTexture
-            }
+            withUnsafePointer(to: &transform, { (transformPtr) in
+                resize.scaleTransform = transformPtr
+                resize.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
+            })
+
+            captureCommandBuffer.addCompletedHandler({ (MTLCommandBuffer) in
+                self.renderQueue.sync {
+                    os_log("render id: %d", currentProcessCount)
+                    //            print("Complete: " + String(CACurrentMediaTime()))
+                    self.displayTexture = self.captureTexture
+                }
+            })
+            captureCommandBuffer.commit()
         }
 //        captureQueue.async {
 //            print("Issue: " + String(CACurrentMediaTime()))
