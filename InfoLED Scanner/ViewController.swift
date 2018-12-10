@@ -102,7 +102,28 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     fileprivate lazy var diffTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
-        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var thresholdTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var erodeTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var dilateTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
@@ -138,10 +159,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     var resizeKernel: MPSImageLanczosScale!
     var diffKernel: ILSImageDiff!
+    var thresholdKernel: MPSImageThresholdBinary!
+    var erodeKernel: MPSImageAreaMin!
+    var dilateKernel: MPSImageAreaMax!
 
     func buildKernels() {
         resizeKernel = MPSImageLanczosScale(device: self.metalDevice)
         diffKernel = ILSImageDiff(device: self.metalDevice)
+        let colorTransform: [Float] = [1.0, 1.0, 1.0]
+        withUnsafePointer(to: colorTransform) { (colorTransformRef) in
+            thresholdKernel = MPSImageThresholdBinary(device: self.metalDevice, thresholdValue: 0.1, maximumValue: 1.0, linearGrayColorTransform: colorTransform)
+        }
+        erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 5, kernelHeight: 5)
+        dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
     }
 
     override func viewDidLoad() {
@@ -310,7 +340,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         captureQueue.async {
             swap(&self.captureTexture, &self.oldCaptureTexture)
 
-            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!.deepcopy()
+            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
             let imageWidth  = CVPixelBufferGetWidth(localBuffer)
             let imageHeight = CVPixelBufferGetHeight(localBuffer)
             var cvImageTexture: CVMetalTexture?
@@ -339,11 +369,17 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldCaptureTexture, sourceTextureRhs: self.captureTexture, destinationTexture: self.diffTexture)
 
+            self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
+
+            self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
+
+            self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
+
             captureCommandBuffer.addCompletedHandler({ (MTLCommandBuffer) in
                 self.renderQueue.sync {
                     os_log("render id: %d", currentProcessCount)
                     //            print("Complete: " + String(CACurrentMediaTime()))
-                    self.displayTexture = self.diffTexture
+                    self.displayTexture = self.dilateTexture
                 }
             })
             captureCommandBuffer.commit()
