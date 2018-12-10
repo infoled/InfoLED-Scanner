@@ -88,14 +88,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     fileprivate lazy var captureTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
-        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var oldCaptureTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
-        textureDescriptor.usage = MTLTextureUsage.shaderWrite
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
@@ -136,8 +136,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         return _textureCache
     }()
 
+    var resizeKernel: MPSImageLanczosScale!
+    var diffKernel: ILSImageDiff!
+
+    func buildKernels() {
+        resizeKernel = MPSImageLanczosScale(device: self.metalDevice)
+        diffKernel = ILSImageDiff(device: self.metalDevice)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // Build MPS kernels
+        buildKernels()
 
         // Adjust POI square size
         poiSquareWidth.constant = PoiWidth
@@ -319,19 +330,20 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
     //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
             let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()!
-            let resize = MPSImageLanczosScale(device: self.metalDevice)
             var transform = MPSScaleTransform(scaleX: self.decimation, scaleY: self.decimation, translateX: 0, translateY: 0)
 
             withUnsafePointer(to: &transform, { (transformPtr) in
-                resize.scaleTransform = transformPtr
-                resize.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
+                self.resizeKernel.scaleTransform = transformPtr
+                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
             })
+
+            try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldCaptureTexture, sourceTextureRhs: self.captureTexture, destinationTexture: self.diffTexture)
 
             captureCommandBuffer.addCompletedHandler({ (MTLCommandBuffer) in
                 self.renderQueue.sync {
                     os_log("render id: %d", currentProcessCount)
                     //            print("Complete: " + String(CACurrentMediaTime()))
-                    self.displayTexture = self.captureTexture
+                    self.displayTexture = self.diffTexture
                 }
             })
             captureCommandBuffer.commit()

@@ -10,7 +10,7 @@ import Foundation
 import MetalPerformanceShaders
 import MetalKit
 
-class IFLImageDiff : MPSKernel {
+class ILSImageDiff : MPSKernel {
 
     enum IFLImageDiffError : Error {
         case FailedToGetDefaultLibrary
@@ -19,11 +19,22 @@ class IFLImageDiff : MPSKernel {
         case TextureTypeNotValid
     }
 
-    public let multiplier : Float
+    let functionName = "image_diff_2d"
+    var pipelineState: MTLComputePipelineState!
 
-    init(device: MTLDevice, multiplier: Float) {
-        self.multiplier = multiplier
+    override init(device: MTLDevice) {
         super.init(device: device)
+        if let library = device.makeDefaultLibrary() {
+            if let computeFunction = library.makeFunction(name: functionName) {
+                do {
+                    try pipelineState = device.makeComputePipelineState(function: computeFunction)
+                } catch {
+                    print("Error occurred when compiling compute pipeline: \(error)")
+                }
+            } else {
+                print("Failed to retrieve kernel function \(functionName) from library")
+            }
+        }
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
@@ -41,14 +52,11 @@ class IFLImageDiff : MPSKernel {
             }
             if sourceTextureLhs.textureType != .type2D ||
                 sourceTextureRhs.textureType != .type2D ||
-                sourceTextureLhs.pixelFormat != .rgba8Unorm ||
-                sourceTextureRhs.pixelFormat != .rgba8Unorm {
+                sourceTextureLhs.pixelFormat != .bgra8Unorm ||
+                sourceTextureRhs.pixelFormat != .bgra8Unorm {
                 throw IFLImageDiffError.TextureTypeNotValid
             }
         }
-        let defaultLibrary = self.device.makeDefaultLibrary()!
-        let kernelFunction = defaultLibrary.makeFunction(name: "image_diff_2d")!
-        let pipelineState = try! device.makeComputePipelineState(function: kernelFunction)
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(pipelineState)
         commandEncoder.setTexture(sourceTextureLhs, index: 0)
@@ -64,5 +72,6 @@ class IFLImageDiff : MPSKernel {
         }()
 
         commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupCount)
+        commandEncoder.endEncoding()
     }
 }
