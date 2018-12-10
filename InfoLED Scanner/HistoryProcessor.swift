@@ -22,8 +22,8 @@ class HistoryProcessor {
     var currentLevelDuration : Double = 0
     var windowSampleSize : Int
 
-    let offThreshold = 2.75
-    let onThreshold = 3.6
+    let offThreshold = 2.75 / 240
+    let onThreshold = 3.6 / 240
     let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
     let epilogue = [1, 0, 0, 1, 0, 0, 1, 1, 0, 1];
 
@@ -58,16 +58,16 @@ class HistoryProcessor {
             throw HistoryProcessorError.LevelError
         }
         if (newLevel == 0 || newLevel * currentLevel < 0) { // End of a level duration
-            currentLevelDuration += Double(currentLevel) / Double(currentLevel - newLevel)
+            currentLevelDuration += adaptivePixel.1! * Double(currentLevel) / Double(currentLevel - newLevel)
             let levelDuration = (currentLevel, currentLevelDuration)
             if (try! processNewLevelDuration(levelDuration: levelDuration)) {
                 return true
             }
         }
         if (currentLevel == 0 || newLevel * currentLevel < 0) { // Start of a level duration
-            currentLevelDuration = Double(newLevel) / Double(newLevel - currentLevel)
+            currentLevelDuration = adaptivePixel.1! * Double(newLevel) / Double(newLevel - currentLevel)
         } else { // not a start, then
-            currentLevelDuration += 1
+            currentLevelDuration += adaptivePixel.1!
         }
         currentLevel = newLevel
         return false
