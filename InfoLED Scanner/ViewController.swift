@@ -61,6 +61,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     private let videoWidth = 1280
     private let videoHeight = 720
     private let decimation = 0.25
+    private let decimationCcl = 0.25
 
     @IBOutlet weak var videoPreviewView: UIView!
     @IBOutlet weak var scanButton: UIButton!
@@ -128,12 +129,21 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         return newTexture
     }()
 
+    fileprivate lazy var cclTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation * self.decimationCcl), height: Int(Double(self.videoHeight) * self.decimation * self.decimationCcl), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
     fileprivate lazy var displayTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
         textureDescriptor.usage = MTLTextureUsage.shaderWrite
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
+
+    lazy var processedImage = [UInt8](repeating: 0, count: Int(Double(self.videoWidth * self.videoHeight * 4) * self.decimation * self.decimation * self.decimationCcl * self.decimationCcl))
 
     fileprivate lazy var captureCommandQueue : MTLCommandQueue! = {
         NSLog("\(self.metalDevice.name)")
@@ -162,6 +172,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     var thresholdKernel: MPSImageThresholdBinary!
     var erodeKernel: MPSImageAreaMin!
     var dilateKernel: MPSImageAreaMax!
+    var resize2Kernel: MPSImageLanczosScale!
 
     func buildKernels() {
         resizeKernel = MPSImageLanczosScale(device: self.metalDevice)
@@ -172,6 +183,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
         erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 5, kernelHeight: 5)
         dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
+        resize2Kernel = MPSImageLanczosScale(device: self.metalDevice)
     }
 
     override func viewDidLoad() {
@@ -375,8 +387,32 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
 
+            var transform2 = MPSScaleTransform(scaleX: self.decimationCcl, scaleY: self.decimationCcl, translateX: 0, translateY: 0)
+            withUnsafePointer(to: &transform2, { (transformPtr) in
+                self.resize2Kernel.scaleTransform = transformPtr
+                self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
+            })
+
             captureCommandBuffer.addCompletedHandler({ (MTLCommandBuffer) in
-                self.renderQueue.sync {
+                let bytesPerRow = self.cclTexture.width * 4
+                let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
+                                       size: MTLSize(width: self.cclTexture.width,
+                                                     height: self.cclTexture.height,
+                                                     depth: self.cclTexture.depth))
+                self.cclTexture.getBytes(&self.processedImage,
+                                            bytesPerRow: bytesPerRow,
+                                            from: region,
+                                            mipmapLevel: 0)
+                let labelImage = CcImage(array: &self.processedImage,
+                                         width: self.cclTexture.width,
+                                         height: self.cclTexture.height,
+                                         bytesPerPixel: 4);
+                let labelResult = CcLabel.labelImageFast(data: labelImage,
+                                                         calculateBoundingBoxes: true)
+
+                print(labelResult.boundingBoxes!)
+
+                self.renderQueue.async {
                     os_log("render id: %d", currentProcessCount)
                     //            print("Complete: " + String(CACurrentMediaTime()))
                     self.displayTexture = self.dilateTexture

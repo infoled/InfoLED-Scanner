@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C0152C621BE939200049838 /* CcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0152C521BE939200049838 /* CcLabel.swift */; };
 		8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */; };
 		8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */; };
 		8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8C0152C521BE939200049838 /* CcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CcLabel.swift; sourceTree = "<group>"; };
 		8C12E5F71EAAE5F6007AE85A /* ILSImageDiff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILSImageDiff.swift; sourceTree = "<group>"; };
 		8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
 		8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLDeviceExtension.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 				8CBB8BE11CED5A2D00C2C280 /* Queue.swift */,
 				8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */,
 				8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */,
+				8C0152C521BE939200049838 /* CcLabel.swift */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
 				8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
+				8C0152C621BE939200049838 /* CcLabel.swift in Sources */,
 				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,
 				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
 				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,
