@@ -523,8 +523,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 if (self.historyProcessor!.processNewPixel(pixel: (red, green, blue), frameDuration: frameDuration) || self.processCount == 2000) {
                     DispatchQueue.main.async {
                         var notification: String?;
-                        if (self.historyProcessor?.decodedPackets.count != 0) {
-                            notification = "\(self.historyProcessor!.decodedPackets[0])"
+                        if (self.historyProcessor?.verifiedPackets.count != 0) {
+                            notification = "\(self.historyProcessor!.verifiedPackets[0])"
                         } else {
                             notification = "tag not found"
                         }

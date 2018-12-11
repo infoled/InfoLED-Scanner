@@ -18,6 +18,7 @@ class HistoryProcessor {
     var levelDurationHistory = [(Int, Double)]()
     var frameLevels = [Int]();
     var decodedPackets = [[Int]]();
+    var verifiedPackets = [[Int]]();
     var currentLevel : Int = 0
     var currentLevelDuration : Double = 0
     var windowSampleSize : Int
@@ -25,7 +26,6 @@ class HistoryProcessor {
     let offThreshold = 2.75 / 240
     let onThreshold = 3.6 / 240
     let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
-    let epilogue = [1, 0, 0, 1, 0, 0, 1, 1, 0, 1];
 
     init(windowSampleSize : Int) {
         self.windowSampleSize = windowSampleSize
@@ -42,8 +42,12 @@ class HistoryProcessor {
             })
             let average = sum / (windowSampleSize * 2 + 1)
             let adaptivePixel = (pixelHistory[centerIndex].0 - average, pixelHistory[centerIndex].1);
-            if (try! processNewAdativePixel(adaptivePixel:adaptivePixel)) {
-                return true
+            if let result = try? processNewAdativePixel(adaptivePixel:adaptivePixel) {
+                if result == true {
+                    return true
+                }
+            } else {
+                print("wierd behavior, probably no tag");
             }
         }
         return false
@@ -123,40 +127,53 @@ class HistoryProcessor {
 //                }
 //            }
 
-            var find_preamble = true;
-            var last_preamble = 0;
             var result = [(Int, Int)]();
             for index in 1..<indices.count {
                 let subarray = frameLevels[index ... (index + preamble.count - 1)]
-                if (find_preamble) {
-                    if (subarray == ArraySlice<Int>(preamble)) {
-                        last_preamble = index
-                        find_preamble = false
-                    }
-                } else {
-                    if (subarray == ArraySlice<Int>(epilogue)) {
-                        let length = index - (last_preamble + preamble.count);
-                        if length == 32 {
-                            result += [(last_preamble + preamble.count, index)];
-                        }
+                if (subarray == ArraySlice<Int>(preamble)) {
+                    let packetBegin = index + preamble.count
+                    let packetEnd = packetBegin + (2 + 16) * 2
+                    if packetEnd <= frameLevels.count {
+                        result += [(packetBegin, packetEnd)]
+                    } else {
+                        break
                     }
                 }
             }
             let preambleRanges = result
 
             decodedPackets = preambleRanges.map({ (start, end) in
-                return frameLevels[start ... end].enumerated().filter({ (index, element) -> Bool in
+                return frameLevels[start ..< end].enumerated().filter({ (index, element) -> Bool in
                     return index % 2 == 0
                 }).map({ (_, element) in
                     element
                 })
             })
 
-            if decodedPackets.count != 0 {
+            verifiedPackets = [[Int]]()
+            for packet in decodedPackets {
+                if verifyPacket(packet: packet) {
+                    verifiedPackets += [packet]
+
+                }
+            }
+
+            if verifiedPackets.count != 0 {
 //                os_log("filteredHistorys: %@", filteredHistorys)
                 return true
             }
         }
         return false
+    }
+
+    func verifyPacket(packet: [Int]) -> Bool {
+        var hash = [0, 0]
+
+        for i in Swift.stride(from: 0, to: packet.count, by: 2){
+            hash[0] ^= packet[i + 0]
+            hash[1] ^= packet[i + 1]
+        }
+
+        return hash[0] == 0 && hash[1] == 0;
     }
 }
