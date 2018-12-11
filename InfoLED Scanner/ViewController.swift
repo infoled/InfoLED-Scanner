@@ -63,16 +63,20 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     private let decimation = 0.25
     private let decimationCcl = 0.25
 
+    private lazy var poiX: CGFloat = CGFloat(videoWidth) / 2;
+    private lazy var poiY: CGFloat = CGFloat(videoHeight) / 2;
+
     @IBOutlet weak var videoPreviewView: UIView!
     @IBOutlet weak var scanButton: UIButton!
     @IBOutlet weak var scanningProgress: UIProgressView!
     @IBOutlet weak var poiSquareHeight: NSLayoutConstraint!
     @IBOutlet weak var poiSquareWidth: NSLayoutConstraint!
-    @IBOutlet weak var poiProgressWidth: NSLayoutConstraint!
+    @IBOutlet weak var poiSquareY: NSLayoutConstraint!
+    @IBOutlet weak var poiSquareX: NSLayoutConstraint!
     @IBOutlet weak var fpsLabel: UILabel!
     @IBOutlet weak var metalPreviewLayer: MTKView!
-    @IBOutlet weak var metalPreviewLayerHeight: NSLayoutConstraint!
-    @IBOutlet weak var metalPreviewLayerWidth: NSLayoutConstraint!
+    @IBOutlet weak var videoPreviewLayerHeight: NSLayoutConstraint!
+    @IBOutlet weak var videoPreviewLayerWidth: NSLayoutConstraint!
 
     var previewLayer:AVCaptureVideoPreviewLayer?;
     let captureSession = AVCaptureSession()
@@ -95,6 +99,13 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }()
 
     fileprivate lazy var oldCaptureTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var brightCaptureTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
@@ -173,6 +184,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     var erodeKernel: MPSImageAreaMin!
     var dilateKernel: MPSImageAreaMax!
     var resize2Kernel: MPSImageLanczosScale!
+    var brightKernel: MPSImageConvolution!
 
     func buildKernels() {
         resizeKernel = MPSImageLanczosScale(device: self.metalDevice)
@@ -184,6 +196,17 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 5, kernelHeight: 5)
         dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
         resize2Kernel = MPSImageLanczosScale(device: self.metalDevice)
+
+        var brightValue: [Float] = [16.0]
+        brightKernel = MPSImageConvolution(device: metalDevice, kernelWidth: 1, kernelHeight: 1, weights: &brightValue)
+    }
+
+    func updateUiElements() {
+        // Adjust POI square size
+        poiSquareWidth.constant = PoiWidth / UIScreen.main.scale * CGFloat(decimation)
+        poiSquareHeight.constant = PoiHeight / UIScreen.main.scale * CGFloat(decimation)
+        poiSquareX.constant = poiX / UIScreen.main.scale * CGFloat(decimation)
+        poiSquareY.constant = poiY / UIScreen.main.scale * CGFloat(decimation)
     }
 
     override func viewDidLoad() {
@@ -192,10 +215,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         // Build MPS kernels
         buildKernels()
 
-        // Adjust POI square size
-        poiSquareWidth.constant = PoiWidth
-        poiSquareHeight.constant = PoiHeight
-        poiProgressWidth.constant = PoiWidth
+        // Update UI elements
+        updateUiElements()
 
         // Create processing queue
 
@@ -256,12 +277,12 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         metalPreviewLayer.device = self.metalDevice
         metalPreviewLayer.colorPixelFormat = .bgra8Unorm
 
-        metalPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale * CGFloat(decimation)
-        metalPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale * CGFloat(decimation)
+        videoPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale * CGFloat(decimation)
+        videoPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale * CGFloat(decimation)
 
         let viewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height / CGFloat(decimation)
 
-        metalPreviewLayer.transform =
+        videoPreviewView.transform =
             CGAffineTransform.init(rotationAngle: .pi / 2)
             .scaledBy(x: viewScaleFactor, y: viewScaleFactor)
 
@@ -387,6 +408,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
 
+            self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
+
             var transform2 = MPSScaleTransform(scaleX: self.decimationCcl, scaleY: self.decimationCcl, translateX: 0, translateY: 0)
             withUnsafePointer(to: &transform2, { (transformPtr) in
                 self.resize2Kernel.scaleTransform = transformPtr
@@ -410,12 +433,24 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 let labelResult = CcLabel.labelImageFast(data: labelImage,
                                                          calculateBoundingBoxes: true)
 
-                print(labelResult.boundingBoxes!)
+                let largestBox = labelResult.boundingBoxes?.reduce(nil
+                    , { (result: BoundingBox?, entry) -> BoundingBox? in
+                        if let result = result {
+                            if (result.getSize() >= entry.value.getSize()) {
+                                return result
+                            }
+                        }
+                        return entry.value
+                })
+                if let largestBox = largestBox {
+                    self.poiX = 0.05 * CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / self.decimation / self.decimationCcl / 2)) + 0.95 * self.poiX
+                    self.poiY = 0.05 * CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / self.decimation / self.decimationCcl / 2)) + 0.95 * self.poiY
+                }
 
                 self.renderQueue.async {
                     os_log("render id: %d", currentProcessCount)
                     //            print("Complete: " + String(CACurrentMediaTime()))
-                    self.displayTexture = self.dilateTexture
+                    self.displayTexture = self.brightCaptureTexture
                 }
             })
             captureCommandBuffer.commit()
@@ -461,10 +496,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             let bytesPerRow = CVPixelBufferGetBytesPerRow(localBuffer)
             let bytesPerPixel = bytesPerRow / imageWidth
 
-            let startx = imageWidth / 2 - poiWidth / 2
-            let endx = imageWidth / 2 + poiWidth / 2
-            let starty = imageHeight / 2 - poiHeight / 2
-            let endy = imageHeight / 2 + poiHeight / 2
+            let startx = Int(poiX) - poiWidth / 2
+            let endx = Int(poiX) + poiWidth / 2
+            let starty = Int(poiY) - poiHeight / 2
+            let endy = Int(poiY) + poiHeight / 2
 
             var red = 0, green = 0, blue = 0;
 
@@ -520,6 +555,7 @@ extension ViewController : MTKViewDelegate {
     }
 
     func draw(in view: MTKView) {
+        updateUiElements()
         DispatchQueue.main.async {
             self.fpsLabel.text = "\(self.fpsCounter.getFps())";
             if self.scanning {
