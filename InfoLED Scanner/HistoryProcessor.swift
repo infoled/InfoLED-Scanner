@@ -153,7 +153,7 @@ class HistoryProcessor {
             verifiedPackets = [[Int]]()
             for packet in decodedPackets {
                 if verifyPacket(packet: packet) {
-                    verifiedPackets += [packet]
+                    verifiedPackets += [Array(packet.dropFirst(2))]
 
                 }
             }
