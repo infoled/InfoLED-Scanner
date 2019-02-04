@@ -24,9 +24,8 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="14B-jm-ksX">
                                 <rect key="frame" x="27" y="128" width="360" height="640"/>
                                 <subviews>
-                                    <mtkView contentMode="scaleToFill" fixedFrame="YES" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="Dmm-aZ-PXL">
+                                    <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="Dmm-aZ-PXL">
                                         <rect key="frame" x="0.0" y="0.0" width="360" height="640"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </mtkView>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="square" translatesAutoresizingMaskIntoConstraints="NO" id="JsE-Lp-LDa">
                                         <rect key="frame" x="130" y="270" width="100" height="100"/>
@@ -42,6 +41,10 @@
                                     <constraint firstAttribute="height" constant="640" id="KmW-JC-p7N"/>
                                     <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerX" secondItem="14B-jm-ksX" secondAttribute="leading" constant="180" id="LnR-qD-xgw"/>
                                     <constraint firstAttribute="width" constant="360" id="NoN-bm-Ffm"/>
+                                    <constraint firstAttribute="bottom" secondItem="Dmm-aZ-PXL" secondAttribute="bottom" id="R17-I5-Lbl"/>
+                                    <constraint firstAttribute="trailing" secondItem="Dmm-aZ-PXL" secondAttribute="trailing" id="pIv-wm-gKI"/>
+                                    <constraint firstItem="Dmm-aZ-PXL" firstAttribute="top" secondItem="14B-jm-ksX" secondAttribute="top" id="pSa-h9-FnV"/>
+                                    <constraint firstItem="Dmm-aZ-PXL" firstAttribute="leading" secondItem="14B-jm-ksX" secondAttribute="leading" id="sqM-bF-0ZA"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kvJ-8w-qf1">
