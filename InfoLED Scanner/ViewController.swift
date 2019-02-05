@@ -79,6 +79,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var videoPreviewLayerHeight: NSLayoutConstraint!
     @IBOutlet weak var videoPreviewLayerWidth: NSLayoutConstraint!
     @IBOutlet weak var lensView: SKView!
+    @IBOutlet weak var lensViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var lensViewWidth: NSLayoutConstraint!
+
 
     var lensScene: LedLens!
 
@@ -207,9 +210,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func updateUiElements() {
         // Adjust POI square size
-        lensScene.setLensWidth(width: PoiWidth / UIScreen.main.scale * CGFloat(decimation))
-        let x = poiX / UIScreen.main.scale * CGFloat(decimation)
-        let y = poiY / UIScreen.main.scale * CGFloat(decimation)
+        lensScene.setLensWidth(width: PoiWidth / UIScreen.main.scale)
+        let x = poiX / UIScreen.main.scale
+        let y = poiY / UIScreen.main.scale
         lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "")]
         poiSquareWidth.constant = PoiWidth / UIScreen.main.scale * CGFloat(decimation)
         poiSquareHeight.constant = PoiHeight / UIScreen.main.scale * CGFloat(decimation)
@@ -289,11 +292,20 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         videoPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale * CGFloat(decimation)
         videoPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale * CGFloat(decimation)
 
-        let viewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height / CGFloat(decimation)
+        let videoViewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height / CGFloat(decimation)
 
         videoPreviewView.transform =
             CGAffineTransform.init(rotationAngle: .pi / 2)
-            .scaledBy(x: viewScaleFactor, y: viewScaleFactor)
+                .scaledBy(x: videoViewScaleFactor, y: videoViewScaleFactor)
+
+        lensViewWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale
+        lensViewHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale
+
+        let lensViewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height
+
+        lensView.transform =
+            CGAffineTransform.init(rotationAngle: .pi / 2)
+                .scaledBy(x: lensViewScaleFactor, y: lensViewScaleFactor)
 
 //        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
 //        previewLayer?.videoGravity = AVLayerVideoGravityResize;
