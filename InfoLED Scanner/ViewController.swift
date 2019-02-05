@@ -12,6 +12,7 @@ import AVFoundation
 import Metal
 import MetalKit
 import MetalPerformanceShaders
+import SpriteKit
 
 let PoiWidth = CGFloat(50)
 let PoiHeight = CGFloat(50)
@@ -77,6 +78,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var metalPreviewLayer: MTKView!
     @IBOutlet weak var videoPreviewLayerHeight: NSLayoutConstraint!
     @IBOutlet weak var videoPreviewLayerWidth: NSLayoutConstraint!
+    @IBOutlet weak var lensView: SKView!
+
+    var lensScene: LedLens!
 
     var previewLayer:AVCaptureVideoPreviewLayer?;
     let captureSession = AVCaptureSession()
@@ -203,6 +207,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func updateUiElements() {
         // Adjust POI square size
+        lensScene.setLensWidth(width: PoiWidth / UIScreen.main.scale * CGFloat(decimation))
+        let x = poiX / UIScreen.main.scale * CGFloat(decimation)
+        let y = poiY / UIScreen.main.scale * CGFloat(decimation)
+        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "")]
         poiSquareWidth.constant = PoiWidth / UIScreen.main.scale * CGFloat(decimation)
         poiSquareHeight.constant = PoiHeight / UIScreen.main.scale * CGFloat(decimation)
         poiSquareX.constant = poiX / UIScreen.main.scale * CGFloat(decimation)
@@ -216,6 +224,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         buildKernels()
 
         // Update UI elements
+        lensScene = lensView.scene as? LedLens
         updateUiElements()
 
         // Create processing queue
