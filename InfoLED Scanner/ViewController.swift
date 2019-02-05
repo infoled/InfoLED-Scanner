@@ -193,8 +193,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         withUnsafePointer(to: colorTransform) { (colorTransformRef) in
             thresholdKernel = MPSImageThresholdBinary(device: self.metalDevice, thresholdValue: 0.1, maximumValue: 1.0, linearGrayColorTransform: colorTransform)
         }
-        erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 5, kernelHeight: 5)
-        dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
+        erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 3, kernelHeight: 3)
+        dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 3, kernelHeight: 3)
         resize2Kernel = MPSImageLanczosScale(device: self.metalDevice)
 
         var brightValue: [Float] = [16.0]
