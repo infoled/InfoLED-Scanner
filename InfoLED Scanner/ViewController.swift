@@ -210,10 +210,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func updateUiElements() {
         // Adjust POI square size
-        lensScene.setLensWidth(width: PoiWidth / UIScreen.main.scale)
         let x = poiX / UIScreen.main.scale
         let y = poiY / UIScreen.main.scale
-        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "")]
+        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "Label", size: CGSize(width: PoiWidth / UIScreen.main.scale, height: PoiHeight / UIScreen.main.scale))]
         poiSquareWidth.constant = PoiWidth / UIScreen.main.scale * CGFloat(decimation)
         poiSquareHeight.constant = PoiHeight / UIScreen.main.scale * CGFloat(decimation)
         poiSquareX.constant = poiX / UIScreen.main.scale * CGFloat(decimation)
@@ -472,6 +471,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     os_log("render id: %d", currentProcessCount)
                     //            print("Complete: " + String(CACurrentMediaTime()))
                     self.displayTexture = self.brightCaptureTexture
+//                    self.displayTexture = self.dilateTexture
                 }
             })
             captureCommandBuffer.commit()

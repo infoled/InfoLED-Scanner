@@ -11,40 +11,28 @@ import SpriteKit
 struct Lens {
     public var position : CGPoint
     public var text : String
+    public var size : CGSize
 }
 
 class LedLens: SKScene {
 
-    private var lensNodeTemplate : SKShapeNode?
     public var lenses : [Lens] = []
-    private var lensNodes : [SKShapeNode] = []
-
-    override func didMove(to view: SKView) {
-        if lensNodeTemplate == nil {
-            setLensWidth(width: 1.0)
-        }
-    }
-
-    func setLensWidth(width: CGFloat) {
-        self.lensNodeTemplate = SKShapeNode.init(rectOf: CGSize.init(width: width, height: width), cornerRadius: 0)
-        if let lensNode = self.lensNodeTemplate {
-            lensNode.lineWidth = 1.0          
-        }
-    }
-    
+    private var lensNodes : [LensNode] = []
 
     override func update(_ currentTime: TimeInterval) {
         for i in 0..<lenses.count {
             let currentLens = lenses[i]
-            var currentNode : SKShapeNode!
+            var currentNode : LensNode!
             if i < lensNodes.count {
                 currentNode = lensNodes[i]
             } else {
-                currentNode = self.lensNodeTemplate?.copy() as? SKShapeNode
+                currentNode = LensNode(size:currentLens.size)
                 lensNodes.append(currentNode)
                 self.addChild(currentNode)
             }
             currentNode.position = CGPoint(x: currentLens.position.x, y: self.size.height - currentLens.position.y)
+            currentNode.setSize(size: currentLens.size)
+            currentNode.lensLabel.text = currentLens.text
         }
         if lensNodes.count > lenses.count {
             lensNodes.dropFirst(lenses.count).forEach { (node) in
