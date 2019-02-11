@@ -14,9 +14,6 @@ import MetalKit
 import MetalPerformanceShaders
 import SpriteKit
 
-let PoiWidth = CGFloat(50)
-let PoiHeight = CGFloat(50)
-
 extension CIImage {
     convenience init(buffer: CMSampleBuffer) {
         self.init(cvPixelBuffer: CMSampleBufferGetImageBuffer(buffer)!)
@@ -62,7 +59,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     private let videoWidth = 1280
     private let videoHeight = 720
     private let decimation = 0.25
+    private let decimationLens = 0.125
     private let decimationCcl = 0.25
+
+    lazy var poiWidth = CGFloat(1 / (decimation * decimationLens))
+    lazy var poiHeight = CGFloat(1 / (decimation * decimationLens))
 
     private lazy var poiX: CGFloat = CGFloat(videoWidth) / 2;
     private lazy var poiY: CGFloat = CGFloat(videoHeight) / 2;
@@ -95,11 +96,18 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     lazy var metalDevice : MTLDevice! = MTLCreateSystemDefaultDevice()
 
     let computeQueue = DispatchQueue(label: "me.jackieyang.infoled.computeQueue")
-    let captureQueue = DispatchQueue(label: "me.jackieyang.infoled.captureQueue", qos: .userInitiated, attributes: .concurrent)
+    let captureQueue = DispatchQueue(label: "me.jackieyang.infoled.captureQueue")
     let renderQueue = DispatchQueue(label: "me.jackieyang.infoled.renderQueue")
 
     fileprivate lazy var captureTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var lensTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation * self.decimationLens), height: Int(Double(self.videoHeight) * self.decimation * self.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
@@ -212,9 +220,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         // Adjust POI square size
         let x = poiX / UIScreen.main.scale
         let y = poiY / UIScreen.main.scale
-        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "Label", size: CGSize(width: PoiWidth / UIScreen.main.scale, height: PoiHeight / UIScreen.main.scale))]
-        poiSquareWidth.constant = PoiWidth / UIScreen.main.scale * CGFloat(decimation)
-        poiSquareHeight.constant = PoiHeight / UIScreen.main.scale * CGFloat(decimation)
+        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "Label", size: CGSize(width: poiWidth / UIScreen.main.scale, height: poiHeight / UIScreen.main.scale))]
+        poiSquareWidth.constant = poiWidth / UIScreen.main.scale * CGFloat(decimation)
+        poiSquareHeight.constant = poiHeight / UIScreen.main.scale * CGFloat(decimation)
         poiSquareX.constant = poiX / UIScreen.main.scale * CGFloat(decimation)
         poiSquareY.constant = poiY / UIScreen.main.scale * CGFloat(decimation)
     }
@@ -420,6 +428,13 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
             })
 
+            var lensTransform = MPSScaleTransform(scaleX: self.decimationLens, scaleY: self.decimationLens, translateX: 0, translateY: 0)
+
+            withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
+                self.resizeKernel.scaleTransform = lensTransformPtr
+                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.lensTexture)
+            })
+
             try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldCaptureTexture, sourceTextureRhs: self.captureTexture, destinationTexture: self.diffTexture)
 
             self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
@@ -473,92 +488,62 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     self.displayTexture = self.brightCaptureTexture
 //                    self.displayTexture = self.dilateTexture
                 }
+
+                if self.scanning {
+                    let bytesPerPixel = 4
+                    let lensPoiX = Double(self.poiX) * self.decimation * self.decimationLens
+                    let lensPoiY = Double(self.poiY) * self.decimation * self.decimationLens
+                    let readWidth = 2
+                    let readHeight = 2
+                    let pixelsCount = readWidth * readHeight
+                    let lensPoiXStart = Int(floor(lensPoiX))
+                    let lensPoiYStart = Int(floor(lensPoiY))
+                    let lensRegion = MTLRegionMake2D(lensPoiXStart, lensPoiYStart, readWidth, readHeight)
+                    let imageByteCount = pixelsCount * bytesPerPixel
+                    var buffer = [UInt8](repeating: 0, count: Int(imageByteCount))
+                    let lensBytesPerRow = readWidth * bytesPerPixel
+                    self.lensTexture.getBytes(&buffer, bytesPerRow: lensBytesPerRow, from: lensRegion, mipmapLevel: 0)
+                    let pixels = stride(from: 0, to: readWidth, by: 1).map({ (x) -> [Int] in
+                        stride(from: 0, to: readHeight, by: 1).map({ (y) -> Int in
+                            let start = y * bytesPerPixel * readWidth + x * bytesPerPixel
+                            let end = start + bytesPerPixel
+                            return buffer[start..<end].reduce(0, {(sum, pixel) -> Int in
+                                return sum + Int(pixel)
+                            })
+                        })
+                    })
+                    let lensPoiXReminder = lensPoiX - Double(lensPoiXStart)
+                    let lensPoiYReminder = lensPoiY - Double(lensPoiYStart)
+                    let lensPixel = stride(from: 0, to: readWidth, by: 1).map({ (x) -> Double in
+                        stride(from: 0, to: readHeight, by: 1).map({ (y) -> Double in
+                            let xFactor = x == 0 ? (1 - lensPoiXReminder) : lensPoiXReminder
+                            let yFactor = y == 0 ? (1 - lensPoiYReminder) : lensPoiYReminder
+                            return xFactor * yFactor * Double(pixels[x][y])
+                        }).reduce(0, +)
+                    }).reduce(0, +)
+                    let lensPixelInt = Int(lensPixel)
+                    self.imageProcessingQueue.async {
+                        if (self.historyProcessor!.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
+                            DispatchQueue.main.async {
+                                var notification: String?;
+                                if (self.historyProcessor?.verifiedPackets.count != 0) {
+                                    notification = "\(self.historyProcessor!.verifiedPackets[0])"
+                                } else {
+                                    notification = "tag not found"
+                                }
+                                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
+                                let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+                                alert.addAction(action)
+                                self.present(alert, animated: true, completion: {})
+                                self.endScanning(captureOutput)
+                            }
+                        }
+                        self.processCount += 1
+                    }
+                    self.cycleCount += 1;
+                }
             })
             captureCommandBuffer.commit()
-        }
-//        captureQueue.async {
-//            print("Issue: " + String(CACurrentMediaTime()))
-//            let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()
-//            let blitEncoder = captureCommandBuffer.makeBlitCommandEncoder()
-//            let copySize =
-//                MTLSize(width: imageTexture.width,
-//                        height: imageTexture.height,
-//                        depth: imageTexture.depth)
-//            blitEncoder.copy(from: imageTexture,
-//                             sourceSlice: 0,
-//                             sourceLevel: 0,
-//                             sourceOrigin: MTLOrigin(),
-//                             sourceSize: copySize,
-//                             to: self.displayTexture,
-//                             destinationSlice: 0,
-//                             destinationLevel: 0,
-//                             destinationOrigin: MTLOrigin())
-//            blitEncoder.endEncoding()
-//            captureCommandBuffer.addCompletedHandler() { (_) in
-//                print("Complete: " + String(CACurrentMediaTime()))
-//                CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-//            }
-//            captureCommandBuffer.commit()
-////            self.renderQueue.async {
-////                self.displayTexture = imageTexture
-////            }
-//        }
-
-        if self.scanning {
-            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-            CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-            let imageWidth  = CVPixelBufferGetWidth(localBuffer)
-            let imageHeight = CVPixelBufferGetHeight(localBuffer)
-            let poiHeight = Int(PoiHeight)
-            let poiWidth = Int(PoiWidth)
-
-            let baseAddr = CVPixelBufferGetBaseAddress(localBuffer)
-            let byteCount = CVPixelBufferGetDataSize(localBuffer)
-            let bytesPerRow = CVPixelBufferGetBytesPerRow(localBuffer)
-            let bytesPerPixel = bytesPerRow / imageWidth
-
-            let startx = Int(poiX) - poiWidth / 2
-            let endx = Int(poiX) + poiWidth / 2
-            let starty = Int(poiY) - poiHeight / 2
-            let endy = Int(poiY) + poiHeight / 2
-
-            var red = 0, green = 0, blue = 0;
-
-            let rgba = UnsafeBufferPointer<UInt8>(
-                start: baseAddr?.assumingMemoryBound(to: UInt8.self),
-                count: byteCount)
-
-            for i in startx...endx{
-                for j in starty...endy {
-                    let offset = j * bytesPerRow + i * bytesPerPixel
-                    red   += Int(rgba[offset + 0])
-                    green += Int(rgba[offset + 1])
-                    blue  += Int(rgba[offset + 2])
-                }
-            }
-
-            CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-
-            NSLog("\(red)\t\(green)\t\(blue)")
-            imageProcessingQueue.async {
-                if (self.historyProcessor!.processNewPixel(pixel: (red, green, blue), frameDuration: frameDuration) || self.processCount == 2000) {
-                    DispatchQueue.main.async {
-                        var notification: String?;
-                        if (self.historyProcessor?.verifiedPackets.count != 0) {
-                            notification = "\(self.historyProcessor!.verifiedPackets[0])"
-                        } else {
-                            notification = "tag not found"
-                        }
-                        let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
-                        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
-                        alert.addAction(action)
-                        self.present(alert, animated: true, completion: {})
-                        self.endScanning(captureOutput)
-                    }
-                }
-                self.processCount += 1
-            }
-            self.cycleCount += 1;
         }
     }
 
