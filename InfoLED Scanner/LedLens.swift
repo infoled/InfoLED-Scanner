@@ -8,10 +8,16 @@
 
 import SpriteKit
 
-struct Lens {
+class Lens {
     public var position : CGPoint
     public var text : String
     public var size : CGSize
+
+    public init(position: CGPoint, text: String, size: CGSize) {
+        self.position = position
+        self.text = text
+        self.size = size
+    }
 }
 
 class LedLens: SKScene {

@@ -56,18 +56,6 @@ func / (tuple: (Int, Int, Int), val: Int) -> (Int, Int, Int) {
 
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    private let videoWidth = 1280
-    private let videoHeight = 720
-    private let decimation = 0.25
-    private let decimationLens = 0.125
-    private let decimationCcl = 0.25
-
-    lazy var poiWidth = CGFloat(1 / (decimation * decimationLens))
-    lazy var poiHeight = CGFloat(1 / (decimation * decimationLens))
-
-    private lazy var poiX: CGFloat = CGFloat(videoWidth) / 2;
-    private lazy var poiY: CGFloat = CGFloat(videoHeight) / 2;
-
     @IBOutlet weak var videoPreviewView: UIView!
     @IBOutlet weak var scanButton: UIButton!
     @IBOutlet weak var scanningProgress: UIProgressView!
@@ -100,76 +88,76 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     let renderQueue = DispatchQueue(label: "me.jackieyang.infoled.renderQueue")
 
     fileprivate lazy var captureTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var lensTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation * self.decimationLens), height: Int(Double(self.videoHeight) * self.decimation * self.decimationLens), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var oldCaptureTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var brightCaptureTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var diffTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var thresholdTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var erodeTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var dilateTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var cclTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation * self.decimationCcl), height: Int(Double(self.videoHeight) * self.decimation * self.decimationCcl), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
     fileprivate lazy var displayTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(self.videoWidth) * self.decimation), height: Int(Double(self.videoHeight) * self.decimation), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = MTLTextureUsage.shaderWrite
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
     }()
 
-    lazy var processedImage = [UInt8](repeating: 0, count: Int(Double(self.videoWidth * self.videoHeight * 4) * self.decimation * self.decimation * self.decimationCcl * self.decimationCcl))
+    lazy var processedImage = [UInt8](repeating: 0, count: Int(Double(Constants.videoWidth * Constants.videoHeight * 4) * Constants.decimation * Constants.decimation * Constants.decimationCcl * Constants.decimationCcl))
 
     fileprivate lazy var captureCommandQueue : MTLCommandQueue! = {
         NSLog("\(self.metalDevice.name)")
@@ -216,17 +204,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         brightKernel = MPSImageConvolution(device: metalDevice, kernelWidth: 1, kernelHeight: 1, weights: &brightValue)
     }
 
-    func updateUiElements() {
-        // Adjust POI square size
-        let x = poiX / UIScreen.main.scale
-        let y = poiY / UIScreen.main.scale
-        lensScene.lenses = [Lens(position: CGPoint(x: x, y: y), text: "Label", size: CGSize(width: poiWidth / UIScreen.main.scale, height: poiHeight / UIScreen.main.scale))]
-        poiSquareWidth.constant = poiWidth / UIScreen.main.scale * CGFloat(decimation)
-        poiSquareHeight.constant = poiHeight / UIScreen.main.scale * CGFloat(decimation)
-        poiSquareX.constant = poiX / UIScreen.main.scale * CGFloat(decimation)
-        poiSquareY.constant = poiY / UIScreen.main.scale * CGFloat(decimation)
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -235,7 +212,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         // Update UI elements
         lensScene = lensView.scene as? LedLens
-        updateUiElements()
 
         // Create processing queue
 
@@ -268,8 +244,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             for format in cameraDevice!.formats {
                 let videoDimention = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
-                if videoDimention.width == Int32(videoWidth) &&
-                    videoDimention.height == Int32(videoHeight) {
+                if videoDimention.width == Int32(Constants.videoWidth) &&
+                    videoDimention.height == Int32(Constants.videoHeight) {
                     for range in format.videoSupportedFrameRateRanges {
                         if CMTimeCompare(range.minFrameDuration, frameDuration) <= 0 {
                             cameraFormat = format;
@@ -296,19 +272,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         metalPreviewLayer.device = self.metalDevice
         metalPreviewLayer.colorPixelFormat = .bgra8Unorm
 
-        videoPreviewLayerWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale * CGFloat(decimation)
-        videoPreviewLayerHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale * CGFloat(decimation)
+        videoPreviewLayerWidth.constant = CGFloat(Constants.videoWidth) / UIScreen.main.scale * CGFloat(Constants.decimation)
+        videoPreviewLayerHeight.constant = CGFloat(Constants.videoHeight) / UIScreen.main.scale * CGFloat(Constants.decimation)
 
-        let videoViewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height / CGFloat(decimation)
+        let videoViewScaleFactor = CGFloat(Constants.videoWidth) / UIScreen.main.bounds.height / CGFloat(Constants.decimation)
 
         videoPreviewView.transform =
             CGAffineTransform.init(rotationAngle: .pi / 2)
                 .scaledBy(x: videoViewScaleFactor, y: videoViewScaleFactor)
 
-        lensViewWidth.constant = CGFloat(videoWidth) / UIScreen.main.scale
-        lensViewHeight.constant = CGFloat(videoHeight) / UIScreen.main.scale
+        lensViewWidth.constant = CGFloat(Constants.videoWidth) / UIScreen.main.scale
+        lensViewHeight.constant = CGFloat(Constants.videoHeight) / UIScreen.main.scale
 
-        let lensViewScaleFactor = CGFloat(videoWidth) / UIScreen.main.bounds.height
+        let lensViewScaleFactor = CGFloat(Constants.videoWidth) / UIScreen.main.bounds.height
 
         lensView.transform =
             CGAffineTransform.init(rotationAngle: .pi / 2)
@@ -319,6 +295,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 //        videoPreviewView.layer.addSublayer(previewLayer!)
 
         captureSession.startRunning()
+
+        historyLenses = [HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))]
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -354,49 +332,22 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
     }
 
-    var cycleCount = 0
-    var processCount = 0
-    static let cycleLimit = 240
     static let windowFrameSize = 5
     static let samplesPerFrame = 240/60
     let windowSampleSize = windowFrameSize * samplesPerFrame
-    var scanning = false
-    var historyProcessor : HistoryProcessor?
 
-    @IBAction func startScanning(_ sender: AnyObject) {
-        scanButton.isEnabled = false
-        lockCameraSettings()
-        cycleCount = 0
-        processCount = 0
-        historyProcessor = HistoryProcessor(windowSampleSize: windowSampleSize)
-        print("=====START SCANNING=====")
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(100) * Int64(NSEC_PER_MSEC)) / Double(NSEC_PER_SEC), execute: {
-//            self.imageProcessingQueue.suspend()
-            self.scanning = true
-        })
-    }
-
-    func endScanning(_ dataOutput: AVCaptureOutput) {
-        print("===== END SCANNING =====")
-        scanning = false;
-        unlockCameraSettings()
-        scanButton.isEnabled = true
-        scanningProgress.progress = 0.0
-//        self.imageProcessingQueue.resume()
+    var historyLenses: [HistoryLens] {
+        get {
+            return lensScene.lenses as! [HistoryLens]
+        }
+        set(newLenses) {
+            lensScene.lenses = newLenses
+        }
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        let currentProcessCount = processCount
-        os_log("catpure id: %d", currentProcessCount)
         let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let frameDuration = self.fpsCounter.call(time: presentationTime.seconds)
-
-        var samplebufferPtr = sampleBuffer
-
-//        withUnsafePointer(to: &samplebufferPtr) { (ptr) -> Void in
-//            print(ptr)
-//        }
-//        print("Start: " + String(CACurrentMediaTime()))
 
         captureQueue.async {
             swap(&self.captureTexture, &self.oldCaptureTexture)
@@ -421,14 +372,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
     //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
             let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()!
-            var transform = MPSScaleTransform(scaleX: self.decimation, scaleY: self.decimation, translateX: 0, translateY: 0)
+            var transform = MPSScaleTransform(scaleX: Constants.decimation, scaleY: Constants.decimation, translateX: 0, translateY: 0)
 
             withUnsafePointer(to: &transform, { (transformPtr) in
                 self.resizeKernel.scaleTransform = transformPtr
                 self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
             })
 
-            var lensTransform = MPSScaleTransform(scaleX: self.decimationLens, scaleY: self.decimationLens, translateX: 0, translateY: 0)
+            var lensTransform = MPSScaleTransform(scaleX: Constants.decimationLens, scaleY: Constants.decimationLens, translateX: 0, translateY: 0)
 
             withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
                 self.resizeKernel.scaleTransform = lensTransformPtr
@@ -445,7 +396,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
 
-            var transform2 = MPSScaleTransform(scaleX: self.decimationCcl, scaleY: self.decimationCcl, translateX: 0, translateY: 0)
+            var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
             withUnsafePointer(to: &transform2, { (transformPtr) in
                 self.resize2Kernel.scaleTransform = transformPtr
                 self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
@@ -478,69 +429,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                         return entry.value
                 })
                 if let largestBox = largestBox {
-                    self.poiX = 0.05 * CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / self.decimation / self.decimationCcl / 2)) + 0.95 * self.poiX
-                    self.poiY = 0.05 * CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / self.decimation / self.decimationCcl / 2)) + 0.95 * self.poiY
+                    var poiX = self.historyLenses[0].poiPos.x
+                    var poiY = self.historyLenses[0].poiPos.y
+                    poiX = 0.05 * CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / Constants.decimation / Constants.decimationCcl / 2)) + 0.95 * poiX
+                    poiY = 0.05 * CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / Constants.decimation / Constants.decimationCcl / 2)) + 0.95 * poiY
+                    self.historyLenses[0].poiPos = CGPoint(x: poiX, y: poiY)
                 }
 
                 self.renderQueue.async {
-                    os_log("render id: %d", currentProcessCount)
-                    //            print("Complete: " + String(CACurrentMediaTime()))
                     self.displayTexture = self.brightCaptureTexture
-//                    self.displayTexture = self.dilateTexture
                 }
 
-                if self.scanning {
-                    let bytesPerPixel = 4
-                    let lensPoiX = Double(self.poiX) * self.decimation * self.decimationLens
-                    let lensPoiY = Double(self.poiY) * self.decimation * self.decimationLens
-                    let readWidth = 2
-                    let readHeight = 2
-                    let pixelsCount = readWidth * readHeight
-                    let lensPoiXStart = Int(floor(lensPoiX))
-                    let lensPoiYStart = Int(floor(lensPoiY))
-                    let lensRegion = MTLRegionMake2D(lensPoiXStart, lensPoiYStart, readWidth, readHeight)
-                    let imageByteCount = pixelsCount * bytesPerPixel
-                    var buffer = [UInt8](repeating: 0, count: Int(imageByteCount))
-                    let lensBytesPerRow = readWidth * bytesPerPixel
-                    self.lensTexture.getBytes(&buffer, bytesPerRow: lensBytesPerRow, from: lensRegion, mipmapLevel: 0)
-                    let pixels = stride(from: 0, to: readWidth, by: 1).map({ (x) -> [Int] in
-                        stride(from: 0, to: readHeight, by: 1).map({ (y) -> Int in
-                            let start = y * bytesPerPixel * readWidth + x * bytesPerPixel
-                            let end = start + bytesPerPixel
-                            return buffer[start..<end].reduce(0, {(sum, pixel) -> Int in
-                                return sum + Int(pixel)
-                            })
-                        })
-                    })
-                    let lensPoiXReminder = lensPoiX - Double(lensPoiXStart)
-                    let lensPoiYReminder = lensPoiY - Double(lensPoiYStart)
-                    let lensPixel = stride(from: 0, to: readWidth, by: 1).map({ (x) -> Double in
-                        stride(from: 0, to: readHeight, by: 1).map({ (y) -> Double in
-                            let xFactor = x == 0 ? (1 - lensPoiXReminder) : lensPoiXReminder
-                            let yFactor = y == 0 ? (1 - lensPoiYReminder) : lensPoiYReminder
-                            return xFactor * yFactor * Double(pixels[x][y])
-                        }).reduce(0, +)
-                    }).reduce(0, +)
-                    let lensPixelInt = Int(lensPixel)
-                    self.imageProcessingQueue.async {
-                        if (self.historyProcessor!.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
-                            DispatchQueue.main.async {
-                                var notification: String?;
-                                if (self.historyProcessor?.verifiedPackets.count != 0) {
-                                    notification = "\(self.historyProcessor!.verifiedPackets[0])"
-                                } else {
-                                    notification = "tag not found"
-                                }
-                                let alert = UIAlertController(title: "Scan Result", message: notification, preferredStyle: UIAlertController.Style.alert)
-                                let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
-                                alert.addAction(action)
-                                self.present(alert, animated: true, completion: {})
-                                self.endScanning(captureOutput)
-                            }
-                        }
-                        self.processCount += 1
-                    }
-                    self.cycleCount += 1;
+                for lens in self.historyLenses {
+                    lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.imageProcessingQueue, frameDuration: frameDuration)
                 }
             })
             captureCommandBuffer.commit()
@@ -561,12 +462,8 @@ extension ViewController : MTKViewDelegate {
     }
 
     func draw(in view: MTKView) {
-        updateUiElements()
         DispatchQueue.main.async {
             self.fpsLabel.text = "\(self.fpsCounter.getFps())";
-            if self.scanning {
-                self.scanningProgress.progress = Float(self.cycleCount) / Float(ViewController.cycleLimit)
-            }
             print("\(self.fpsCounter.getFps())")
         }
         if let currentDrawable = metalPreviewLayer.currentDrawable {

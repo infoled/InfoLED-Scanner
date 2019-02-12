@@ -25,6 +25,8 @@
 		8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */; };
 		8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BE11CED5A2D00C2C280 /* Queue.swift */; };
 		8CD22B6D220E36960086B704 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6C220E36960086B704 /* LensNode.swift */; };
+		8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6E221219740086B704 /* HistoryLens.swift */; };
+		8CD22B7122121B120086B704 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B7022121B120086B704 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,8 @@
 		8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
 		8CBB8BE11CED5A2D00C2C280 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		8CD22B6C220E36960086B704 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
+		8CD22B6E221219740086B704 /* HistoryLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryLens.swift; sourceTree = "<group>"; };
+		8CD22B7022121B120086B704 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +140,8 @@
 				8C0A93A42208F61F007E71E2 /* LedLens.sks */,
 				8C0A93A62208F698007E71E2 /* LedLens.swift */,
 				8CD22B6C220E36960086B704 /* LensNode.swift */,
+				8CD22B6E221219740086B704 /* HistoryLens.swift */,
+				8CD22B7022121B120086B704 /* Constants.swift */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -306,6 +312,8 @@
 				8C0152C621BE939200049838 /* CcLabel.swift in Sources */,
 				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,
 				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
+				8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */,
+				8CD22B7122121B120086B704 /* Constants.swift in Sources */,
 				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,
 				8C0A93A72208F698007E71E2 /* LedLens.swift in Sources */,
 			);

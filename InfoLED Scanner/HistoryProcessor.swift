@@ -31,6 +31,24 @@ class HistoryProcessor {
         self.windowSampleSize = windowSampleSize
     }
 
+    func resetProecessing() {
+        pixelHistory = [((Int, Int, Int), Double?)]()
+        adaptivePixelHistory = [((Int, Int, Int), Double?)]()
+        adaptiveGrayHistory = [(Int, Double?)]()
+        levelDurationHistory = [(Int, Double)]()
+        frameLevels = [Int]();
+        decodedPackets = [[Int]]();
+        verifiedPackets = [[Int]]();
+        currentLevel = 0
+        currentLevelDuration = 0
+    }
+
+    static func packetString(packet: [Int]) -> String {
+        return String(packet.map { (bit) -> Character in
+            return bit == 0 ? "0" : "1"
+        })
+    }
+
     func processNewPixel(pixel: (Int, Int, Int), frameDuration: Double?) -> Bool {
         pixelHistory += [(pixel, frameDuration)]
         if pixelHistory.count >= 2 * windowSampleSize + 1 {
