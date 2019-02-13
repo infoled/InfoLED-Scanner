@@ -383,7 +383,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             lens.cyclesFound = 0
             let poiX = lens.poiPos.x
             let poiY = lens.poiPos.y
-            lens.poiPos = CGPoint(x: poiX * 0.5 + position.x * 0.5, y: poiY * 0.5 + position.y * 0.5)
+            let distance = lens.poiPos.distance(with: position)
+            let damping = CGFloat(max(1 - distance / 100, 0))
+            lens.poiPos = CGPoint(x: poiX * damping + position.x * (1 - damping), y: poiY * damping + position.y * (1 - damping))
             self.available = false
         }
 
