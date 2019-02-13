@@ -54,6 +54,12 @@ func / (tuple: (Int, Int, Int), val: Int) -> (Int, Int, Int) {
     return (tuple.0 / val, tuple.1 / val, tuple.2 / val)
 }
 
+extension CGPoint {
+    func distance(with point: CGPoint) -> CGFloat {
+        return hypot(self.x - point.x, self.y - point.y)
+    }
+}
+
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     @IBOutlet weak var videoPreviewView: UIView!
@@ -296,7 +302,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         captureSession.startRunning()
 
-        historyLenses = [HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))]
+        historyLenses = (0..<ViewController.lensCount).map({ (_) in
+            return HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))
+        })
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -343,6 +351,128 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         set(newLenses) {
             lensScene.lenses = newLenses
         }
+    }
+
+    static let lensCount = 5
+    static let boxesCount = 5
+    static let movementsPerFrame = 1
+    static let ignoreRaidus = 100
+    static let maxHistory = 500
+
+    class CandidateBox {
+        var position: CGPoint
+        var available: Bool
+
+        init(_ position: CGPoint) {
+            print("candidate: \(position)")
+            self.position = position
+            self.available = true
+        }
+
+        func match(with lens: HistoryLens) -> Bool {
+            if available {
+                let distance = hypot(self.position.x - lens.poiPos.x, self.position.y - lens.poiPos.y)
+                if distance < CGFloat(movementsPerFrame * lens.cyclesFound) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        func assigned(to lens: HistoryLens) {
+            lens.cyclesFound = 0
+            let poiX = lens.poiPos.x
+            let poiY = lens.poiPos.y
+            lens.poiPos = CGPoint(x: poiX * 0.5 + position.x * 0.5, y: poiY * 0.5 + position.y * 0.5)
+            self.available = false
+        }
+
+        func close(with candidate: CandidateBox) -> Bool {
+            let distance = self.position.distance(with: candidate.position)
+            if distance < CGFloat(ViewController.ignoreRaidus) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    func updateBoundingBoxes(boundingBoxes: [Int: BoundingBox]) {
+        let sortedBoxes = boundingBoxes.sorted { (arg0, arg1) -> Bool in
+            let (_, value1) = arg0
+            let (_, value2) = arg1
+            return value1.getSize() > value2.getSize()
+            }.prefix(ViewController.boxesCount * 2)
+
+        let sortedCandidates = sortedBoxes.map { (arg0) -> CandidateBox in
+            let (_, value) = arg0
+            let poiX = CGFloat(Int(Double(value.x_start + value.x_end) / Constants.decimation / Constants.decimationCcl / 2))
+            let poiY = CGFloat(Int(Double(value.y_start + value.y_end) / Constants.decimation / Constants.decimationCcl / 2))
+            return CandidateBox(CGPoint(x: poiX, y: poiY))
+        }
+
+        var selectedCandidates = [CandidateBox]()
+
+        for candidate in sortedCandidates {
+            var close = false
+            for selectedCandidate in selectedCandidates {
+                if selectedCandidate.close(with: candidate) {
+                    close = true
+                    break
+                }
+            }
+            if !close {
+                selectedCandidates.append(candidate)
+            }
+        }
+
+        historyLenses = historyLenses.sorted(by: { (lens0, lens1) -> Bool in
+            return lens0.cyclesFound < lens1.cyclesFound
+        })
+
+        var newHistoryLenses = [HistoryLens]()
+
+        for lens in historyLenses {
+            lens.cyclesFound += 1
+            var matchedCandidate: CandidateBox?
+            for candidate in selectedCandidates {
+                if candidate.match(with: lens) {
+                    matchedCandidate = candidate
+                    break
+                }
+
+            }
+            if let candidate = matchedCandidate {
+                candidate.assigned(to: lens)
+            }
+            var close = false
+            for existedLens in newHistoryLenses {
+                if (existedLens.poiPos.distance(with: lens.poiPos) < CGFloat(ViewController.ignoreRaidus)) {
+                    close = true
+                    break
+                }
+            }
+            if (!close) {
+                newHistoryLenses.append(lens)
+            } else {
+                let newLens = HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))
+                newLens.poiPos = CGPoint(x: Int.random(in: 0..<Constants.videoWidth), y: Int.random(in: 0..<Constants.videoHeight))
+                newHistoryLenses.append(newLens)
+            }
+        }
+        historyLenses = newHistoryLenses
+
+//        if sortedBoxes.count > 0{
+//            let largestBox = sortedBoxes[0].value
+//            var poiX = self.historyLenses[0].poiPos.x
+//            var poiY = self.historyLenses[0].poiPos.y
+//            let newPoiX = CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / Constants.decimation / Constants.decimationCcl / 2))
+//            let newPoiY = CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / Constants.decimation / Constants.decimationCcl / 2))
+//            print("newPoi: (\(newPoiX), \(newPoiY))")
+//            poiX = 0.05 * newPoiX + 0.95 * poiX
+//            poiY = 0.05 * newPoiY + 0.95 * poiY
+//            self.historyLenses[0].poiPos = CGPoint(x: poiX, y: poiY)
+//        }
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
@@ -419,21 +549,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 let labelResult = CcLabel.labelImageFast(data: labelImage,
                                                          calculateBoundingBoxes: true)
 
-                let largestBox = labelResult.boundingBoxes?.reduce(nil
-                    , { (result: BoundingBox?, entry) -> BoundingBox? in
-                        if let result = result {
-                            if (result.getSize() >= entry.value.getSize()) {
-                                return result
-                            }
-                        }
-                        return entry.value
-                })
-                if let largestBox = largestBox {
-                    var poiX = self.historyLenses[0].poiPos.x
-                    var poiY = self.historyLenses[0].poiPos.y
-                    poiX = 0.05 * CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / Constants.decimation / Constants.decimationCcl / 2)) + 0.95 * poiX
-                    poiY = 0.05 * CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / Constants.decimation / Constants.decimationCcl / 2)) + 0.95 * poiY
-                    self.historyLenses[0].poiPos = CGPoint(x: poiX, y: poiY)
+                if let boundingBoxes = labelResult.boundingBoxes {
+                    self.updateBoundingBoxes(boundingBoxes: boundingBoxes)
                 }
 
                 self.renderQueue.async {
@@ -452,8 +569,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
 }
 
 extension ViewController : MTKViewDelegate {

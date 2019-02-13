@@ -40,4 +40,13 @@ class LensNode : SKNode {
         self.addChild(lensBracket)
         self.lensLabel.position.y = size.height / 2
     }
+
+    func setAvailable(available: Bool) {
+        self.lensLabel.isHidden = !available
+        if available {
+            self.lensBracket.strokeColor = .green
+        } else {
+            self.lensBracket.strokeColor = .gray
+        }
+    }
 }

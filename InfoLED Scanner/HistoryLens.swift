@@ -44,6 +44,8 @@ class HistoryLens: Lens {
     var processCount = 0
     var cycleCount = 0
 
+    var cyclesFound = 2400 //Never found before, so assign a large value
+
     init(windowSize: Int, poiSize: CGSize) {
         self.historyProcessor = HistoryProcessor(windowSampleSize: windowSize)
         super.init(position: CGPoint.zero, text: "loading", size: CGSize.zero)
@@ -54,13 +56,13 @@ class HistoryLens: Lens {
     func processFrame(lensTexture: MTLTexture, imageProcessingQueue: DispatchQueue, frameDuration: Double?) {
         if self.scanning {
             let bytesPerPixel = 4
-            let lensPoiX = Double(poiPos.x) * Constants.decimation * Constants.decimationLens
-            let lensPoiY = Double(poiPos.y) * Constants.decimation * Constants.decimationLens
+            let lensPoiX = min(Double(poiPos.x) * Constants.decimation * Constants.decimationLens, Double(lensTexture.width))
+            let lensPoiY = min(Double(poiPos.y) * Constants.decimation * Constants.decimationLens, Double(lensTexture.height))
             let readWidth = 2
             let readHeight = 2
             let pixelsCount = readWidth * readHeight
-            let lensPoiXStart = Int(floor(lensPoiX))
-            let lensPoiYStart = Int(floor(lensPoiY))
+            let lensPoiXStart = min(Int(floor(lensPoiX)), Int(lensTexture.width - readWidth))
+            let lensPoiYStart = min(Int(floor(lensPoiY)), Int(lensTexture.height - readHeight))
             let lensRegion = MTLRegionMake2D(lensPoiXStart, lensPoiYStart, readWidth, readHeight)
             let imageByteCount = pixelsCount * bytesPerPixel
             var buffer = [UInt8](repeating: 0, count: Int(imageByteCount))
@@ -88,13 +90,15 @@ class HistoryLens: Lens {
             imageProcessingQueue.async {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
                     var notification: String!;
-                    if (self.historyProcessor.verifiedPackets.count != 0) {
+                    let tagFound = self.historyProcessor.verifiedPackets.count != 0
+                    if (tagFound) {
                         notification = "\(HistoryProcessor.packetString(packet: self.historyProcessor.verifiedPackets[0]))"
                     } else {
                         notification = "tag not found"
                     }
                     DispatchQueue.main.async {
                         self.text = notification
+                        self.detected = tagFound
                     }
                     self.historyProcessor.resetProecessing()
                 }
