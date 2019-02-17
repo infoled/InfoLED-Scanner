@@ -90,9 +90,10 @@ class HistoryLens: Lens {
             imageProcessingQueue.async {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
                     var notification: String!;
-                    let tagFound = self.historyProcessor.verifiedPackets.count != 0
-                    if (tagFound) {
-                        notification = "\(HistoryProcessor.packetString(packet: self.historyProcessor.verifiedPackets[0]))"
+                    let packet = self.historyProcessor.getPopularPacket()
+                    let tagFound = packet != nil
+                    if let validPacket = packet {
+                        notification = "\(HistoryProcessor.packetString(packet: validPacket))"
                     } else {
                         notification = "tag not found"
                     }
@@ -100,7 +101,6 @@ class HistoryLens: Lens {
                         self.text = notification
                         self.detected = tagFound
                     }
-                    self.historyProcessor.resetProecessing()
                 }
                 self.processCount += 1
             }

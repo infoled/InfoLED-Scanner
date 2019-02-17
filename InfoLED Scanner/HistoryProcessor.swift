@@ -23,15 +23,29 @@ class HistoryProcessor {
     var currentLevelDuration : Double = 0
     var windowSampleSize : Int
 
-    let offThreshold = 2.75 / 240
-    let onThreshold = 3.6 / 240
-    let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
+    static let offThreshold = 2.75 / 240
+    static let onThreshold = 3.6 / 240
+    static let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
+
+    static let dataLength = 16
+    static let hashLength = 2
+    static let preambleLength = preamble.count
+
+    static let verifiedPacketsLimit = 10
+    static let frameLevelsLimit = preamble.count + (dataLength + hashLength) * 2 + 10
+    static let levelDurationHistoryLimit = frameLevelsLimit
+    static let adaptivePixelHistoryLimit = levelDurationHistoryLimit * 10
+    static let pixelHistoryLimit = adaptivePixelHistoryLimit
+
+    static let cleanUpLimit = 100
+
+    var cleanUpTimer = 0
 
     init(windowSampleSize : Int) {
         self.windowSampleSize = windowSampleSize
     }
 
-    func resetProecessing() {
+    func resetPacketProecessing() {
         os_log("reset processing")
         pixelHistory = [((Int, Int, Int), Double?)]()
         adaptivePixelHistory = [((Int, Int, Int), Double?)]()
@@ -39,7 +53,6 @@ class HistoryProcessor {
         levelDurationHistory = [(Int, Double)]()
         frameLevels = [Int]();
         decodedPackets = [[Int]]();
-        verifiedPackets = [[Int]]();
         currentLevel = 0
         currentLevelDuration = 0
     }
@@ -51,7 +64,15 @@ class HistoryProcessor {
     }
 
     func processNewPixel(pixel: (Int, Int, Int), frameDuration: Double?) -> Bool {
+        cleanUpTimer += 1
+        if (cleanUpTimer > HistoryProcessor.cleanUpLimit) {
+            cleanUp()
+            cleanUpTimer = 0
+        }
         pixelHistory += [(pixel, frameDuration)]
+        if pixelHistory.count > HistoryProcessor.pixelHistoryLimit {
+            pixelHistory = Array(pixelHistory.suffix(HistoryProcessor.pixelHistoryLimit))
+        }
         if pixelHistory.count >= 2 * windowSampleSize + 1 {
             let centerIndex = pixelHistory.count - windowSampleSize - 1
             let windowRange = (centerIndex - windowSampleSize)...(centerIndex + windowSampleSize)
@@ -104,13 +125,13 @@ class HistoryProcessor {
 //            os_log("processNewLevelDuration: level error")
             throw HistoryProcessorError.LevelError
         } else if level > 0 {
-            if Duration < onThreshold {
+            if Duration < HistoryProcessor.onThreshold {
                 frameLevels += [1]
             } else {
                 frameLevels += [1, 1]
             }
         } else {
-            if Duration < offThreshold {
+            if Duration < HistoryProcessor.offThreshold {
                 frameLevels += [0]
             } else {
                 frameLevels += [0, 0]
@@ -125,35 +146,15 @@ class HistoryProcessor {
     }
 
     func decodeFrameLevels() -> Bool {
-        if (frameLevels.count > 2 * preamble.count) {
-            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - preamble.count)
-
-//            let preamblePos = indices.reduce([]) { (result, index) -> [Int] in
-//                let subarray = frameLevels[index ... (index + preamble.count - 1)]
-//                if (subarray == ArraySlice<Int>(preamble)) {
-//                    return result + [index];
-//                } else {
-//                    return result;
-//                }
-//            }
-//
-//            var preambleRanges = [(Int, Int)]();
-//            if preamblePos.count > 1 {
-//                for i in 1..<preamblePos.count {
-//                    let start = preamblePos[i - 1] + preamble.count
-//                    let end = preamblePos[i] - 1
-//                    if start < end {
-//                        preambleRanges += [(preamblePos[i - 1] + preamble.count, preamblePos[i] - 1)]
-//                    }
-//                }
-//            }
+        if (frameLevels.count > 2 * HistoryProcessor.preambleLength) {
+            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - HistoryProcessor.preamble.count)
 
             var result = [(Int, Int)]();
             for index in 1..<indices.count {
-                let subarray = frameLevels[index ... (index + preamble.count - 1)]
-                if (subarray == ArraySlice<Int>(preamble)) {
-                    let packetBegin = index + preamble.count
-                    let packetEnd = packetBegin + (2 + 16) * 2
+                let subarray = frameLevels[index ... (index + HistoryProcessor.preambleLength - 1)]
+                if (subarray == ArraySlice<Int>(HistoryProcessor.preamble)) {
+                    let packetBegin = index + HistoryProcessor.preambleLength
+                    let packetEnd = packetBegin + (HistoryProcessor.hashLength + HistoryProcessor.dataLength) * 2
                     if packetEnd <= frameLevels.count {
                         result += [(packetBegin, packetEnd)]
                     } else {
@@ -171,11 +172,10 @@ class HistoryProcessor {
                 })
             })
 
-            verifiedPackets = [[Int]]()
             for packet in decodedPackets {
                 if verifyPacket(packet: packet) {
+                    resetPacketProecessing()
                     verifiedPackets += [Array(packet.dropFirst(2))]
-
                 }
             }
 
@@ -188,13 +188,49 @@ class HistoryProcessor {
     }
 
     func verifyPacket(packet: [Int]) -> Bool {
-        var hash = [0, 0]
+        var hash = [Int].init(repeating: 0, count: HistoryProcessor.hashLength)
 
-        for i in Swift.stride(from: 0, to: packet.count, by: 2){
-            hash[0] ^= packet[i + 0]
-            hash[1] ^= packet[i + 1]
+        for i in Swift.stride(from: 0, to: packet.count, by: HistoryProcessor.hashLength){
+            for j in 0..<HistoryProcessor.hashLength {
+                hash[j] ^= packet[i + j]
+            }
         }
 
-        return hash[0] == 0 && hash[1] == 0;
+        return hash.reduce(true, { (result, hash_bit) -> Bool in
+            return result && (hash_bit == 0)
+        })
+    }
+
+    func getPopularPacket() -> [Int]? {
+        let counts = verifiedPackets.reduce(into: [:]) {(result, packet) in
+            result[packet, default: 0] += 1
+        }
+
+        if let (value, _) = counts.max(by: { $0.1 < $1.1 }) {
+            return value
+        } else {
+            return nil
+        }
+    }
+
+    func cleanUp() {
+        if pixelHistory.count > HistoryProcessor.pixelHistoryLimit {
+            pixelHistory = Array(pixelHistory.suffix(HistoryProcessor.pixelHistoryLimit))
+        }
+        if adaptivePixelHistory.count > HistoryProcessor.adaptivePixelHistoryLimit {
+            adaptivePixelHistory = Array(adaptivePixelHistory.suffix(HistoryProcessor.adaptivePixelHistoryLimit))
+        }
+        if adaptiveGrayHistory.count > HistoryProcessor.adaptivePixelHistoryLimit {
+            adaptiveGrayHistory = Array(adaptiveGrayHistory.suffix(HistoryProcessor.adaptivePixelHistoryLimit))
+        }
+        if levelDurationHistory.count > HistoryProcessor.levelDurationHistoryLimit {
+            levelDurationHistory = Array(levelDurationHistory.suffix(HistoryProcessor.levelDurationHistoryLimit))
+        }
+        if frameLevels.count > HistoryProcessor.frameLevelsLimit {
+            frameLevels = Array(frameLevels.suffix(HistoryProcessor.frameLevelsLimit))
+        }
+        if verifiedPackets.count > HistoryProcessor.verifiedPacketsLimit {
+            verifiedPackets = Array(verifiedPackets.suffix(HistoryProcessor.verifiedPacketsLimit))
+        }
     }
 }

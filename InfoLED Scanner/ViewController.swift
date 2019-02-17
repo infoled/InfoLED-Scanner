@@ -454,27 +454,16 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     break
                 }
             }
-            if (!close) {
-                newHistoryLenses.append(lens)
-            } else {
+            if (close || lens.cyclesFound > ViewController.maxHistory) {
+                // if this lens is too close to another lens or haven't been updated for a long time
                 let newLens = HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))
                 newLens.poiPos = CGPoint(x: Int.random(in: 0..<Constants.videoWidth), y: Int.random(in: 0..<Constants.videoHeight))
                 newHistoryLenses.append(newLens)
+            } else {
+                newHistoryLenses.append(lens)
             }
         }
         historyLenses = newHistoryLenses
-
-//        if sortedBoxes.count > 0{
-//            let largestBox = sortedBoxes[0].value
-//            var poiX = self.historyLenses[0].poiPos.x
-//            var poiY = self.historyLenses[0].poiPos.y
-//            let newPoiX = CGFloat(Int(Double(largestBox.x_start + largestBox.x_end) / Constants.decimation / Constants.decimationCcl / 2))
-//            let newPoiY = CGFloat(Int(Double(largestBox.y_start + largestBox.y_end) / Constants.decimation / Constants.decimationCcl / 2))
-//            print("newPoi: (\(newPoiX), \(newPoiY))")
-//            poiX = 0.05 * newPoiX + 0.95 * poiX
-//            poiY = 0.05 * newPoiY + 0.95 * poiY
-//            self.historyLenses[0].poiPos = CGPoint(x: poiX, y: poiY)
-//        }
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
