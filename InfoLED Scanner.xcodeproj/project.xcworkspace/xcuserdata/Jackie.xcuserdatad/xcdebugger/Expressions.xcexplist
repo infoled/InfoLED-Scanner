@@ -3,7 +3,46 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "HistoryProcessor.decodeFrameLevels():HistoryProcessor.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "frameLevels.endIndex">
+            </PersistentString>
+            <PersistentString
+               value = "indices">
+            </PersistentString>
+            <PersistentString
+               value = "frameLevels">
+            </PersistentString>
+            <PersistentString
+               value = "frameLevels.startIndex">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #3 in closure #1 in ViewController.captureOutput(_:didOutput:from:):ViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in ViewController.captureOutput(_:didOutput:from:):ViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.decimationLens">
+            </PersistentString>
+            <PersistentString
+               value = "lensTexture">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ViewController.viewDidLoad():ViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "videoPreviewLayerHeight.constant">
+            </PersistentString>
+            <PersistentString
+               value = "videoPreviewLayerWidth.constant">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "HistoryProcessor.processNewLevelDuration(levelDuration:):HistoryProcessor.swift">
@@ -19,17 +58,6 @@
             </PersistentString>
             <PersistentString
                value = "adaptiveGrayHistory">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ViewController.viewDidLoad():ViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "videoPreviewLayerHeight.constant">
-            </PersistentString>
-            <PersistentString
-               value = "videoPreviewLayerWidth.constant">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

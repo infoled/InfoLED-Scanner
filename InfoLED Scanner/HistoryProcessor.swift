@@ -32,6 +32,7 @@ class HistoryProcessor {
     }
 
     func resetProecessing() {
+        os_log("reset processing")
         pixelHistory = [((Int, Int, Int), Double?)]()
         adaptivePixelHistory = [((Int, Int, Int), Double?)]()
         adaptiveGrayHistory = [(Int, Double?)]()
@@ -77,6 +78,7 @@ class HistoryProcessor {
         adaptiveGrayHistory.append((adaptiveGray, adaptivePixel.1))
         let newLevel = adaptiveGray;
         if (newLevel == 0 && currentLevel == 0) {
+//            os_log("processNewAdativePixel: level error %@", adaptiveGrayHistory)
             throw HistoryProcessorError.LevelError
         }
         if (newLevel == 0 || newLevel * currentLevel < 0) { // End of a level duration
@@ -99,6 +101,7 @@ class HistoryProcessor {
         levelDurationHistory.append(levelDuration)
         let (level, Duration) = levelDuration;
         if level == 0 {
+//            os_log("processNewLevelDuration: level error")
             throw HistoryProcessorError.LevelError
         } else if level > 0 {
             if Duration < onThreshold {
@@ -115,7 +118,7 @@ class HistoryProcessor {
         }
         if decodeFrameLevels() {
 //             os_log("levelDurationHistory: %@", levelDurationHistory)
-//             os_log("frameLevels: %@", frameLevels)
+             os_log("frameLevels: %@", frameLevels)
             return true
         }
         return false
@@ -177,7 +180,7 @@ class HistoryProcessor {
             }
 
             if verifiedPackets.count != 0 {
-//                os_log("filteredHistorys: %@", filteredHistorys)
+//                os_log("filteredHistorys: %@", verifiedPackets)
                 return true
             }
         }

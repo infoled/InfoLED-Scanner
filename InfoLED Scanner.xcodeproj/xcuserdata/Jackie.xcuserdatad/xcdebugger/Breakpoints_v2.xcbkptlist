@@ -9,28 +9,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "InfoLED Scanner/ViewController.swift"
-            timestampString = "571360166.7359999"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
-            landmarkName = "captureOutput(_:didOutput:from:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "InfoLED Scanner/HistoryProcessor.swift"
-            timestampString = "571077332.1224591"
+            timestampString = "571791334.576768"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
             landmarkName = "decodeFrameLevels()"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "InfoLED Scanner/HistoryProcessor.swift"
-            timestampString = "571077332.122517"
+            timestampString = "571791334.57686"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "143"
-            endingLineNumber = "143"
+            startingLineNumber = "164"
+            endingLineNumber = "164"
             landmarkName = "decodeFrameLevels()"
             landmarkType = "7">
          </BreakpointContent>
@@ -58,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "InfoLED Scanner/HistoryProcessor.swift"
-            timestampString = "571077332.122558"
+            timestampString = "571791334.576906"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "81"
-            endingLineNumber = "81"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "processNewLevelDuration(levelDuration:)"
             landmarkType = "7">
          </BreakpointContent>
