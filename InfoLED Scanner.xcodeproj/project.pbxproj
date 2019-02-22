@@ -22,6 +22,7 @@
 		8C3747631C99921100EDDF23 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747611C99921100EDDF23 /* LaunchScreen.storyboard */; };
 		8C37476E1C99921200EDDF23 /* InfoLED_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */; };
 		8C3747791C99921200EDDF23 /* InfoLED_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */; };
+		8C657362221F912E0099B5A8 /* SampleBufferProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C657361221F912E0099B5A8 /* SampleBufferProcessor.swift */; };
 		8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */; };
 		8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BE11CED5A2D00C2C280 /* Queue.swift */; };
 		8CD22B6D220E36960086B704 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6C220E36960086B704 /* LensNode.swift */; };
@@ -68,6 +69,7 @@
 		8C3747741C99921200EDDF23 /* InfoLED ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "InfoLED ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLED_ScannerUITests.swift; sourceTree = "<group>"; };
 		8C37477A1C99921200EDDF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C657361221F912E0099B5A8 /* SampleBufferProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleBufferProcessor.swift; sourceTree = "<group>"; };
 		8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
 		8CBB8BE11CED5A2D00C2C280 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		8CD22B6C220E36960086B704 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				8CD22B6C220E36960086B704 /* LensNode.swift */,
 				8CD22B6E221219740086B704 /* HistoryLens.swift */,
 				8CD22B7022121B120086B704 /* Constants.swift */,
+				8C657361221F912E0099B5A8 /* SampleBufferProcessor.swift */,
 			);
 			path = "InfoLED Scanner";
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C657362221F912E0099B5A8 /* SampleBufferProcessor.swift in Sources */,
 				8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */,
 				8CD22B6D220E36960086B704 /* LensNode.swift in Sources */,
 				8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */,
