@@ -7,9 +7,12 @@
 //
 
 import XCTest
+import AVFoundation
 @testable import InfoLED_Scanner
 
 class InfoLED_ScannerTests: XCTestCase {
+    var internalHistoryLens: [HistoryLens]!
+    var fpsCounter: FpsCounter!
     
     override func setUp() {
         super.setUp()
@@ -22,8 +25,23 @@ class InfoLED_ScannerTests: XCTestCase {
     }
     
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        fpsCounter = FpsCounter()
+        let bufferProcessor = SampleBufferProcessor(delegate: self)
+        let videoURL = Bundle(for: type(of: self)).url(forResource: "IMG_5622", withExtension: "MOV")!
+        let videoAsset = AVAsset(url: videoURL)
+        let reader = try! AVAssetReader(asset: videoAsset)
+
+        let videoTrack = videoAsset.tracks(withMediaType: .video)[0]
+
+        let trackReaderOutput = AVAssetReaderTrackOutput(track: videoTrack, outputSettings: [kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA] as [String : Any])
+
+        reader.add(trackReaderOutput)
+
+        reader.startReading()
+
+        while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
+            bufferProcessor.processSampleBuffer(sampleBuffer: sampleBuffer)
+        }
     }
     
     func testPerformanceExample() {
@@ -33,4 +51,19 @@ class InfoLED_ScannerTests: XCTestCase {
         }
     }
     
+}
+
+extension InfoLED_ScannerTests: SampleBufferProcessorDelegate {
+    var historyLenses: [HistoryLens] {
+        get {
+            return internalHistoryLens
+        }
+        set(newValue) {
+            internalHistoryLens = newValue
+        }
+    }
+
+    func callFpsCounter(time: Double) -> Double? {
+        return fpsCounter.call(time: time)
+    }
 }
