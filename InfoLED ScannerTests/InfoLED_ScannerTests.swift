@@ -10,9 +10,41 @@ import XCTest
 import AVFoundation
 @testable import InfoLED_Scanner
 
+class TestBufferProcessorDelegate: SampleBufferProcessorDelegate {
+    var beginTimestamp: Double?
+    var lastTimestamp: Double?
+    var frameCount = 0
+    var historyLenses: [HistoryLens] = []
+
+    var elapsedTime: Double {
+        get {
+            if let beginTimestamp = self.beginTimestamp {
+                if let lastTimestamp = self.lastTimestamp {
+                    return lastTimestamp - beginTimestamp
+                }
+            }
+            return Double(0)
+        }
+    }
+
+    func callFpsCounter(time: Double) -> Double? {
+        if beginTimestamp == nil {
+            beginTimestamp = time
+        }
+        var frameTime: Double? = nil
+        if let lastTimestamp = self.lastTimestamp {
+            frameTime = time - lastTimestamp
+        }
+        lastTimestamp = time
+        frameCount += 1
+        return frameTime
+    }
+
+
+}
+
 class InfoLED_ScannerTests: XCTestCase {
     var internalHistoryLens: [HistoryLens]!
-    var fpsCounter: FpsCounter!
     
     override func setUp() {
         super.setUp()
@@ -25,8 +57,9 @@ class InfoLED_ScannerTests: XCTestCase {
     }
     
     func testExample() {
-        fpsCounter = FpsCounter()
-        let bufferProcessor = SampleBufferProcessor(delegate: self)
+        let delegate = TestBufferProcessorDelegate()
+        let eventLogger = MemoryEventLogger()
+        let bufferProcessor = SampleBufferProcessor(delegate: delegate, eventLogger: eventLogger)
         let videoURL = Bundle(for: type(of: self)).url(forResource: "IMG_5622", withExtension: "MOV")!
         let videoAsset = AVAsset(url: videoURL)
         let reader = try! AVAssetReader(asset: videoAsset)
@@ -39,8 +72,15 @@ class InfoLED_ScannerTests: XCTestCase {
 
         reader.startReading()
 
+        var lastEventCount = 0
+
         while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
             bufferProcessor.processSampleBuffer(sampleBuffer: sampleBuffer)
+            print("frame \(delegate.frameCount): ")
+            for eventId in lastEventCount ..< eventLogger.events.count {
+                print("event: \(eventLogger.events[eventId])")
+            }
+            lastEventCount = eventLogger.events.count
         }
     }
     
@@ -51,19 +91,4 @@ class InfoLED_ScannerTests: XCTestCase {
         }
     }
     
-}
-
-extension InfoLED_ScannerTests: SampleBufferProcessorDelegate {
-    var historyLenses: [HistoryLens] {
-        get {
-            return internalHistoryLens
-        }
-        set(newValue) {
-            internalHistoryLens = newValue
-        }
-    }
-
-    func callFpsCounter(time: Double) -> Double? {
-        return fpsCounter.call(time: time)
-    }
 }

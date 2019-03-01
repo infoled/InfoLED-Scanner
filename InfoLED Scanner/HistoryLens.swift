@@ -9,7 +9,7 @@
 import UIKit
 
 class HistoryLens: Lens {
-    public let historyProcessor: HistoryProcessor
+    public var historyProcessor: HistoryProcessor!
 
     public var poiPos: CGPoint {
         get {
@@ -46,9 +46,15 @@ class HistoryLens: Lens {
 
     var cyclesFound = 2400 //Never found before, so assign a large value
 
-    init(windowSize: Int, poiSize: CGSize) {
-        self.historyProcessor = HistoryProcessor(windowSampleSize: windowSize)
+    let eventLogger: EventLogger?
+
+    init(windowSize: Int, poiSize: CGSize, eventLogger: EventLogger?) {
+        self.eventLogger = eventLogger
         super.init(position: CGPoint.zero, text: "loading", size: CGSize.zero)
+        let processorLogger = self.eventLogger?.Logger { () -> Dictionary<String, Any> in
+            ["position": self.poiPos]
+        }
+        self.historyProcessor = HistoryProcessor(windowSampleSize: windowSize, eventLogger: processorLogger)
         self.poiSize = poiSize
         self.poiPos = CGPoint(x: CGFloat(Constants.videoWidth) / 2, y: CGFloat(Constants.videoHeight) / 2)
     }

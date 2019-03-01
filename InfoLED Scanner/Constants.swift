@@ -12,7 +12,7 @@ class Constants {
     static let videoWidth = 1280
     static let videoHeight = 720
     static let decimation = 0.25
-    static let decimationLens = 0.125
+    static let decimationLens = 0.25
     static let decimationCcl = 0.25
 
     static let poiWidth = CGFloat(1 / (decimation * decimationLens))

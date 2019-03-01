@@ -125,10 +125,21 @@ class SampleBufferProcessor {
 
     var delegate: SampleBufferProcessorDelegate
 
-    init(delegate: SampleBufferProcessorDelegate) {
+    var eventLogger: EventLogger?
+
+    func createHistoryLens() -> HistoryLens {
+        return HistoryLens(
+            windowSize: windowSampleSize,
+            poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight),
+            eventLogger: eventLogger
+        )
+    }
+
+    init(delegate: SampleBufferProcessorDelegate, eventLogger: EventLogger? = nil) {
+        self.eventLogger = eventLogger
         self.delegate = delegate
         self.delegate.historyLenses = (0..<SampleBufferProcessor.lensCount).map({ (_) in
-            return HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))
+            return createHistoryLens()
         })
 
         // Build MPS kernels
@@ -233,7 +244,9 @@ class SampleBufferProcessor {
                 }
 
                 for lens in self.delegate.historyLenses {
-                    lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.imageProcessingQueue, frameDuration: frameDuration)
+                    if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
+                        lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.imageProcessingQueue, frameDuration: frameDuration)
+                    }
                 }
             })
             captureCommandBuffer.commit()
@@ -283,7 +296,7 @@ class SampleBufferProcessor {
         var available: Bool
 
         init(_ position: CGPoint) {
-            print("candidate: \(position)")
+//            print("candidate: \(position)")
             self.position = position
             self.available = true
         }
@@ -365,6 +378,7 @@ class SampleBufferProcessor {
             }
             if let candidate = matchedCandidate {
                 candidate.assigned(to: lens)
+                eventLogger?.recordMessage(message: "Lens updated at \(lens.poiPos)")
             }
             var close = false
             for existedLens in newHistoryLenses {
@@ -375,7 +389,7 @@ class SampleBufferProcessor {
             }
             if (close || lens.cyclesFound > SampleBufferProcessor.maxHistory) {
                 // if this lens is too close to another lens or haven't been updated for a long time
-                let newLens = HistoryLens(windowSize: windowSampleSize, poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight))
+                let newLens = createHistoryLens()
                 newLens.poiPos = CGPoint(x: Int.random(in: 0..<Constants.videoWidth), y: Int.random(in: 0..<Constants.videoHeight))
                 newHistoryLenses.append(newLens)
             } else {

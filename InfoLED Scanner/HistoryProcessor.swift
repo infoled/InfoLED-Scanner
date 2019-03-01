@@ -23,6 +23,8 @@ class HistoryProcessor {
     var currentLevelDuration : Double = 0
     var windowSampleSize : Int
 
+    var receivedDecodedPacketCount = 0
+
     static let offThreshold = 2.75 / 240
     static let onThreshold = 3.6 / 240
     static let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
@@ -41,8 +43,11 @@ class HistoryProcessor {
 
     var cleanUpTimer = 0
 
-    init(windowSampleSize : Int) {
+    let eventLogger: EventLogger?
+
+    init(windowSampleSize : Int, eventLogger: EventLogger?) {
         self.windowSampleSize = windowSampleSize
+        self.eventLogger = eventLogger
     }
 
     func resetPacketProecessing() {
@@ -51,10 +56,12 @@ class HistoryProcessor {
         adaptivePixelHistory = [((Int, Int, Int), Double?)]()
         adaptiveGrayHistory = [(Int, Double?)]()
         levelDurationHistory = [(Int, Double)]()
-        frameLevels = [Int]();
-        decodedPackets = [[Int]]();
+        frameLevels = [Int]()
+        decodedPackets = [[Int]]()
         currentLevel = 0
         currentLevelDuration = 0
+
+        receivedDecodedPacketCount = 0
     }
 
     static func packetString(packet: [Int]) -> String {
@@ -139,7 +146,7 @@ class HistoryProcessor {
         }
         if decodeFrameLevels() {
 //             os_log("levelDurationHistory: %@", levelDurationHistory)
-             os_log("frameLevels: %@", frameLevels)
+//             os_log("frameLevels: %@", frameLevels)
             return true
         }
         return false
@@ -172,10 +179,17 @@ class HistoryProcessor {
                 })
             })
 
+            if decodedPackets.count > receivedDecodedPacketCount {
+                eventLogger?.recordMessage(message: "New decoded packet: \(decodedPackets.last!)")
+                receivedDecodedPacketCount = decodedPackets.count
+            }
+
             for packet in decodedPackets {
                 if verifyPacket(packet: packet) {
                     resetPacketProecessing()
-                    verifiedPackets += [Array(packet.dropFirst(2))]
+                    let verifiedPacket = Array(packet.dropFirst(2))
+                    eventLogger?.recordMessage(message: "New verified packet: \(verifiedPacket)")
+                    verifiedPackets += [verifiedPacket]
                 }
             }
 
