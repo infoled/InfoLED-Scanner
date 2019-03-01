@@ -30,6 +30,8 @@
 		8CD22B6D220E36960086B704 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6C220E36960086B704 /* LensNode.swift */; };
 		8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6E221219740086B704 /* HistoryLens.swift */; };
 		8CD22B7122121B120086B704 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B7022121B120086B704 /* Constants.swift */; };
+		8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE322290B490011A24F /* IMG_5696.MOV */; };
+		8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE222290B490011A24F /* IMG_5695.MOV */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		8C12E5F91EAAEC68007AE85A /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
 		8C12E5FB1EAC07A1007AE85A /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLDeviceExtension.swift; sourceTree = "<group>"; };
 		8C17ADE022274A6F0011A24F /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
+		8C17ADE222290B490011A24F /* IMG_5695.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5695.MOV; sourceTree = "<group>"; };
+		8C17ADE322290B490011A24F /* IMG_5696.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5696.MOV; sourceTree = "<group>"; };
 		8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
 		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -176,6 +180,8 @@
 		8C657363221FA2A00099B5A8 /* InfoLED TestData */ = {
 			isa = PBXGroup;
 			children = (
+				8C17ADE222290B490011A24F /* IMG_5695.MOV */,
+				8C17ADE322290B490011A24F /* IMG_5696.MOV */,
 				8C657364221FA3700099B5A8 /* IMG_5622.MOV */,
 			);
 			path = "InfoLED TestData";
@@ -302,6 +308,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */,
+				8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */,
 				8C657365221FA3700099B5A8 /* IMG_5622.MOV in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
