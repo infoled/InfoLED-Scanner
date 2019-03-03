@@ -211,7 +211,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        bufferProcessor.processSampleBuffer(sampleBuffer: sampleBuffer)
+        bufferProcessor.processSampleBufferAsync(sampleBuffer: sampleBuffer)
     }
 
     override func didReceiveMemoryWarning() {

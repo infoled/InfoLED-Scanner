@@ -19,8 +19,6 @@ class SampleBufferProcessor {
     let captureQueue = DispatchQueue(label: "me.jackieyang.infoled.captureQueue")
     let renderQueue = DispatchQueue(label: "me.jackieyang.infoled.renderQueue")
 
-    let imageProcessingQueue = DispatchQueue(label: "me.jackieyang.processing-queue")
-
     fileprivate lazy var captureTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
@@ -177,97 +175,118 @@ class SampleBufferProcessor {
         brightKernel = MPSImageConvolution(device: metalDevice, kernelWidth: 1, kernelHeight: 1, weights: &brightValue)
     }
 
-    func processSampleBuffer(sampleBuffer: CMSampleBuffer) {
+    func processSampleBufferAsync(sampleBuffer: CMSampleBuffer) {
         let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let frameDuration = self.delegate.callFpsCounter(time: presentationTime.seconds)
 
         captureQueue.async {
-            swap(&self.linearTexture, &self.oldLinearTexture)
+            self.processSampleBufferOnCaptureQueue(sampleBuffer: sampleBuffer, frameDuration: frameDuration, async: true)
+        }
+    }
 
-            let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-            let imageWidth  = CVPixelBufferGetWidth(localBuffer)
-            let imageHeight = CVPixelBufferGetHeight(localBuffer)
-            var cvImageTexture: CVMetalTexture?
+    func processSampleBufferSync(sampleBuffer: CMSampleBuffer) {
+        let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+        let frameDuration = self.delegate.callFpsCounter(time: presentationTime.seconds)
 
-            CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                      self.textureCache,
-                                                      localBuffer,
-                                                      nil,
-                                                      MTLPixelFormat.bgra8Unorm,
-                                                      imageWidth,
-                                                      imageHeight,
-                                                      0,
-                                                      &cvImageTexture)
+        captureQueue.sync {
+            self.processSampleBufferOnCaptureQueue(sampleBuffer: sampleBuffer, frameDuration: frameDuration, async: false)
+        }
+    }
 
-            let imageTexture = CVMetalTextureGetTexture(cvImageTexture!)!
+    func processSampleBufferOnCaptureQueue(sampleBuffer:CMSampleBuffer, frameDuration: Double?, async: Bool) {
+        swap(&self.linearTexture, &self.oldLinearTexture)
 
-            //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-            //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
-            let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()!
-            var transform = MPSScaleTransform(scaleX: Constants.decimation, scaleY: Constants.decimation, translateX: 0, translateY: 0)
+        let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
+        let imageWidth  = CVPixelBufferGetWidth(localBuffer)
+        let imageHeight = CVPixelBufferGetHeight(localBuffer)
+        var cvImageTexture: CVMetalTexture?
 
-            withUnsafePointer(to: &transform, { (transformPtr) in
-                self.resizeKernel.scaleTransform = transformPtr
-                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
-            })
+        CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                  self.textureCache,
+                                                  localBuffer,
+                                                  nil,
+                                                  MTLPixelFormat.bgra8Unorm,
+                                                  imageWidth,
+                                                  imageHeight,
+                                                  0,
+                                                  &cvImageTexture)
 
-            self.linearKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.linearTexture)
+        let imageTexture = CVMetalTextureGetTexture(cvImageTexture!)!
 
-            var lensTransform = MPSScaleTransform(scaleX: Constants.decimationLens, scaleY: Constants.decimationLens, translateX: 0, translateY: 0)
+        //        CVPixelBufferLockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+        //        CVPixelBufferUnlockBaseAddress(localBuffer, CVPixelBufferLockFlags.readOnly)
+        let captureCommandBuffer = self.captureCommandQueue.makeCommandBuffer()!
+        var transform = MPSScaleTransform(scaleX: Constants.decimation, scaleY: Constants.decimation, translateX: 0, translateY: 0)
 
-            withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
-                self.resizeKernel.scaleTransform = lensTransformPtr
-                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTexture)
-            })
+        withUnsafePointer(to: &transform, { (transformPtr) in
+            self.resizeKernel.scaleTransform = transformPtr
+            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
+        })
 
-            try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldLinearTexture, sourceTextureRhs: self.linearTexture, destinationTexture: self.diffTexture)
+        self.linearKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.linearTexture)
 
-            self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
+        var lensTransform = MPSScaleTransform(scaleX: Constants.decimationLens, scaleY: Constants.decimationLens, translateX: 0, translateY: 0)
 
-            self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
+        withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
+            self.resizeKernel.scaleTransform = lensTransformPtr
+            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTexture)
+        })
 
-            self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
+        try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldLinearTexture, sourceTextureRhs: self.linearTexture, destinationTexture: self.diffTexture)
 
-            self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
+        self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
 
-            var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
-            withUnsafePointer(to: &transform2, { (transformPtr) in
-                self.resize2Kernel.scaleTransform = transformPtr
-                self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
-            })
+        self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
 
-            captureCommandBuffer.addCompletedHandler({ (MTLCommandBuffer) in
-                let bytesPerRow = self.cclTexture.width * 4
-                let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
-                                       size: MTLSize(width: self.cclTexture.width,
-                                                     height: self.cclTexture.height,
-                                                     depth: self.cclTexture.depth))
-                self.cclTexture.getBytes(&self.processedImage,
-                                         bytesPerRow: bytesPerRow,
-                                         from: region,
-                                         mipmapLevel: 0)
-                let labelImage = CcImage(array: &self.processedImage,
-                                         width: self.cclTexture.width,
-                                         height: self.cclTexture.height,
-                                         bytesPerPixel: 4);
-                let labelResult = CcLabel.labelImageFast(data: labelImage,
-                                                         calculateBoundingBoxes: true)
+        self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
 
-                if let boundingBoxes = labelResult.boundingBoxes {
-                    self.updateBoundingBoxes(boundingBoxes: boundingBoxes)
+        self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
+
+        var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
+        withUnsafePointer(to: &transform2, { (transformPtr) in
+            self.resize2Kernel.scaleTransform = transformPtr
+            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
+        })
+
+        func handleComptetedbuffer(buffer: MTLCommandBuffer) {
+            let bytesPerRow = self.cclTexture.width * 4
+            let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
+                                   size: MTLSize(width: self.cclTexture.width,
+                                                 height: self.cclTexture.height,
+                                                 depth: self.cclTexture.depth))
+            self.cclTexture.getBytes(&self.processedImage,
+                                     bytesPerRow: bytesPerRow,
+                                     from: region,
+                                     mipmapLevel: 0)
+            let labelImage = CcImage(array: &self.processedImage,
+                                     width: self.cclTexture.width,
+                                     height: self.cclTexture.height,
+                                     bytesPerPixel: 4);
+            let labelResult = CcLabel.labelImageFast(data: labelImage,
+                                                     calculateBoundingBoxes: true)
+
+            if let boundingBoxes = labelResult.boundingBoxes {
+                self.updateBoundingBoxes(boundingBoxes: boundingBoxes)
+            }
+
+            self.renderQueue.async {
+                self.displayTexture = self.brightCaptureTexture
+            }
+
+            for lens in self.delegate.historyLenses {
+                if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
+                    lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration)
                 }
+            }
+        }
 
-                self.renderQueue.async {
-                    self.displayTexture = self.brightCaptureTexture
-                }
-
-                for lens in self.delegate.historyLenses {
-                    if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
-                        lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.imageProcessingQueue, frameDuration: frameDuration)
-                    }
-                }
-            })
-            captureCommandBuffer.commit()
+        if async {
+            captureCommandBuffer.addCompletedHandler(handleComptetedbuffer)
+        }
+        captureCommandBuffer.commit()
+        if !async {
+            captureCommandBuffer.waitUntilCompleted()
+            handleComptetedbuffer(buffer: captureCommandBuffer)
         }
     }
 

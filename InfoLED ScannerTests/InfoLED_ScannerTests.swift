@@ -75,7 +75,7 @@ class InfoLED_ScannerTests: XCTestCase {
         var lastEventCount = 0
 
         while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
-            bufferProcessor.processSampleBuffer(sampleBuffer: sampleBuffer)
+            bufferProcessor.processSampleBufferSync(sampleBuffer: sampleBuffer)
             print("frame \(delegate.frameCount): ")
             for eventId in lastEventCount ..< eventLogger.events.count {
                 print("event: \(eventLogger.events[eventId])")

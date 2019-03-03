@@ -93,7 +93,7 @@ class HistoryLens: Lens {
                 }).reduce(0, +)
             }).reduce(0, +)
             let lensPixelInt = Int(lensPixel)
-            imageProcessingQueue.async {
+            imageProcessingQueue.sync {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
                     var notification: String!;
                     let packet = self.historyProcessor.getPopularPacket()
