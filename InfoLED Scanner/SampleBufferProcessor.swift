@@ -28,6 +28,13 @@ class SampleBufferProcessor {
         return newTexture
     }()
 
+    fileprivate lazy var linearTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
     fileprivate lazy var lensTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
@@ -35,7 +42,7 @@ class SampleBufferProcessor {
         return newTexture
     }()
 
-    fileprivate lazy var oldCaptureTexture : MTLTexture = {
+    fileprivate lazy var oldLinearTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation), height: Int(Double(Constants.videoHeight) * Constants.decimation), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
@@ -116,6 +123,7 @@ class SampleBufferProcessor {
     }()
 
     var resizeKernel: MPSImageLanczosScale!
+    var linearKernel: MPSImageConversion!
     var diffKernel: ILSImageDiff!
     var thresholdKernel: MPSImageThresholdBinary!
     var erodeKernel: MPSImageAreaMin!
@@ -148,6 +156,14 @@ class SampleBufferProcessor {
 
     func buildKernels() {
         resizeKernel = MPSImageLanczosScale(device: self.metalDevice)
+        let conversionInfo = CGColorConversionInfo(src: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                                   dst: CGColorSpace(name: CGColorSpace.linearSRGB)!)
+
+        linearKernel = MPSImageConversion(device: self.metalDevice,
+                                          srcAlpha: .alphaIsOne,
+                                          destAlpha: .alphaIsOne,
+                                          backgroundColor: nil,
+                                          conversionInfo: conversionInfo)
         diffKernel = ILSImageDiff(device: self.metalDevice)
         let colorTransform: [Float] = [1.0, 1.0, 1.0]
         withUnsafePointer(to: colorTransform) { (colorTransformRef) in
@@ -166,7 +182,7 @@ class SampleBufferProcessor {
         let frameDuration = self.delegate.callFpsCounter(time: presentationTime.seconds)
 
         captureQueue.async {
-            swap(&self.captureTexture, &self.oldCaptureTexture)
+            swap(&self.linearTexture, &self.oldLinearTexture)
 
             let localBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
             let imageWidth  = CVPixelBufferGetWidth(localBuffer)
@@ -195,14 +211,16 @@ class SampleBufferProcessor {
                 self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: imageTexture, destinationTexture: self.captureTexture)
             })
 
+            self.linearKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.linearTexture)
+
             var lensTransform = MPSScaleTransform(scaleX: Constants.decimationLens, scaleY: Constants.decimationLens, translateX: 0, translateY: 0)
 
             withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
                 self.resizeKernel.scaleTransform = lensTransformPtr
-                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.lensTexture)
+                self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTexture)
             })
 
-            try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldCaptureTexture, sourceTextureRhs: self.captureTexture, destinationTexture: self.diffTexture)
+            try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldLinearTexture, sourceTextureRhs: self.linearTexture, destinationTexture: self.diffTexture)
 
             self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
 
