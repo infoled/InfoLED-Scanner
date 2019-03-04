@@ -9,7 +9,7 @@
 import SpriteKit
 
 class LensNode : SKNode {
-    var lensLabel: SKLabelNode
+    private var lensLabel: SKLabelNode
     var lensBracket: SKShapeNode
     var size: CGSize
 
@@ -29,6 +29,19 @@ class LensNode : SKNode {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func setLabelText(text: String) {
+        if #available(iOS 11.0, *) {
+            let attributedText = NSMutableAttributedString(string: text)
+            let entireRange = NSRange(location: 0, length: attributedText.length)
+            attributedText.addAttribute(.foregroundColor, value: UIColor.white, range: entireRange)
+            attributedText.addAttribute(.strokeColor, value: UIColor.black, range: entireRange)
+            attributedText.addAttribute(.strokeWidth, value: 3.0, range: entireRange)
+            self.lensLabel.attributedText = attributedText
+        } else {
+            self.lensLabel.text = text
+        }
     }
 
     func setSize(size: CGSize) {

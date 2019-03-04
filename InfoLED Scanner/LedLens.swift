@@ -39,7 +39,7 @@ class LedLens: SKScene {
             }
             currentNode.position = CGPoint(x: currentLens.position.x, y: self.size.height - currentLens.position.y)
             currentNode.setSize(size: currentLens.size)
-            currentNode.lensLabel.text = currentLens.text
+            currentNode.setLabelText(text: currentLens.text)
             currentNode.setAvailable(available: currentLens.detected)
         }
         if lensNodes.count > lenses.count {
