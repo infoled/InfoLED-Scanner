@@ -34,7 +34,7 @@ class SampleBufferProcessor {
     }()
 
     fileprivate lazy var lensTexture : MTLTexture = {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
         return newTexture
@@ -319,7 +319,7 @@ class SampleBufferProcessor {
     // MARK: Deal with history lenses
 
     static let windowFrameSize = 5
-    static let samplesPerFrame = 240/60
+    static let samplesPerFrame = 240/120
     let windowSampleSize = windowFrameSize * samplesPerFrame
 
     static let lensCount = 5

@@ -61,7 +61,7 @@ class HistoryLens: Lens {
 
     func processFrame(lensTexture: MTLTexture, imageProcessingQueue: DispatchQueue, frameDuration: Double?) {
         if self.scanning {
-            let bytesPerPixel = 4
+            let bytesPerPixel = 4 * MemoryLayout<Float32>.size
             let lensPoiX = min(Double(poiPos.x) * Constants.decimation * Constants.decimationLens, Double(lensTexture.width))
             let lensPoiY = min(Double(poiPos.y) * Constants.decimation * Constants.decimationLens, Double(lensTexture.height))
             let readWidth = 2
@@ -71,15 +71,15 @@ class HistoryLens: Lens {
             let lensPoiYStart = min(Int(floor(lensPoiY)), Int(lensTexture.height - readHeight))
             let lensRegion = MTLRegionMake2D(lensPoiXStart, lensPoiYStart, readWidth, readHeight)
             let imageByteCount = pixelsCount * bytesPerPixel
-            var buffer = [UInt8](repeating: 0, count: Int(imageByteCount))
+            var buffer = [Float32](repeating: 0, count: Int(imageByteCount))
             let lensBytesPerRow = readWidth * bytesPerPixel
             lensTexture.getBytes(&buffer, bytesPerRow: lensBytesPerRow, from: lensRegion, mipmapLevel: 0)
-            let pixels = stride(from: 0, to: readWidth, by: 1).map({ (x) -> [Int] in
-                stride(from: 0, to: readHeight, by: 1).map({ (y) -> Int in
+            let pixels = stride(from: 0, to: readWidth, by: 1).map({ (x) -> [Float32] in
+                stride(from: 0, to: readHeight, by: 1).map({ (y) -> Float32 in
                     let start = y * bytesPerPixel * readWidth + x * bytesPerPixel
                     let end = start + bytesPerPixel
-                    return buffer[start..<end].reduce(0, {(sum, pixel) -> Int in
-                        return sum + Int(pixel)
+                    return buffer[start..<end].reduce(Float32(0), {(sum, pixel) -> Float32 in
+                        return sum + Float32(pixel)
                     })
                 })
             })
@@ -92,7 +92,7 @@ class HistoryLens: Lens {
                     return xFactor * yFactor * Double(pixels[x][y])
                 }).reduce(0, +)
             }).reduce(0, +)
-            let lensPixelInt = Int(lensPixel)
+            let lensPixelInt = Int(lensPixel * 1000)
             imageProcessingQueue.sync {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
                     var notification: String!;
