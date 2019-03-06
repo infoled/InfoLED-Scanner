@@ -24,15 +24,21 @@
 		8C37476E1C99921200EDDF23 /* InfoLED_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C37476D1C99921200EDDF23 /* InfoLED_ScannerTests.swift */; };
 		8C3747791C99921200EDDF23 /* InfoLED_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747781C99921200EDDF23 /* InfoLED_ScannerUITests.swift */; };
 		8C657362221F912E0099B5A8 /* SampleBufferProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C657361221F912E0099B5A8 /* SampleBufferProcessor.swift */; };
-		8C657365221FA3700099B5A8 /* IMG_5622.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C657364221FA3700099B5A8 /* IMG_5622.MOV */; };
+		8C9EABD8222FBBD600E0371C /* 100cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8BB222FAF9D00D22358 /* 100cm.MOV */; };
+		8C9EABD9222FBBD600E0371C /* 20cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8BC222FAF9D00D22358 /* 20cm.MOV */; };
+		8C9EABDA222FBBD600E0371C /* 80cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8BD222FAF9D00D22358 /* 80cm.MOV */; };
+		8C9EABDB222FBBD600E0371C /* 40cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8BE222FAF9D00D22358 /* 40cm.MOV */; };
+		8C9EABDC222FBBD600E0371C /* 60cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8BF222FAF9D00D22358 /* 60cm.MOV */; };
+		8C9EABDD222FBBDB00E0371C /* 30cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8C1222FAF9D00D22358 /* 30cm.MOV */; };
+		8C9EABDE222FBBDB00E0371C /* 10cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8C2222FAF9D00D22358 /* 10cm.MOV */; };
+		8C9EABDF222FBBDB00E0371C /* 50cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8C3222FAF9D00D22358 /* 50cm.MOV */; };
+		8C9EABE0222FBBDB00E0371C /* 20cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8C4222FAF9D00D22358 /* 20cm.MOV */; };
+		8C9EABE1222FBBDB00E0371C /* 40cm.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8C30B8C5222FAF9D00D22358 /* 40cm.MOV */; };
 		8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */; };
 		8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CBB8BE11CED5A2D00C2C280 /* Queue.swift */; };
 		8CD22B6D220E36960086B704 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6C220E36960086B704 /* LensNode.swift */; };
 		8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B6E221219740086B704 /* HistoryLens.swift */; };
 		8CD22B7122121B120086B704 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B7022121B120086B704 /* Constants.swift */; };
-		8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE322290B490011A24F /* IMG_5696.MOV */; };
-		8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE222290B490011A24F /* IMG_5695.MOV */; };
-		8CF22848222E42EE005283DC /* IMG_5792.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8CF22846222E42EB005283DC /* IMG_5792.MOV */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +58,37 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8C9EABCB222FBAD700E0371C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "03-05/2x";
+			dstSubfolderSpec = 7;
+			files = (
+				8C9EABD8222FBBD600E0371C /* 100cm.MOV in CopyFiles */,
+				8C9EABD9222FBBD600E0371C /* 20cm.MOV in CopyFiles */,
+				8C9EABDA222FBBD600E0371C /* 80cm.MOV in CopyFiles */,
+				8C9EABDB222FBBD600E0371C /* 40cm.MOV in CopyFiles */,
+				8C9EABDC222FBBD600E0371C /* 60cm.MOV in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8C9EABD1222FBB0000E0371C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "03-05/1x";
+			dstSubfolderSpec = 7;
+			files = (
+				8C9EABDD222FBBDB00E0371C /* 30cm.MOV in CopyFiles */,
+				8C9EABDE222FBBDB00E0371C /* 10cm.MOV in CopyFiles */,
+				8C9EABDF222FBBDB00E0371C /* 50cm.MOV in CopyFiles */,
+				8C9EABE0222FBBDB00E0371C /* 20cm.MOV in CopyFiles */,
+				8C9EABE1222FBBDB00E0371C /* 40cm.MOV in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		8C0152C521BE939200049838 /* CcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CcLabel.swift; sourceTree = "<group>"; };
 		8C0A93A42208F61F007E71E2 /* LedLens.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LedLens.sks; sourceTree = "<group>"; };
@@ -63,6 +100,16 @@
 		8C17ADE222290B490011A24F /* IMG_5695.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5695.MOV; sourceTree = "<group>"; };
 		8C17ADE322290B490011A24F /* IMG_5696.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5696.MOV; sourceTree = "<group>"; };
 		8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
+		8C30B8BB222FAF9D00D22358 /* 100cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 100cm.MOV; path = "InfoLED TestData/03-05/2x/100cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8BC222FAF9D00D22358 /* 20cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 20cm.MOV; path = "InfoLED TestData/03-05/2x/20cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8BD222FAF9D00D22358 /* 80cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 80cm.MOV; path = "InfoLED TestData/03-05/2x/80cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8BE222FAF9D00D22358 /* 40cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 40cm.MOV; path = "InfoLED TestData/03-05/2x/40cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8BF222FAF9D00D22358 /* 60cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 60cm.MOV; path = "InfoLED TestData/03-05/2x/60cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8C1222FAF9D00D22358 /* 30cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 30cm.MOV; path = "InfoLED TestData/03-05/1x/30cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8C2222FAF9D00D22358 /* 10cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 10cm.MOV; path = "InfoLED TestData/03-05/1x/10cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8C3222FAF9D00D22358 /* 50cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 50cm.MOV; path = "InfoLED TestData/03-05/1x/50cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8C4222FAF9D00D22358 /* 20cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 20cm.MOV; path = "InfoLED TestData/03-05/1x/20cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C30B8C5222FAF9D00D22358 /* 40cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 40cm.MOV; path = "InfoLED TestData/03-05/1x/40cm.MOV"; sourceTree = SOURCE_ROOT; };
 		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3747571C99921100EDDF23 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +159,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8C30B8B9222FAF9D00D22358 /* 03-05 */ = {
+			isa = PBXGroup;
+			children = (
+				8C30B8BA222FAF9D00D22358 /* 2x */,
+				8C30B8C0222FAF9D00D22358 /* 1x */,
+			);
+			path = "03-05";
+			sourceTree = "<group>";
+		};
+		8C30B8BA222FAF9D00D22358 /* 2x */ = {
+			isa = PBXGroup;
+			children = (
+				8C30B8BB222FAF9D00D22358 /* 100cm.MOV */,
+				8C30B8BC222FAF9D00D22358 /* 20cm.MOV */,
+				8C30B8BD222FAF9D00D22358 /* 80cm.MOV */,
+				8C30B8BE222FAF9D00D22358 /* 40cm.MOV */,
+				8C30B8BF222FAF9D00D22358 /* 60cm.MOV */,
+			);
+			path = 2x;
+			sourceTree = "<group>";
+		};
+		8C30B8C0222FAF9D00D22358 /* 1x */ = {
+			isa = PBXGroup;
+			children = (
+				8C30B8C1222FAF9D00D22358 /* 30cm.MOV */,
+				8C30B8C2222FAF9D00D22358 /* 10cm.MOV */,
+				8C30B8C3222FAF9D00D22358 /* 50cm.MOV */,
+				8C30B8C4222FAF9D00D22358 /* 20cm.MOV */,
+				8C30B8C5222FAF9D00D22358 /* 40cm.MOV */,
+			);
+			path = 1x;
+			sourceTree = "<group>";
+		};
 		8C3747491C99921100EDDF23 = {
 			isa = PBXGroup;
 			children = (
@@ -182,6 +262,7 @@
 		8C657363221FA2A00099B5A8 /* InfoLED TestData */ = {
 			isa = PBXGroup;
 			children = (
+				8C30B8B9222FAF9D00D22358 /* 03-05 */,
 				8CF22846222E42EB005283DC /* IMG_5792.MOV */,
 				8C17ADE222290B490011A24F /* IMG_5695.MOV */,
 				8C17ADE322290B490011A24F /* IMG_5696.MOV */,
@@ -217,6 +298,8 @@
 				8C3747651C99921200EDDF23 /* Sources */,
 				8C3747661C99921200EDDF23 /* Frameworks */,
 				8C3747671C99921200EDDF23 /* Resources */,
+				8C9EABCB222FBAD700E0371C /* CopyFiles */,
+				8C9EABD1222FBB0000E0371C /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -311,10 +394,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */,
-				8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */,
-				8C657365221FA3700099B5A8 /* IMG_5622.MOV in Resources */,
-				8CF22848222E42EE005283DC /* IMG_5792.MOV in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

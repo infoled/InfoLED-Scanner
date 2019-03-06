@@ -60,7 +60,7 @@ class InfoLED_ScannerTests: XCTestCase {
         let delegate = TestBufferProcessorDelegate()
         let eventLogger = MemoryEventLogger()
         let bufferProcessor = SampleBufferProcessor(delegate: delegate, eventLogger: eventLogger)
-        let videoURL = Bundle(for: type(of: self)).url(forResource: "IMG_5622", withExtension: "MOV")!
+        let videoURL = Bundle(for: type(of: self)).url(forResource: "10cm", withExtension: "MOV", subdirectory: "03-05/1x/")!
         let videoAsset = AVAsset(url: videoURL)
         let reader = try! AVAssetReader(asset: videoAsset)
 
@@ -73,15 +73,38 @@ class InfoLED_ScannerTests: XCTestCase {
         reader.startReading()
 
         var lastEventCount = 0
+        var firstCorrectPacketFrame: Int?
+        var BER = [Float]()
 
         while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
             bufferProcessor.processSampleBufferSync(sampleBuffer: sampleBuffer)
             print("frame \(delegate.frameCount): ")
             for eventId in lastEventCount ..< eventLogger.events.count {
                 print("event: \(eventLogger.events[eventId])")
+                let currentEvent = eventLogger.events[eventId]
+                if currentEvent.message.keys.contains("decodedPacket") {
+                    let correctPackets = [0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]
+                    let actualPackets = Array((currentEvent.message["decodedPacket"] as! [Int]).dropFirst(2))
+                    print(actualPackets)
+                    var wrongBits = 0
+                    for (actualDigit, correctDigit) in zip(actualPackets, correctPackets) {
+                        wrongBits += actualDigit == correctDigit ? 0 : 1
+                    }
+                    BER.append(Float(wrongBits) / Float(correctPackets.count))
+                    if wrongBits == 0 && firstCorrectPacketFrame == nil {
+                        firstCorrectPacketFrame = delegate.frameCount
+                    }
+                }
             }
             lastEventCount = eventLogger.events.count
         }
+        print("""
+            Test Summary:
+            \(BER.count) packet(s) received
+            First received packet at frame \(firstCorrectPacketFrame ?? -1)
+            Average BER: \(Float(BER.reduce(0, +)) / Float(BER.count))
+            BER: \(BER)
+            """)
     }
     
     func testPerformanceExample() {
