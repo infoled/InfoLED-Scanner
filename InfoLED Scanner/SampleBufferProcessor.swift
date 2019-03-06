@@ -33,7 +33,28 @@ class SampleBufferProcessor {
         return newTexture
     }()
 
-    fileprivate lazy var lensTexture : MTLTexture = {
+    fileprivate lazy var lensTextures : [MTLTexture] = (0..<SampleBufferProcessor.windowSampleSize).map {_ in
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }
+
+    fileprivate lazy var averageLensTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var tempLensTexture : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var emptyLensTexture : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
@@ -128,14 +149,18 @@ class SampleBufferProcessor {
     var dilateKernel: MPSImageAreaMax!
     var resize2Kernel: MPSImageLanczosScale!
     var brightKernel: MPSImageConvolution!
+    var addKernel: MPSImageAdd!
+    var subtractKernel: MPSImageSubtract!
 
     var delegate: SampleBufferProcessorDelegate
 
     var eventLogger: EventLogger?
 
+    var currentLensIndex = 0
+
     func createHistoryLens() -> HistoryLens {
         return HistoryLens(
-            windowSize: windowSampleSize,
+            windowSize: SampleBufferProcessor.windowSampleSize,
             poiSize: CGSize(width: Constants.poiWidth, height: Constants.poiHeight),
             eventLogger: eventLogger
         )
@@ -173,6 +198,9 @@ class SampleBufferProcessor {
 
         var brightValue: [Float] = [16.0]
         brightKernel = MPSImageConvolution(device: metalDevice, kernelWidth: 1, kernelHeight: 1, weights: &brightValue)
+
+        addKernel = MPSImageAdd(device: metalDevice)
+        subtractKernel = MPSImageSubtract(device: metalDevice)
     }
 
     func processSampleBufferAsync(sampleBuffer: CMSampleBuffer) {
@@ -229,7 +257,7 @@ class SampleBufferProcessor {
 
         withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
             self.resizeKernel.scaleTransform = lensTransformPtr
-            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTexture)
+            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTextures[currentLensIndex])
         })
 
         try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldLinearTexture, sourceTextureRhs: self.linearTexture, destinationTexture: self.diffTexture)
@@ -247,6 +275,37 @@ class SampleBufferProcessor {
             self.resize2Kernel.scaleTransform = transformPtr
             self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
         })
+
+        self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyLensTexture, toTexture: self.averageLensTexture)
+
+        let activeLensTextureIndex = (((currentLensIndex - SampleBufferProcessor.halfWindowSize) % SampleBufferProcessor.windowSampleSize) + SampleBufferProcessor.windowSampleSize) % SampleBufferProcessor.windowSampleSize
+        let activeLensTexture = self.lensTextures[activeLensTextureIndex]
+        for i in 0..<SampleBufferProcessor.windowSampleSize {
+            if i != activeLensTextureIndex {
+                let currentLensTexture = self.lensTextures[i];
+                self.addKernel.encode(
+                    commandBuffer: captureCommandBuffer,
+                    primaryTexture: self.averageLensTexture,
+                    secondaryTexture: activeLensTexture,
+                    destinationTexture: tempLensTexture
+                ) // tempLensTexture = self.averageLensTexture + activeLensTexture
+                self.subtractKernel.encode(
+                    commandBuffer: captureCommandBuffer,
+                    primaryTexture: tempLensTexture,
+                    secondaryTexture: currentLensTexture,
+                    destinationTexture: self.averageLensTexture
+                ) // self.averageLensTexture = tempLensTexture - currentLensTexture
+            }
+        }
+
+        let localLensTexture = { () -> MTLTexture in
+            let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
+            textureDescriptor.usage = [.shaderWrite, .shaderRead]
+            let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+            return newTexture
+        }()
+
+        self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
         func handleComptetedbuffer(buffer: MTLCommandBuffer) {
             let bytesPerRow = self.cclTexture.width * 4
@@ -275,7 +334,7 @@ class SampleBufferProcessor {
 
             for lens in self.delegate.historyLenses {
                 if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
-                    lens.processFrame(lensTexture: self.lensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration)
+                    lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration)
                 }
             }
         }
@@ -288,28 +347,31 @@ class SampleBufferProcessor {
             captureCommandBuffer.waitUntilCompleted()
             handleComptetedbuffer(buffer: captureCommandBuffer)
         }
+        currentLensIndex = (currentLensIndex + 1) % SampleBufferProcessor.windowSampleSize
     }
 
-    func CopyDisplayTextureSync(to currentDrawable: CAMetalDrawable) {
+    func copyTexture(buffer: MTLCommandBuffer, fromTexture: MTLTexture, toTexture: MTLTexture) {
+        let blitEncoder = buffer.makeBlitCommandEncoder()!
+        let copySize =
+            MTLSize(width: min(fromTexture.width, toTexture.width),
+                    height: min(fromTexture.height, toTexture.height),
+                    depth: min(fromTexture.depth, toTexture.depth))
+        blitEncoder.copy(from: fromTexture,
+                         sourceSlice: 0,
+                         sourceLevel: 0,
+                         sourceOrigin: MTLOrigin(),
+                         sourceSize: copySize,
+                         to: toTexture,
+                         destinationSlice: 0,
+                         destinationLevel: 0,
+                         destinationOrigin: MTLOrigin())
+        blitEncoder.endEncoding()
+    }
+
+    func copyDisplayTextureSync(to currentDrawable: CAMetalDrawable) {
         renderQueue.sync {
             let renderCommandBuffer = self.renderCommandQueue.makeCommandBuffer()!
-            let blitEncoder = renderCommandBuffer.makeBlitCommandEncoder()!
-            let copySize =
-                MTLSize(width: min(displayTexture.width,
-                                   currentDrawable.texture.width),
-                        height: min(displayTexture.height,
-                                    currentDrawable.texture.height),
-                        depth: displayTexture.depth)
-            blitEncoder.copy(from: displayTexture,
-                             sourceSlice: 0,
-                             sourceLevel: 0,
-                             sourceOrigin: MTLOrigin(),
-                             sourceSize: copySize,
-                             to: currentDrawable.texture,
-                             destinationSlice: 0,
-                             destinationLevel: 0,
-                             destinationOrigin: MTLOrigin())
-            blitEncoder.endEncoding()
+            copyTexture(buffer: renderCommandBuffer, fromTexture: displayTexture, toTexture: currentDrawable.texture)
             renderCommandBuffer.present(currentDrawable)
             renderCommandBuffer.commit()
         }
@@ -320,7 +382,8 @@ class SampleBufferProcessor {
 
     static let windowFrameSize = 5
     static let samplesPerFrame = 240/120
-    let windowSampleSize = windowFrameSize * samplesPerFrame
+    static let halfWindowSize = (windowFrameSize * samplesPerFrame) / 2
+    static let windowSampleSize = 2 * halfWindowSize + 1
 
     static let lensCount = 5
     static let boxesCount = 5
@@ -415,7 +478,7 @@ class SampleBufferProcessor {
             }
             if let candidate = matchedCandidate {
                 candidate.assigned(to: lens)
-                eventLogger?.recordMessage(message: "Lens updated at \(lens.poiPos)")
+                eventLogger?.recordMessage(dict: ["lensPos": lens.poiPos])
             }
             var close = false
             for existedLens in newHistoryLenses {

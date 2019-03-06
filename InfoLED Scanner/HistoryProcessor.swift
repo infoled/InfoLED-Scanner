@@ -24,6 +24,7 @@ class HistoryProcessor {
     var windowSampleSize : Int
 
     var receivedDecodedPacketCount = 0
+    var receivedVerifiedPacketCount = 0
 
     static let offThreshold = 2.75 / 240
     static let onThreshold = 3.6 / 240
@@ -76,26 +77,15 @@ class HistoryProcessor {
             cleanUp()
             cleanUpTimer = 0
         }
-        pixelHistory += [(pixel, frameDuration)]
-        if pixelHistory.count > HistoryProcessor.pixelHistoryLimit {
-            pixelHistory = Array(pixelHistory.suffix(HistoryProcessor.pixelHistoryLimit))
+        guard frameDuration != nil else {
+            return false
         }
-        if pixelHistory.count >= 2 * windowSampleSize + 1 {
-            let centerIndex = pixelHistory.count - windowSampleSize - 1
-            let windowRange = (centerIndex - windowSampleSize)...(centerIndex + windowSampleSize)
-            let sum = pixelHistory[windowRange].reduce((0, 0, 0)
-                , {(sum: (Int, Int, Int), nextPixel: ((Int, Int, Int), Double?)) -> (Int, Int, Int) in
-                    return sum + nextPixel.0
-            })
-            let average = sum / (windowSampleSize * 2 + 1)
-            let adaptivePixel = (pixelHistory[centerIndex].0 - average, pixelHistory[centerIndex].1);
-            if let result = try? processNewAdativePixel(adaptivePixel:adaptivePixel) {
-                if result == true {
-                    return true
-                }
-            } else {
-                print("wierd behavior, probably no tag");
+        if let result = try? processNewAdativePixel(adaptivePixel:(pixel, frameDuration)) {
+            if result == true {
+                return true
             }
+        } else {
+            print("wierd behavior, probably no tag");
         }
         return false
     }
@@ -109,12 +99,11 @@ class HistoryProcessor {
 //            os_log("processNewAdativePixel: level error %@", adaptiveGrayHistory)
             throw HistoryProcessorError.LevelError
         }
+        var verifiedPacketFound = false
         if (newLevel == 0 || newLevel * currentLevel < 0) { // End of a level duration
             currentLevelDuration += adaptivePixel.1! * Double(currentLevel) / Double(currentLevel - newLevel)
             let levelDuration = (currentLevel, currentLevelDuration)
-            if (try! processNewLevelDuration(levelDuration: levelDuration)) {
-                return true
-            }
+            verifiedPacketFound = try! processNewLevelDuration(levelDuration: levelDuration)
         }
         if (currentLevel == 0 || newLevel * currentLevel < 0) { // Start of a level duration
             currentLevelDuration = adaptivePixel.1! * Double(newLevel) / Double(newLevel - currentLevel)
@@ -122,7 +111,7 @@ class HistoryProcessor {
             currentLevelDuration += adaptivePixel.1!
         }
         currentLevel = newLevel
-        return false
+        return verifiedPacketFound
     }
 
     func processNewLevelDuration(levelDuration: (Int, Double)) throws -> Bool {
@@ -180,7 +169,7 @@ class HistoryProcessor {
             })
 
             if decodedPackets.count > receivedDecodedPacketCount {
-                eventLogger?.recordMessage(message: "New decoded packet: \(decodedPackets.last!)")
+                eventLogger?.recordMessage(dict: ["decodedPacket": decodedPackets.last!])
                 receivedDecodedPacketCount = decodedPackets.count
             }
 
@@ -188,13 +177,14 @@ class HistoryProcessor {
                 if verifyPacket(packet: packet) {
                     resetPacketProecessing()
                     let verifiedPacket = Array(packet.dropFirst(2))
-                    eventLogger?.recordMessage(message: "New verified packet: \(verifiedPacket)")
+                    eventLogger?.recordMessage(dict: ["verifiedPacket": verifiedPacket])
                     verifiedPackets += [verifiedPacket]
                 }
             }
 
-            if verifiedPackets.count != 0 {
+            if verifiedPackets.count > receivedDecodedPacketCount {
 //                os_log("filteredHistorys: %@", verifiedPackets)
+                receivedDecodedPacketCount = verifiedPackets.count
                 return true
             }
         }

@@ -32,6 +32,7 @@
 		8CD22B7122121B120086B704 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B7022121B120086B704 /* Constants.swift */; };
 		8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE322290B490011A24F /* IMG_5696.MOV */; };
 		8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8C17ADE222290B490011A24F /* IMG_5695.MOV */; };
+		8CF22848222E42EE005283DC /* IMG_5792.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 8CF22846222E42EB005283DC /* IMG_5792.MOV */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		8CD22B6C220E36960086B704 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
 		8CD22B6E221219740086B704 /* HistoryLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryLens.swift; sourceTree = "<group>"; };
 		8CD22B7022121B120086B704 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		8CF22846222E42EB005283DC /* IMG_5792.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5792.MOV; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 		8C657363221FA2A00099B5A8 /* InfoLED TestData */ = {
 			isa = PBXGroup;
 			children = (
+				8CF22846222E42EB005283DC /* IMG_5792.MOV */,
 				8C17ADE222290B490011A24F /* IMG_5695.MOV */,
 				8C17ADE322290B490011A24F /* IMG_5696.MOV */,
 				8C657364221FA3700099B5A8 /* IMG_5622.MOV */,
@@ -311,6 +314,7 @@
 				8CE048B522290C4800FE22FA /* IMG_5696.MOV in Resources */,
 				8CE048B622290C4C00FE22FA /* IMG_5695.MOV in Resources */,
 				8C657365221FA3700099B5A8 /* IMG_5622.MOV in Resources */,
+				8CF22848222E42EE005283DC /* IMG_5792.MOV in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,7 +448,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -493,7 +497,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -508,7 +512,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -523,7 +527,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";

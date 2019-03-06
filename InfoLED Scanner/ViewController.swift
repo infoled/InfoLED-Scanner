@@ -231,7 +231,7 @@ extension ViewController : MTKViewDelegate {
             print("\(self.fpsCounter.getFps())")
         }
         if let currentDrawable = metalPreviewLayer.currentDrawable {
-            self.bufferProcessor.CopyDisplayTextureSync(to: currentDrawable)
+            self.bufferProcessor.copyDisplayTextureSync(to: currentDrawable)
         }
     }
 }
