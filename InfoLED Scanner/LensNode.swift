@@ -35,9 +35,11 @@ class LensNode : SKNode {
         if #available(iOS 11.0, *) {
             let attributedText = NSMutableAttributedString(string: text)
             let entireRange = NSRange(location: 0, length: attributedText.length)
-            attributedText.addAttribute(.foregroundColor, value: UIColor.white, range: entireRange)
-            attributedText.addAttribute(.strokeColor, value: UIColor.black, range: entireRange)
-            attributedText.addAttribute(.strokeWidth, value: 3.0, range: entireRange)
+            attributedText.addAttributes([
+                .foregroundColor: UIColor.white,
+                .strokeColor: UIColor.black,
+                .font: UIFont(name: "Menlo", size: 10)!
+                ], range: entireRange)
             self.lensLabel.attributedText = attributedText
         } else {
             self.lensLabel.text = text
