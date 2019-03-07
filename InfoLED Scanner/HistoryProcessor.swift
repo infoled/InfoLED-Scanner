@@ -30,9 +30,10 @@ class HistoryProcessor {
     static let dataLength = 16
     static let hashLength = 2
     static let preambleLength = preamble.count
+    static let totalPacketLength = preambleLength + (hashLength + dataLength) * 2
 
     static let verifiedPacketsLimit = 10
-    static let frameLevelsLimit = preamble.count + (dataLength + hashLength) * 2 + 10
+    static let frameLevelsLimit = totalPacketLength + 10
     static let levelDurationHistoryLimit = frameLevelsLimit
     static let adaptivePixelHistoryLimit = levelDurationHistoryLimit * 10
     static let pixelHistoryLimit = adaptivePixelHistoryLimit
@@ -125,9 +126,9 @@ class HistoryProcessor {
     }
 
     func decodeFrameLevels() -> Bool {
-        let packetBitLength = HistoryProcessor.preambleLength + (HistoryProcessor.hashLength + HistoryProcessor.dataLength) * 2
-        if (frameLevels.count > packetBitLength) {
-            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - packetBitLength)
+        let totalPacketLength = HistoryProcessor.totalPacketLength
+        if (frameLevels.count >= totalPacketLength) {
+            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - totalPacketLength)
 
             var result = [(Int, Int)]()
             print(indices)
@@ -158,9 +159,6 @@ class HistoryProcessor {
             if newDecodedPackets.count != 0 {
                 for packet in newDecodedPackets {
                     eventLogger?.recordMessage(dict: ["decodedPacket": packet])
-                    withUnsafePointer(to: &cleanUpTimer) { (selfPointer) in
-                        print("decodedPacket[\(selfPointer)]: \(packet)")
-                    }
                 }
             }
 
