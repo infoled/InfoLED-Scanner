@@ -23,9 +23,6 @@ class HistoryProcessor {
     var currentLevelDuration : Double = 0
     var windowSampleSize : Int
 
-    var receivedDecodedPacketCount = 0
-    var receivedVerifiedPacketCount = 0
-
     static let offThreshold = 2.75 / 240
     static let onThreshold = 3.6 / 240
     static let preamble = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0];
@@ -49,20 +46,6 @@ class HistoryProcessor {
     init(windowSampleSize : Int, eventLogger: EventLogger?) {
         self.windowSampleSize = windowSampleSize
         self.eventLogger = eventLogger
-    }
-
-    func resetPacketProecessing() {
-        os_log("reset processing")
-        pixelHistory = [((Int, Int, Int), Double?)]()
-        adaptivePixelHistory = [((Int, Int, Int), Double?)]()
-        adaptiveGrayHistory = [(Int, Double?)]()
-        levelDurationHistory = [(Int, Double)]()
-        frameLevels = [Int]()
-        decodedPackets = [[Int]]()
-        currentLevel = 0
-        currentLevelDuration = 0
-
-        receivedDecodedPacketCount = 0
     }
 
     static func packetString(packet: [Int]) -> String {
@@ -142,25 +125,24 @@ class HistoryProcessor {
     }
 
     func decodeFrameLevels() -> Bool {
-        if (frameLevels.count > 2 * HistoryProcessor.preambleLength) {
-            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - HistoryProcessor.preamble.count)
+        let packetBitLength = HistoryProcessor.preambleLength + (HistoryProcessor.hashLength + HistoryProcessor.dataLength) * 2
+        if (frameLevels.count > packetBitLength) {
+            let indices = Array(frameLevels.startIndex...frameLevels.endIndex - packetBitLength)
 
-            var result = [(Int, Int)]();
-            for index in 1..<indices.count {
-                let subarray = frameLevels[index ... (index + HistoryProcessor.preambleLength - 1)]
+            var result = [(Int, Int)]()
+            print(indices)
+            for index in indices {
+                let subarray = frameLevels[index ..< (index + HistoryProcessor.preambleLength)]
                 if (subarray == ArraySlice<Int>(HistoryProcessor.preamble)) {
                     let packetBegin = index + HistoryProcessor.preambleLength
                     let packetEnd = packetBegin + (HistoryProcessor.hashLength + HistoryProcessor.dataLength) * 2
-                    if packetEnd <= frameLevels.count {
-                        result += [(packetBegin, packetEnd)]
-                    } else {
-                        break
-                    }
+                    assert(packetEnd <= frameLevels.count)
+                    result += [(packetBegin, packetEnd)]
                 }
             }
             let preambleRanges = result
 
-            decodedPackets = preambleRanges.map({ (start, end) in
+            let newDecodedPackets = preambleRanges.map({ (start, end) in
                 return frameLevels[start ..< end].enumerated().filter({ (index, element) -> Bool in
                     return index % 2 == 0
                 }).map({ (_, element) in
@@ -168,25 +150,31 @@ class HistoryProcessor {
                 })
             })
 
-            if decodedPackets.count > receivedDecodedPacketCount {
-                eventLogger?.recordMessage(dict: ["decodedPacket": decodedPackets.last!])
-                receivedDecodedPacketCount = decodedPackets.count
+
+            if let lastIndex = indices.last {
+                frameLevels = Array(frameLevels.dropFirst(lastIndex + 1))
             }
 
-            for packet in decodedPackets {
-                if verifyPacket(packet: packet) {
-                    resetPacketProecessing()
-                    let verifiedPacket = Array(packet.dropFirst(2))
-                    eventLogger?.recordMessage(dict: ["verifiedPacket": verifiedPacket])
-                    verifiedPackets += [verifiedPacket]
+            if newDecodedPackets.count != 0 {
+                for packet in newDecodedPackets {
+                    eventLogger?.recordMessage(dict: ["decodedPacket": packet])
+                    withUnsafePointer(to: &cleanUpTimer) { (selfPointer) in
+                        print("decodedPacket[\(selfPointer)]: \(packet)")
+                    }
                 }
             }
 
-            if verifiedPackets.count > receivedDecodedPacketCount {
-//                os_log("filteredHistorys: %@", verifiedPackets)
-                receivedDecodedPacketCount = verifiedPackets.count
-                return true
+            var newVerifiedPacket = false
+            for packet in newDecodedPackets {
+                if verifyPacket(packet: packet) {
+                    let verifiedPacket = Array(packet.dropFirst(2))
+                    eventLogger?.recordMessage(dict: ["verifiedPacket": verifiedPacket])
+                    verifiedPackets += [verifiedPacket]
+                    newVerifiedPacket = true
+                }
             }
+
+            return newVerifiedPacket
         }
         return false
     }
