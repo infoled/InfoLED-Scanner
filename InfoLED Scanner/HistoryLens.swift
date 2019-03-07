@@ -51,8 +51,8 @@ class HistoryLens: Lens {
     init(windowSize: Int, poiSize: CGSize, eventLogger: EventLogger?) {
         self.eventLogger = eventLogger
         super.init(position: CGPoint.zero, text: "loading", size: CGSize.zero)
-        let processorLogger = self.eventLogger?.Logger { () -> Dictionary<String, Any> in
-            ["position": self.poiPos]
+        let processorLogger = self.eventLogger?.Logger { [weak self] () -> Dictionary<String, Any> in
+            ["position": self!.poiPos]
         }
         self.historyProcessor = HistoryProcessor(windowSampleSize: windowSize, eventLogger: processorLogger)
         self.poiSize = poiSize
