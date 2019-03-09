@@ -63,7 +63,7 @@ class ILSImageDiff : MPSKernel {
         commandEncoder.setTexture(sourceTextureRhs, index: 1)
         commandEncoder.setTexture(destinationTexture, index: 2)
 
-        let threadGroupCount = MTLSizeMake(16, 16, 1)
+        let threadGroupCount = MTLSizeMake(8, 8, 1)
 
         let threadGroups: MTLSize = {
             MTLSizeMake(Int(sourceTextureLhs.width) / threadGroupCount.width,
