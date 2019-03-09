@@ -38,7 +38,8 @@ class LensNode : SKNode {
             attributedText.addAttributes([
                 .foregroundColor: UIColor.white,
                 .strokeColor: UIColor.black,
-                .font: UIFont(name: "Menlo", size: 10)!
+                .font: UIFont(name: "Menlo", size: 10)!,
+                .strokeWidth: -2.0
                 ], range: entireRange)
             self.lensLabel.attributedText = attributedText
         } else {
