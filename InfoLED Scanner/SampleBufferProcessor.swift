@@ -413,11 +413,7 @@ class SampleBufferProcessor {
 
         func assigned(to lens: HistoryLens) {
             lens.cyclesFound = 0
-            let poiX = lens.poiPos.x
-            let poiY = lens.poiPos.y
-            let distance = lens.poiPos.distance(with: position)
-            let damping = CGFloat(max(1 - distance / 100, 0))
-            lens.poiPos = CGPoint(x: poiX * damping + position.x * (1 - damping), y: poiY * damping + position.y * (1 - damping))
+            lens.poiPos = position
             self.available = false
         }
 
