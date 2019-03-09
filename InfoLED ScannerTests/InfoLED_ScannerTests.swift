@@ -107,7 +107,29 @@ class InfoLED_ScannerTests: XCTestCase {
         super.tearDown()
     }
 
-    func test0305() {
+    func test0305_1() {
+        let testFolderName = "03-05"
+        let cameraConfigs = [1]
+        let cameraConfigNames = cameraConfigs.map{"\($0)x"}
+        let videoDistances = cameraConfigs.map{stride(from: 50 * $0, to: 0 * $0, by: -10 * $0)}
+        let videoDistanceNames = videoDistances.map{$0.map{"\($0)cm"}}
+        var resultDict = [String: TestVideoResult]()
+        for (cameraConfigName, videoNames) in zip(cameraConfigNames, videoDistanceNames) {
+            let directory = "\(testFolderName)/\(cameraConfigName)"
+            for videoName in videoNames {
+                print("\(cameraConfigName)/\(videoName)")
+                let result = testVideo(directory: directory, name: videoName)
+                resultDict["\(cameraConfigName)/\(videoName)"] = result
+                result.printDescription()
+            }
+        }
+        for (name, result) in resultDict {
+            print("Test \(name):\n")
+            result.printDescription()
+        }
+    }
+
+    func test0305_2() {
         let testFolderName = "03-05"
         let cameraConfigs = [2]
         let cameraConfigNames = cameraConfigs.map{"\($0)x"}
