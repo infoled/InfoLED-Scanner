@@ -264,16 +264,16 @@ class SampleBufferProcessor {
 
         self.thresholdKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.diffTexture, destinationTexture: self.thresholdTexture)
 
-        self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
-
-        self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
+//        self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
+//
+//        self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
 
         self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
 
         var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
         withUnsafePointer(to: &transform2, { (transformPtr) in
             self.resize2Kernel.scaleTransform = transformPtr
-            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
+            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.cclTexture)
         })
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyLensTexture, toTexture: self.averageLensTexture)

@@ -95,7 +95,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         // Adjust video settings
         captureSession.sessionPreset = AVCaptureSession.Preset(rawValue: convertFromAVCaptureSessionPreset(AVCaptureSession.Preset.inputPriority))
-        cameraDevice = AVCaptureDevice.default(for: AVMediaType(rawValue: convertFromAVMediaType(AVMediaType.video)))!;
+        cameraDevice = AVCaptureDevice.default(.builtInTelephotoCamera, for: AVMediaType(rawValue: convertFromAVMediaType(AVMediaType.video)), position: .back)!;
         do {
             let cameraDeviceInput = try AVCaptureDeviceInput.init(device: cameraDevice!);
             if (captureSession.canAddInput(cameraDeviceInput)) {
