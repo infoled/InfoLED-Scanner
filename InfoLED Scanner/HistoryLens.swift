@@ -59,7 +59,7 @@ class HistoryLens: Lens {
         self.poiPos = CGPoint(x: CGFloat(Constants.videoWidth) / 2, y: CGFloat(Constants.videoHeight) / 2)
     }
 
-    func processFrame(lensTexture: MTLTexture, imageProcessingQueue: DispatchQueue, frameDuration: Double?) {
+    func processFrame(lensTexture: MTLTexture, imageProcessingQueue: DispatchQueue, frameDuration: Double?, frameId: Int) {
         if self.scanning {
             let channelPerPixel = 4
             let bytesPerPixel = channelPerPixel * MemoryLayout<Float32>.size
@@ -94,7 +94,7 @@ class HistoryLens: Lens {
             }).reduce(0, +)
             let lensPixelInt = Int(lensPixel * 1000)
             imageProcessingQueue.sync {
-                if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration) || self.processCount == 2000) {
+                if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration, frameId: frameId) || self.processCount == 2000) {
                     var notification: String!;
                     let packet = self.historyProcessor.getPopularPacket()
                     let tagFound = packet != nil

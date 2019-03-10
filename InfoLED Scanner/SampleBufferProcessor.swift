@@ -158,6 +158,8 @@ class SampleBufferProcessor {
 
     var currentLensIndex = 0
 
+    var currentFrameId = 0;
+
     func createHistoryLens() -> HistoryLens {
         return HistoryLens(
             windowSize: SampleBufferProcessor.windowSampleSize,
@@ -308,6 +310,7 @@ class SampleBufferProcessor {
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
         func handleComptetedbuffer(buffer: MTLCommandBuffer) {
+            currentFrameId += 1
             let bytesPerRow = self.cclTexture.width * 4
             let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
                                    size: MTLSize(width: self.cclTexture.width,
@@ -334,7 +337,7 @@ class SampleBufferProcessor {
 
             for lens in self.delegate.historyLenses {
                 if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
-                    lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration)
+                    lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration, frameId: currentFrameId)
                 }
             }
         }
