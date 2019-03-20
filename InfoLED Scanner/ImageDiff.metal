@@ -80,13 +80,14 @@ kernel void image_diff_2d(texture2d<float, access::read> thisFrame [[texture(0)]
     sumY(tid, groupDiff, groupAvail, 4);
     threadgroup_barrier(mem_flags::mem_threadgroup);
     float minDifference = safeDivide(groupDiff[3][3][0][0], groupAvail[3][3][0][0]);
-    uint2 minPos = gid;
+    uint2 minPos = uint2(gid.x - 1, gid.y - 1);
     for (int i = int(gid.x) - range; i <= int(gid.x) + range; i++) {
         int index_i = i - (int(gid.x) - range);
         for (int j = int(gid.y) - range; j <= int(gid.y) + range; j++) {
             int index_j = j - (int(gid.y) - range);
             float difference = safeDivide(groupDiff[index_i][index_j][0][0], groupAvail[index_i][index_j][0][0]);
             uint2 pos = uint2(i, j);
+            if (pos.x == gid.x && pos.y == gid.y) continue; //Ignore central point
             if (difference < minDifference) {
                 minDifference = difference;
                 minPos = pos;
@@ -94,7 +95,13 @@ kernel void image_diff_2d(texture2d<float, access::read> thisFrame [[texture(0)]
 
         }
     }
-    float3 difference = fabs(thisFrame.read(gid).rgb - lastFrame.read(minPos).rgb);
+    float3 lastPixel = lastFrame.read(gid).rgb;
+    float3 lastClosePixel = lastFrame.read(minPos).rgb;
+    float3 largerPixel = max(lastPixel, lastClosePixel);
+    float3 smallerPixel = min(lastPixel, lastClosePixel);
+    float3 thisPixel = thisFrame.read(gid).rgb;
+    float3 clampPixel = clamp(thisPixel, smallerPixel, largerPixel);
+    float3 difference = fabs(thisPixel - clampPixel);
     float3 sum = thisFrame.read(gid).rgb + lastFrame.read(minPos).rgb;
     outFrame.write(float4(4 * difference, 1), gid);
     //    outFrame.write(float4((float2((int2(minPos) - int2(gid)) + range) / 3.0), 0, 1), gid);
