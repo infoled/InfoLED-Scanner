@@ -176,6 +176,11 @@ class InfoLED_ScannerTests: XCTestCase {
             result.printDescription()
         }
     }
+
+    func testPilot() {
+        let result = testVideo(directory: "Pilot", name: "test")
+        result.printDescription()
+    }
     
     func testVideo(directory: String, name: String) -> TestVideoResult {
         let delegate = TestBufferProcessorDelegate()
