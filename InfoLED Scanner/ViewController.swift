@@ -54,12 +54,6 @@ func / (tuple: (Int, Int, Int), val: Int) -> (Int, Int, Int) {
     return (tuple.0 / val, tuple.1 / val, tuple.2 / val)
 }
 
-extension CGPoint {
-    func distance(with point: CGPoint) -> CGFloat {
-        return hypot(self.x - point.x, self.y - point.y)
-    }
-}
-
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     @IBOutlet weak var videoPreviewView: UIView!

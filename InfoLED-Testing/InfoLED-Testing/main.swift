@@ -6,9 +6,9 @@
 //  Copyright © 2016 yangjunrui. All rights reserved.
 //
 
-import XCTest
+import Foundation
 import AVFoundation
-@testable import InfoLED_Scanner
+import Darwin
 
 class TestBufferProcessorDelegate: SampleBufferProcessorDelegate {
     var beginTimestamp: Double?
@@ -121,18 +121,9 @@ class TestVideoResult {
     }
 }
 
-class InfoLED_ScannerTests: XCTestCase {
-    var internalHistoryLens: [HistoryLens]!
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
+class InfoLED_ScannerTests {
+
+    let baseDir = "."
 
     func test0305_1() {
         let testFolderName = "03-05"
@@ -182,14 +173,15 @@ class InfoLED_ScannerTests: XCTestCase {
         let studyFolderName = "Study"
         let userIds = [1]
         let environments = ["Dark", "Office", "Outdoor"]
-        let distances = ["_1m", "_2m", "_3m", "_4m", "_5m", "_6m", "_7m"]
+        let distances = ["_7m", "_6m", "_5m", "_4m", "_3m", "_2m", "_1m"]
         var resultDict = [String: TestVideoResult]()
 
         for userId in userIds {
             for environment in environments {
                 for distance in distances {
                     let filename = "\(userId)_\(environment)_\(distance)"
-                    let result = testVideo(directory: studyFolderName, name: filename)
+                    let foldername = "\(baseDir)/\(studyFolderName)/"
+                    let result = testVideo(directory: foldername, name: filename)
                     if let validResult = result {
                         validResult.printDescription()
                         resultDict[filename] = validResult
@@ -207,17 +199,24 @@ class InfoLED_ScannerTests: XCTestCase {
         let result = testVideo(directory: "Pilot", name: "test")!
         result.printDescription()
     }
-    
+
     func testVideo(directory: String, name: String) -> TestVideoResult? {
+        let videoURL = URL(fileURLWithPath: directory + name + ".MOV")
+        return testVideo(at: videoURL.path)
+    }
+
+    func testVideo(at path: String) -> TestVideoResult? {
         let delegate = TestBufferProcessorDelegate()
         let eventLogger = MemoryEventLogger()
         let bufferProcessor = SampleBufferProcessor(delegate: delegate, eventLogger: eventLogger)
-        let videoURLOptional = Bundle(for: type(of: self)).url(forResource: name, withExtension: "MOV", subdirectory: directory)
-        guard let videoURL = videoURLOptional else {
+
+        let videoURL = URL(fileURLWithPath: path)
+        let videoAsset = AVAsset(url: videoURL)
+        let readerOptional = try? AVAssetReader(asset: videoAsset)
+
+        guard let reader = readerOptional else {
             return nil
         }
-        let videoAsset = AVAsset(url: videoURL)
-        let reader = try! AVAssetReader(asset: videoAsset)
 
         let videoTrack = videoAsset.tracks(withMediaType: .video)[0]
 
@@ -232,9 +231,9 @@ class InfoLED_ScannerTests: XCTestCase {
 
         while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
             bufferProcessor.processSampleBufferSync(sampleBuffer: sampleBuffer)
-            print("frame \(delegate.frameCount): ")
+            fputs("frame \(delegate.frameCount): \n", stderr)
             for eventId in lastEventCount ..< eventLogger.events.count {
-                print("event: \(eventLogger.events[eventId])")
+                fputs("event: \(eventLogger.events[eventId])\n", stderr)
                 let currentEvent = eventLogger.events[eventId]
                 if currentEvent.message.keys.contains("decodedPacket") {
                     let correctPackets = [0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]
@@ -253,12 +252,11 @@ class InfoLED_ScannerTests: XCTestCase {
         videoResult.calculateResult(totalFrames: delegate.frameCount)
         return videoResult
     }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-    
+
+}
+
+if (CommandLine.arguments.count == 2) {
+    let result = InfoLED_ScannerTests().testVideo(at: CommandLine.arguments[1])
+    print("Test \(CommandLine.arguments[1]):\n")
+    result?.printDescription()
 }

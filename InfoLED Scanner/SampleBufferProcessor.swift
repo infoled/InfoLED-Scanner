@@ -37,6 +37,8 @@ class SampleBufferProcessor {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        var emptyFloat = [Float](repeating: 0, count: newTexture.width * newTexture.height * 4)
+        newTexture.replace(region: MTLRegionMake2D(0, 0, newTexture.width, newTexture.height), mipmapLevel: 0, withBytes: &emptyFloat, bytesPerRow: newTexture.width * 4 * 4)
         return newTexture
     }
 
@@ -58,6 +60,8 @@ class SampleBufferProcessor {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        var emptyFloat = [Float](repeating: 0, count: newTexture.width * newTexture.height * 4)
+        newTexture.replace(region: MTLRegionMake2D(0, 0, newTexture.width, newTexture.height), mipmapLevel: 0, withBytes: &emptyFloat, bytesPerRow: newTexture.width * 4 * 4)
         return newTexture
     }()
 
@@ -309,6 +313,12 @@ class SampleBufferProcessor {
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
+        let currentLensTexture = self.lensTextures[currentLensIndex];
+        #if os(OSX)
+        self.flushTexture(buffer: captureCommandBuffer, resource: self.cclTexture)
+        self.flushTexture(buffer: captureCommandBuffer, resource: localLensTexture)
+        #endif
+
         weak var weakSelfOptional = self
         func handleComptetedbuffer(buffer: MTLCommandBuffer) {
             guard let weakSelf = weakSelfOptional else {
@@ -375,6 +385,14 @@ class SampleBufferProcessor {
                          destinationOrigin: MTLOrigin())
         blitEncoder.endEncoding()
     }
+
+#if os(OSX)
+    func flushTexture(buffer: MTLCommandBuffer, resource: MTLResource) {
+        let blitEncoder = buffer.makeBlitCommandEncoder()!
+        blitEncoder.synchronize(resource: resource)
+        blitEncoder.endEncoding()
+    }
+#endif
 
     func copyDisplayTextureSync(to currentDrawable: CAMetalDrawable) {
         renderQueue.sync {

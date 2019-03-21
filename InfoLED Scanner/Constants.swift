@@ -6,7 +6,17 @@
 //  Copyright © 2019 yangjunrui. All rights reserved.
 //
 
+#if os(OSX)
+import Cocoa
+#elseif os(iOS)
 import UIKit
+#endif
+
+extension CGPoint {
+    func distance(with point: CGPoint) -> CGFloat {
+        return hypot(self.x - point.x, self.y - point.y)
+    }
+}
 
 class Constants {
     static let videoWidth = 1280

@@ -1,7 +1,6 @@
 // Adopted from https://github.com/nfergu/cclabel
 
 import Foundation
-import UIKit
 
 class CcImage {
     let width: Int;

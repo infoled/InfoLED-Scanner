@@ -31,6 +31,7 @@ class LensNode : SKNode {
         fatalError("init(coder:) has not been implemented")
     }
 
+    #if os(iOS)
     func setLabelText(text: String) {
         if #available(iOS 11.0, *) {
             let attributedText = NSMutableAttributedString(string: text)
@@ -46,6 +47,7 @@ class LensNode : SKNode {
             self.lensLabel.text = text
         }
     }
+    #endif
 
     func setSize(size: CGSize) {
         if size == self.size {

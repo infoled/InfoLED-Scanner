@@ -6,26 +6,38 @@
 //  Copyright © 2019 yangjunrui. All rights reserved.
 //
 
+#if os(OSX)
+import Cocoa
+#elseif os(iOS)
 import UIKit
+#endif
+
+func ScreenScale() -> CGFloat {
+    #if os(OSX)
+    return CGFloat(1)
+    #elseif os(iOS)
+    return UIScreen.main.scale
+    #endif
+}
 
 class HistoryLens: Lens {
     public var historyProcessor: HistoryProcessor!
 
     public var poiPos: CGPoint {
         get {
-            return CGPoint(x: position.x * UIScreen.main.scale, y: position.y * UIScreen.main.scale)
+            return CGPoint(x: position.x * ScreenScale(), y: position.y * ScreenScale())
         }
         set (newPos) {
-            position = CGPoint(x: newPos.x / UIScreen.main.scale, y: newPos.y / UIScreen.main.scale)
+            position = CGPoint(x: newPos.x / ScreenScale(), y: newPos.y / ScreenScale())
         }
     }
 
     public var poiSize: CGSize {
         get {
-            return CGSize(width: size.width * UIScreen.main.scale, height: size.height * UIScreen.main.scale)
+            return CGSize(width: size.width * ScreenScale(), height: size.height * ScreenScale())
         }
         set (newSize) {
-            size = CGSize(width: newSize.width / UIScreen.main.scale, height: newSize.height / UIScreen.main.scale)
+            size = CGSize(width: newSize.width / ScreenScale(), height: newSize.height / ScreenScale())
         }
     }
 
@@ -85,13 +97,17 @@ class HistoryLens: Lens {
             })
             let lensPoiXReminder = lensPoiX - Double(lensPoiXStart)
             let lensPoiYReminder = lensPoiY - Double(lensPoiYStart)
-            let lensPixel = stride(from: 0, to: readWidth, by: 1).map({ (x) -> Double in
+            var lensPixel = stride(from: 0, to: readWidth, by: 1).map({ (x) -> Double in
                 stride(from: 0, to: readHeight, by: 1).map({ (y) -> Double in
                     let xFactor = x == 0 ? (1 - lensPoiXReminder) : lensPoiXReminder
                     let yFactor = y == 0 ? (1 - lensPoiYReminder) : lensPoiYReminder
                     return xFactor * yFactor * Double(pixels[x][y])
                 }).reduce(0, +)
             }).reduce(0, +)
+            if lensPixel.isNaN {
+                lensPixel = 0
+                print("lensPixel NaN")
+            }
             let lensPixelInt = Int(lensPixel * 1000)
             imageProcessingQueue.sync {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration, frameId: frameId) || self.processCount == 2000) {

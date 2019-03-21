@@ -6,7 +6,11 @@
 //  Copyright © 2016 yangjunrui. All rights reserved.
 //
 
+#if os(OSX)
+import Cocoa
+#elseif os(iOS)
 import UIKit
+#endif
 import os
 
 open class FpsCounter {
