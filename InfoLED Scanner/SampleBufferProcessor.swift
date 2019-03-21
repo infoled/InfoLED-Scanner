@@ -309,34 +309,38 @@ class SampleBufferProcessor {
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
+        weak var weakSelfOptional = self
         func handleComptetedbuffer(buffer: MTLCommandBuffer) {
+            guard let weakSelf = weakSelfOptional else {
+                return
+            }
             currentFrameId += 1
-            let bytesPerRow = self.cclTexture.width * 4
+            let bytesPerRow = weakSelf.cclTexture.width * 4
             let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
-                                   size: MTLSize(width: self.cclTexture.width,
-                                                 height: self.cclTexture.height,
-                                                 depth: self.cclTexture.depth))
-            self.cclTexture.getBytes(&self.processedImage,
-                                     bytesPerRow: bytesPerRow,
-                                     from: region,
-                                     mipmapLevel: 0)
-            let labelImage = CcImage(array: &self.processedImage,
-                                     width: self.cclTexture.width,
-                                     height: self.cclTexture.height,
+                                   size: MTLSize(width: weakSelf.cclTexture.width,
+                                                 height: weakSelf.cclTexture.height,
+                                                 depth: weakSelf.cclTexture.depth))
+            weakSelf.cclTexture.getBytes(&weakSelf.processedImage,
+                                          bytesPerRow: bytesPerRow,
+                                          from: region,
+                                          mipmapLevel: 0)
+            let labelImage = CcImage(array: &weakSelf.processedImage,
+                                     width: weakSelf.cclTexture.width,
+                                     height: weakSelf.cclTexture.height,
                                      bytesPerPixel: 4);
             let labelResult = CcLabel.labelImageFast(data: labelImage,
                                                      calculateBoundingBoxes: true)
 
             if let boundingBoxes = labelResult.boundingBoxes {
-                self.updateBoundingBoxes(boundingBoxes: boundingBoxes)
+                weakSelf.updateBoundingBoxes(boundingBoxes: boundingBoxes)
             }
 
-            self.renderQueue.async {
-//                self.displayTexture = self.brightCaptureTexture
-                self.displayTexture = self.dilateTexture
+            weakSelf.renderQueue.async {
+//                weakSelf.displayTexture = weakSelf.brightCaptureTexture
+                weakSelf.displayTexture = weakSelf.dilateTexture
             }
 
-            for lens in self.delegate.historyLenses {
+            for lens in weakSelf.delegate.historyLenses {
                 if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
                     lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration, frameId: currentFrameId)
                 }
