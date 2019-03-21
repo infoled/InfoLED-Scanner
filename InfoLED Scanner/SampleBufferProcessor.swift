@@ -195,7 +195,7 @@ class SampleBufferProcessor {
             thresholdKernel = MPSImageThresholdBinary(device: self.metalDevice, thresholdValue: 0.1, maximumValue: 1.0, linearGrayColorTransform: colorTransform)
         }
         erodeKernel = MPSImageAreaMin(device: metalDevice, kernelWidth: 3, kernelHeight: 3)
-        dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 3, kernelHeight: 3)
+        dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
         resize2Kernel = MPSImageLanczosScale(device: self.metalDevice)
 
         var brightValue: [Float] = [16.0]
@@ -268,14 +268,14 @@ class SampleBufferProcessor {
 
 //        self.erodeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.erodeTexture)
 //
-//        self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.erodeTexture, destinationTexture: self.dilateTexture)
+        self.dilateKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.dilateTexture)
 
         self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
 
         var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
         withUnsafePointer(to: &transform2, { (transformPtr) in
             self.resize2Kernel.scaleTransform = transformPtr
-            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.thresholdTexture, destinationTexture: self.cclTexture)
+            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
         })
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyLensTexture, toTexture: self.averageLensTexture)
@@ -332,7 +332,8 @@ class SampleBufferProcessor {
             }
 
             self.renderQueue.async {
-                self.displayTexture = self.brightCaptureTexture
+//                self.displayTexture = self.brightCaptureTexture
+                self.displayTexture = self.dilateTexture
             }
 
             for lens in self.delegate.historyLenses {
