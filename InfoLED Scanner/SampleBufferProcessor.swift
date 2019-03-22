@@ -107,7 +107,30 @@ class SampleBufferProcessor {
         return newTexture
     }()
 
-    fileprivate lazy var cclTexture : MTLTexture = {
+    fileprivate lazy var cclTextures : [MTLTexture] = (0..<SampleBufferProcessor.windowSampleSize).map {_ in
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }
+
+    fileprivate lazy var sumCclTextures : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        return newTexture
+    }()
+
+    fileprivate lazy var tempCclTextures : MTLTexture = {
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+        let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        var emptyUInt8 = [UInt8](repeating: 0, count: newTexture.width * newTexture.height * 4)
+        newTexture.replace(region: MTLRegionMake2D(0, 0, newTexture.width, newTexture.height), mipmapLevel: 0, withBytes: &emptyUInt8, bytesPerRow: newTexture.width * 4)
+        return newTexture
+    }()
+
+    fileprivate lazy var emptyCclTextures : MTLTexture = {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
@@ -160,7 +183,7 @@ class SampleBufferProcessor {
 
     var eventLogger: EventLogger?
 
-    var currentLensIndex = 0
+    var currentTextureIndex = 0
 
     var currentFrameId = 0;
 
@@ -263,7 +286,7 @@ class SampleBufferProcessor {
 
         withUnsafePointer(to: &lensTransform, { (lensTransformPtr) in
             self.resizeKernel.scaleTransform = lensTransformPtr
-            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTextures[currentLensIndex])
+            self.resizeKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.linearTexture, destinationTexture: self.lensTextures[currentTextureIndex])
         })
 
         try! self.diffKernel.encode(commandBuffer: captureCommandBuffer, sourceTextureLhs: self.oldLinearTexture, sourceTextureRhs: self.linearTexture, destinationTexture: self.diffTexture)
@@ -276,18 +299,35 @@ class SampleBufferProcessor {
 
         self.brightKernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.captureTexture, destinationTexture: self.brightCaptureTexture)
 
+        let activeTextureIndex = (((currentTextureIndex - SampleBufferProcessor.halfWindowSize) % SampleBufferProcessor.windowSampleSize) + SampleBufferProcessor.windowSampleSize) % SampleBufferProcessor.windowSampleSize
+        let currentCclTexture = cclTextures[currentTextureIndex]
+        let currentLensTexture = lensTextures[currentTextureIndex]
+        let activeCclTexture = cclTextures[activeTextureIndex]
+        let activeLensTexture = lensTextures[activeTextureIndex]
+
         var transform2 = MPSScaleTransform(scaleX: Constants.decimationCcl, scaleY: Constants.decimationCcl, translateX: 0, translateY: 0)
         withUnsafePointer(to: &transform2, { (transformPtr) in
             self.resize2Kernel.scaleTransform = transformPtr
-            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: self.cclTexture)
+            self.resize2Kernel.encode(commandBuffer: captureCommandBuffer, sourceTexture: self.dilateTexture, destinationTexture: currentCclTexture)
         })
+
+        self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyCclTextures, toTexture: self.sumCclTextures)
+        self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyCclTextures, toTexture: self.tempCclTextures)
+
+        for i in 0..<SampleBufferProcessor.windowSampleSize {
+            swap(&self.tempCclTextures, &self.sumCclTextures)
+            self.addKernel.encode(
+                commandBuffer: captureCommandBuffer,
+                primaryTexture: self.tempCclTextures,
+                secondaryTexture: self.cclTextures[i],
+                destinationTexture: self.sumCclTextures
+            )
+        }
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.emptyLensTexture, toTexture: self.averageLensTexture)
 
-        let activeLensTextureIndex = (((currentLensIndex - SampleBufferProcessor.halfWindowSize) % SampleBufferProcessor.windowSampleSize) + SampleBufferProcessor.windowSampleSize) % SampleBufferProcessor.windowSampleSize
-        let activeLensTexture = self.lensTextures[activeLensTextureIndex]
         for i in 0..<SampleBufferProcessor.windowSampleSize {
-            if i != activeLensTextureIndex {
+            if i != activeTextureIndex {
                 let currentLensTexture = self.lensTextures[i];
                 self.addKernel.encode(
                     commandBuffer: captureCommandBuffer,
@@ -304,6 +344,15 @@ class SampleBufferProcessor {
             }
         }
 
+        let localCclTexture = { () -> MTLTexture in
+            let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
+            textureDescriptor.usage = [.shaderWrite, .shaderRead]
+            let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+            return newTexture
+        }()
+
+        self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.sumCclTextures, toTexture: localCclTexture)
+
         let localLensTexture = { () -> MTLTexture in
             let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba32Float, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationLens), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationLens), mipmapped: false)
             textureDescriptor.usage = [.shaderWrite, .shaderRead]
@@ -313,7 +362,6 @@ class SampleBufferProcessor {
 
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
-        let currentLensTexture = self.lensTextures[currentLensIndex];
         #if os(OSX)
         self.flushTexture(buffer: captureCommandBuffer, resource: self.cclTexture)
         self.flushTexture(buffer: captureCommandBuffer, resource: localLensTexture)
@@ -325,18 +373,18 @@ class SampleBufferProcessor {
                 return
             }
             currentFrameId += 1
-            let bytesPerRow = weakSelf.cclTexture.width * 4
+            let bytesPerRow = localCclTexture.width * 4
             let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
-                                   size: MTLSize(width: weakSelf.cclTexture.width,
-                                                 height: weakSelf.cclTexture.height,
-                                                 depth: weakSelf.cclTexture.depth))
-            weakSelf.cclTexture.getBytes(&weakSelf.processedImage,
+                                   size: MTLSize(width: localCclTexture.width,
+                                                 height: localCclTexture.height,
+                                                 depth: localCclTexture.depth))
+            localCclTexture.getBytes(&weakSelf.processedImage,
                                           bytesPerRow: bytesPerRow,
                                           from: region,
                                           mipmapLevel: 0)
             let labelImage = CcImage(array: &weakSelf.processedImage,
-                                     width: weakSelf.cclTexture.width,
-                                     height: weakSelf.cclTexture.height,
+                                     width: localCclTexture.width,
+                                     height: localCclTexture.height,
                                      bytesPerPixel: 4);
             let labelResult = CcLabel.labelImageFast(data: labelImage,
                                                      calculateBoundingBoxes: true)
@@ -346,8 +394,7 @@ class SampleBufferProcessor {
             }
 
             weakSelf.renderQueue.async {
-//                weakSelf.displayTexture = weakSelf.brightCaptureTexture
-                weakSelf.displayTexture = weakSelf.dilateTexture
+                weakSelf.displayTexture = weakSelf.brightCaptureTexture
             }
 
             for lens in weakSelf.delegate.historyLenses {
@@ -365,7 +412,7 @@ class SampleBufferProcessor {
             captureCommandBuffer.waitUntilCompleted()
             handleComptetedbuffer(buffer: captureCommandBuffer)
         }
-        currentLensIndex = (currentLensIndex + 1) % SampleBufferProcessor.windowSampleSize
+        currentTextureIndex = (currentTextureIndex + 1) % SampleBufferProcessor.windowSampleSize
     }
 
     func copyTexture(buffer: MTLCommandBuffer, fromTexture: MTLTexture, toTexture: MTLTexture) {
