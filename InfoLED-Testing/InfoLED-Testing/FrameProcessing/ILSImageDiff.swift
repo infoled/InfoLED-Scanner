@@ -66,8 +66,8 @@ class ILSImageDiff : MPSKernel {
         let threadGroupCount = MTLSizeMake(8, 8, 1)
 
         let threadGroups: MTLSize = {
-            MTLSizeMake(Int(sourceTextureLhs.width) / threadGroupCount.width,
-                        Int(sourceTextureLhs.height) / threadGroupCount.height,
+            MTLSizeMake(Int(ceil(Float(sourceTextureLhs.width) / Float(threadGroupCount.width))),
+                        Int(ceil(Float(sourceTextureLhs.height) / Float(threadGroupCount.height))),
                         1)
         }()
 

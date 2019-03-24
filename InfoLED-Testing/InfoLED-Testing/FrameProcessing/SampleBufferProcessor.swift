@@ -125,8 +125,6 @@ class SampleBufferProcessor {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
-        var emptyUInt8 = [UInt8](repeating: 0, count: newTexture.width * newTexture.height * 4)
-        newTexture.replace(region: MTLRegionMake2D(0, 0, newTexture.width, newTexture.height), mipmapLevel: 0, withBytes: &emptyUInt8, bytesPerRow: newTexture.width * 4)
         return newTexture
     }()
 
@@ -134,6 +132,8 @@ class SampleBufferProcessor {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm, width: Int(Double(Constants.videoWidth) * Constants.decimation * Constants.decimationCcl), height: Int(Double(Constants.videoHeight) * Constants.decimation * Constants.decimationCcl), mipmapped: false)
         textureDescriptor.usage = [.shaderWrite, .shaderRead]
         let newTexture = self.metalDevice.makeTexture(descriptor: textureDescriptor)!
+        var emptyUInt8 = [UInt8](repeating: 0, count: newTexture.width * newTexture.height * 4)
+        newTexture.replace(region: MTLRegionMake2D(0, 0, newTexture.width, newTexture.height), mipmapLevel: 0, withBytes: &emptyUInt8, bytesPerRow: newTexture.width * 4)
         return newTexture
     }()
 
@@ -363,7 +363,7 @@ class SampleBufferProcessor {
         self.copyTexture(buffer: captureCommandBuffer, fromTexture: self.averageLensTexture, toTexture: localLensTexture)
 
         #if os(OSX)
-        self.flushTexture(buffer: captureCommandBuffer, resource: self.cclTexture)
+        self.flushTexture(buffer: captureCommandBuffer, resource: localCclTexture)
         self.flushTexture(buffer: captureCommandBuffer, resource: localLensTexture)
         #endif
 
@@ -372,6 +372,10 @@ class SampleBufferProcessor {
             guard let weakSelf = weakSelfOptional else {
                 return
             }
+//            let currentLensImage = CIImage(mtlTexture: localCclTexture, options: [:])!
+//            let ciContext = CIContext()
+//            let imageData = ciContext.jpegRepresentation(of: currentLensImage, colorSpace: CGColorSpace(name: CGColorSpace.sRGB)!, options: [:])
+//            try! imageData?.write(to: URL(fileURLWithPath: "/Users/Jackie/Downloads/test.jpg"))
             currentFrameId += 1
             let bytesPerRow = localCclTexture.width * 4
             let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
