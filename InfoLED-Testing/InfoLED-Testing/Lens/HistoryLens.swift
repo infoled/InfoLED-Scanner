@@ -51,12 +51,16 @@ class HistoryLens: Lens {
         }
     }
 
-    var scanning = true
+    var lensHistory = 0
+    var lensMissing = 0
+    var lensSize = 0
+
+    var scanning : Bool {
+        return lensHistory > 0
+    }
 
     var processCount = 0
     var cycleCount = 0
-
-    var cyclesFound = 2400 //Never found before, so assign a large value
 
     let eventLogger: EventLogger?
 

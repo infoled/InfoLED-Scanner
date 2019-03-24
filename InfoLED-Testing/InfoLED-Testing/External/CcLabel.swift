@@ -65,7 +65,7 @@ class CcLabel {
 
             for col in 0 ..< width {
 
-                if (data.getPixel(col, row) != 0) {
+                if (data.getPixel(col, row) > 120) {
                     // The pixel is black so it needs to be labelled.
                     let sameColInPreviousRowLabel = (row > 0 ? previousOutputRow[col] : -1)
                     var currentPixelLabel: Int

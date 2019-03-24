@@ -103,7 +103,7 @@ kernel void image_diff_2d(texture2d<float, access::read> thisFrame [[texture(0)]
     float3 clampPixel = clamp(thisPixel, smallerPixel, largerPixel);
     float3 difference = fabs(thisPixel - clampPixel);
     float3 sum = thisFrame.read(gid).rgb + lastFrame.read(minPos).rgb;
-    outFrame.write(float4(4 * difference, 1), gid);
+    outFrame.write(float4(6 * difference, 1), gid);
     //    outFrame.write(float4((float2((int2(minPos) - int2(gid)) + range) / 3.0), 0, 1), gid);
     //    float pixel = groupDiff[1][1][tid.x][tid.y];
     //    float pixel = minDifference * 1000;

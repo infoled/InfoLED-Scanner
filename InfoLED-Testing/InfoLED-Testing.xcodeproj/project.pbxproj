@@ -7,20 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8CAEED5E22437B780043440A /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5022437B780043440A /* HistoryLens.swift */; };
-		8CAEED5F22437B780043440A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5122437B780043440A /* Constants.swift */; };
-		8CAEED6022437B780043440A /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5222437B780043440A /* FpsCounter.swift */; };
-		8CAEED6122437B780043440A /* ILSImageDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5322437B780043440A /* ILSImageDiff.swift */; };
-		8CAEED6222437B780043440A /* SampleBufferProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5422437B780043440A /* SampleBufferProcessor.swift */; };
-		8CAEED6322437B780043440A /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5522437B780043440A /* EventLogger.swift */; };
-		8CAEED6422437B780043440A /* CcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5722437B780043440A /* CcLabel.swift */; };
-		8CAEED6522437B780043440A /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5822437B780043440A /* Queue.swift */; };
-		8CAEED6622437B780043440A /* MTLDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5922437B780043440A /* MTLDeviceExtension.swift */; };
-		8CAEED6722437B780043440A /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5A22437B780043440A /* HistoryProcessor.swift */; };
-		8CAEED6922437B780043440A /* ImageDiff.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5C22437B780043440A /* ImageDiff.metal */; };
-		8CAEED6A22437B780043440A /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED5D22437B780043440A /* LensNode.swift */; };
 		8CAEED6C22437B960043440A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEED6B22437B960043440A /* main.swift */; };
-		8CAEEDB422437E780043440A /* Lens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAEEDB322437E780043440A /* Lens.swift */; };
 		8CAEEDB5224382FA0043440A /* 1_Dark__1m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED7122437BCF0043440A /* 1_Dark__1m.MOV */; };
 		8CAEEDB6224382FA0043440A /* 1_Outdoor__5m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED7222437BCF0043440A /* 1_Outdoor__5m.MOV */; };
 		8CAEEDB7224382FA0043440A /* 1_Outdoor__4m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED7322437BCF0043440A /* 1_Outdoor__4m.MOV */; };
@@ -55,6 +42,22 @@
 		8CAEEDD4224383000043440A /* 2_Outdoor__2m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED9222437BCF0043440A /* 2_Outdoor__2m.MOV */; };
 		8CAEEDD5224383000043440A /* 2_Outdoor__3m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED9322437BCF0043440A /* 2_Outdoor__3m.MOV */; };
 		8CAEEDD6224383000043440A /* 2_Office__5m.MOV in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8CAEED9422437BCF0043440A /* 2_Office__5m.MOV */; };
+		8CD6444022471BE800802CB4 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443D22471B5D00802CB4 /* Constants.swift */; };
+		8CD6444122471BEA00802CB4 /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443E22471B5D00802CB4 /* EventLogger.swift */; };
+		8CD6444222471BF000802CB4 /* FlowGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443822471B3F00802CB4 /* FlowGraph.swift */; };
+		8CD6444322471BF000802CB4 /* FrameLensProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443922471B3F00802CB4 /* FrameLensProcessor.swift */; };
+		8CD6444422471BF000802CB4 /* BoundingBoxConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443A22471B3F00802CB4 /* BoundingBoxConverter.swift */; };
+		8CD6444622471BFA00802CB4 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443322471B3C00802CB4 /* LensNode.swift */; };
+		8CD6444722471BFA00802CB4 /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443422471B3C00802CB4 /* HistoryLens.swift */; };
+		8CD6444822471BFA00802CB4 /* Lens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443522471B3C00802CB4 /* Lens.swift */; };
+		8CD6444922471BFA00802CB4 /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */; };
+		8CD6444A22471C0200802CB4 /* MTLDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442B22471B3800802CB4 /* MTLDeviceExtension.swift */; };
+		8CD6444B22471C0200802CB4 /* ILSImageDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442C22471B3800802CB4 /* ILSImageDiff.swift */; };
+		8CD6444C22471C0200802CB4 /* ImageDiff.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442D22471B3800802CB4 /* ImageDiff.metal */; };
+		8CD6444D22471C0200802CB4 /* SampleBufferProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442E22471B3800802CB4 /* SampleBufferProcessor.swift */; };
+		8CD6444E22471C0200802CB4 /* FpsCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442F22471B3800802CB4 /* FpsCounter.swift */; };
+		8CD6444F22471C1800802CB4 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442822471B2F00802CB4 /* Queue.swift */; };
+		8CD6445022471C1800802CB4 /* CcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6442922471B2F00802CB4 /* CcLabel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -105,18 +108,6 @@
 
 /* Begin PBXFileReference section */
 		8CAEED4622437B3F0043440A /* InfoLED-Testing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "InfoLED-Testing"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8CAEED5022437B780043440A /* HistoryLens.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HistoryLens.swift; path = "../../InfoLED Scanner/HistoryLens.swift"; sourceTree = "<group>"; };
-		8CAEED5122437B780043440A /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = "../../InfoLED Scanner/Constants.swift"; sourceTree = "<group>"; };
-		8CAEED5222437B780043440A /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FpsCounter.swift; path = "../../InfoLED Scanner/FpsCounter.swift"; sourceTree = "<group>"; };
-		8CAEED5322437B780043440A /* ILSImageDiff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ILSImageDiff.swift; path = "../../InfoLED Scanner/ILSImageDiff.swift"; sourceTree = "<group>"; };
-		8CAEED5422437B780043440A /* SampleBufferProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SampleBufferProcessor.swift; path = "../../InfoLED Scanner/SampleBufferProcessor.swift"; sourceTree = "<group>"; };
-		8CAEED5522437B780043440A /* EventLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventLogger.swift; path = "../../InfoLED Scanner/EventLogger.swift"; sourceTree = "<group>"; };
-		8CAEED5722437B780043440A /* CcLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CcLabel.swift; path = "../../InfoLED Scanner/CcLabel.swift"; sourceTree = "<group>"; };
-		8CAEED5822437B780043440A /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Queue.swift; path = "../../InfoLED Scanner/Queue.swift"; sourceTree = "<group>"; };
-		8CAEED5922437B780043440A /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MTLDeviceExtension.swift; path = "../../InfoLED Scanner/MTLDeviceExtension.swift"; sourceTree = "<group>"; };
-		8CAEED5A22437B780043440A /* HistoryProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HistoryProcessor.swift; path = "../../InfoLED Scanner/HistoryProcessor.swift"; sourceTree = "<group>"; };
-		8CAEED5C22437B780043440A /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = ImageDiff.metal; path = "../../InfoLED Scanner/ImageDiff.metal"; sourceTree = "<group>"; };
-		8CAEED5D22437B780043440A /* LensNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LensNode.swift; path = "../../InfoLED Scanner/LensNode.swift"; sourceTree = "<group>"; };
 		8CAEED6B22437B960043440A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8CAEED6F22437BCF0043440A /* strip_recording_name.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = strip_recording_name.py; sourceTree = "<group>"; };
 		8CAEED7122437BCF0043440A /* 1_Dark__1m.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = 1_Dark__1m.MOV; sourceTree = "<group>"; };
@@ -177,7 +168,22 @@
 		8CAEEDAD22437BCF0043440A /* IMG_5696.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5696.MOV; sourceTree = "<group>"; };
 		8CAEEDAE22437BCF0043440A /* IMG_5695.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5695.MOV; sourceTree = "<group>"; };
 		8CAEEDB022437BCF0043440A /* test.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = test.MOV; sourceTree = "<group>"; };
-		8CAEEDB322437E780043440A /* Lens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lens.swift; sourceTree = "<group>"; };
+		8CD6442822471B2F00802CB4 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		8CD6442922471B2F00802CB4 /* CcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CcLabel.swift; sourceTree = "<group>"; };
+		8CD6442B22471B3800802CB4 /* MTLDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLDeviceExtension.swift; sourceTree = "<group>"; };
+		8CD6442C22471B3800802CB4 /* ILSImageDiff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILSImageDiff.swift; sourceTree = "<group>"; };
+		8CD6442D22471B3800802CB4 /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
+		8CD6442E22471B3800802CB4 /* SampleBufferProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleBufferProcessor.swift; sourceTree = "<group>"; };
+		8CD6442F22471B3800802CB4 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
+		8CD6443322471B3C00802CB4 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
+		8CD6443422471B3C00802CB4 /* HistoryLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryLens.swift; sourceTree = "<group>"; };
+		8CD6443522471B3C00802CB4 /* Lens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lens.swift; sourceTree = "<group>"; };
+		8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
+		8CD6443822471B3F00802CB4 /* FlowGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowGraph.swift; sourceTree = "<group>"; };
+		8CD6443922471B3F00802CB4 /* FrameLensProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameLensProcessor.swift; sourceTree = "<group>"; };
+		8CD6443A22471B3F00802CB4 /* BoundingBoxConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxConverter.swift; sourceTree = "<group>"; };
+		8CD6443D22471B5D00802CB4 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		8CD6443E22471B5D00802CB4 /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,19 +217,11 @@
 		8CAEED4822437B3F0043440A /* InfoLED-Testing */ = {
 			isa = PBXGroup;
 			children = (
-				8CAEED5922437B780043440A /* MTLDeviceExtension.swift */,
-				8CAEEDB322437E780043440A /* Lens.swift */,
-				8CAEED5222437B780043440A /* FpsCounter.swift */,
-				8CAEED5322437B780043440A /* ILSImageDiff.swift */,
-				8CAEED5822437B780043440A /* Queue.swift */,
-				8CAEED5C22437B780043440A /* ImageDiff.metal */,
-				8CAEED5A22437B780043440A /* HistoryProcessor.swift */,
-				8CAEED5722437B780043440A /* CcLabel.swift */,
-				8CAEED5D22437B780043440A /* LensNode.swift */,
-				8CAEED5022437B780043440A /* HistoryLens.swift */,
-				8CAEED5122437B780043440A /* Constants.swift */,
-				8CAEED5422437B780043440A /* SampleBufferProcessor.swift */,
-				8CAEED5522437B780043440A /* EventLogger.swift */,
+				8CD6443F22471B5D00802CB4 /* Shared */,
+				8CD6443B22471B3F00802CB4 /* LensMatching */,
+				8CD6443722471B3C00802CB4 /* Lens */,
+				8CD6443022471B3800802CB4 /* FrameProcessing */,
+				8CD6442A22471B2F00802CB4 /* External */,
 				8CAEED6B22437B960043440A /* main.swift */,
 			);
 			path = "InfoLED-Testing";
@@ -360,6 +358,57 @@
 			path = "Pilot Study";
 			sourceTree = "<group>";
 		};
+		8CD6442A22471B2F00802CB4 /* External */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6442822471B2F00802CB4 /* Queue.swift */,
+				8CD6442922471B2F00802CB4 /* CcLabel.swift */,
+			);
+			path = External;
+			sourceTree = "<group>";
+		};
+		8CD6443022471B3800802CB4 /* FrameProcessing */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6442B22471B3800802CB4 /* MTLDeviceExtension.swift */,
+				8CD6442C22471B3800802CB4 /* ILSImageDiff.swift */,
+				8CD6442D22471B3800802CB4 /* ImageDiff.metal */,
+				8CD6442E22471B3800802CB4 /* SampleBufferProcessor.swift */,
+				8CD6442F22471B3800802CB4 /* FpsCounter.swift */,
+			);
+			path = FrameProcessing;
+			sourceTree = "<group>";
+		};
+		8CD6443722471B3C00802CB4 /* Lens */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6443322471B3C00802CB4 /* LensNode.swift */,
+				8CD6443422471B3C00802CB4 /* HistoryLens.swift */,
+				8CD6443522471B3C00802CB4 /* Lens.swift */,
+				8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */,
+			);
+			path = Lens;
+			sourceTree = "<group>";
+		};
+		8CD6443B22471B3F00802CB4 /* LensMatching */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6443822471B3F00802CB4 /* FlowGraph.swift */,
+				8CD6443922471B3F00802CB4 /* FrameLensProcessor.swift */,
+				8CD6443A22471B3F00802CB4 /* BoundingBoxConverter.swift */,
+			);
+			path = LensMatching;
+			sourceTree = "<group>";
+		};
+		8CD6443F22471B5D00802CB4 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6443D22471B5D00802CB4 /* Constants.swift */,
+				8CD6443E22471B5D00802CB4 /* EventLogger.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -417,20 +466,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8CAEED6422437B780043440A /* CcLabel.swift in Sources */,
-				8CAEEDB422437E780043440A /* Lens.swift in Sources */,
-				8CAEED6222437B780043440A /* SampleBufferProcessor.swift in Sources */,
-				8CAEED5E22437B780043440A /* HistoryLens.swift in Sources */,
-				8CAEED6522437B780043440A /* Queue.swift in Sources */,
-				8CAEED6922437B780043440A /* ImageDiff.metal in Sources */,
-				8CAEED6322437B780043440A /* EventLogger.swift in Sources */,
-				8CAEED6622437B780043440A /* MTLDeviceExtension.swift in Sources */,
-				8CAEED6122437B780043440A /* ILSImageDiff.swift in Sources */,
+				8CD6444D22471C0200802CB4 /* SampleBufferProcessor.swift in Sources */,
+				8CD6444922471BFA00802CB4 /* HistoryProcessor.swift in Sources */,
+				8CD6444422471BF000802CB4 /* BoundingBoxConverter.swift in Sources */,
+				8CD6444722471BFA00802CB4 /* HistoryLens.swift in Sources */,
+				8CD6444E22471C0200802CB4 /* FpsCounter.swift in Sources */,
+				8CD6444622471BFA00802CB4 /* LensNode.swift in Sources */,
+				8CD6444322471BF000802CB4 /* FrameLensProcessor.swift in Sources */,
+				8CD6444A22471C0200802CB4 /* MTLDeviceExtension.swift in Sources */,
+				8CD6444B22471C0200802CB4 /* ILSImageDiff.swift in Sources */,
+				8CD6444222471BF000802CB4 /* FlowGraph.swift in Sources */,
+				8CD6445022471C1800802CB4 /* CcLabel.swift in Sources */,
 				8CAEED6C22437B960043440A /* main.swift in Sources */,
-				8CAEED6A22437B780043440A /* LensNode.swift in Sources */,
-				8CAEED6722437B780043440A /* HistoryProcessor.swift in Sources */,
-				8CAEED5F22437B780043440A /* Constants.swift in Sources */,
-				8CAEED6022437B780043440A /* FpsCounter.swift in Sources */,
+				8CD6444022471BE800802CB4 /* Constants.swift in Sources */,
+				8CD6444122471BEA00802CB4 /* EventLogger.swift in Sources */,
+				8CD6444F22471C1800802CB4 /* Queue.swift in Sources */,
+				8CD6444C22471C0200802CB4 /* ImageDiff.metal in Sources */,
+				8CD6444822471BFA00802CB4 /* Lens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

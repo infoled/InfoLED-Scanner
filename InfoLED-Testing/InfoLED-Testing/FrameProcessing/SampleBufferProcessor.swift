@@ -394,13 +394,11 @@ class SampleBufferProcessor {
             }
 
             weakSelf.renderQueue.async {
-                weakSelf.displayTexture = weakSelf.brightCaptureTexture
+                weakSelf.displayTexture = self.brightCaptureTexture
             }
 
             for lens in weakSelf.delegate.historyLenses {
-                if (lens.cyclesFound < SampleBufferProcessor.maxHistory) {
-                    lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration, frameId: currentFrameId)
-                }
+                lens.processFrame(lensTexture: localLensTexture, imageProcessingQueue: self.computeQueue, frameDuration: frameDuration, frameId: currentFrameId)
             }
         }
 
@@ -459,111 +457,16 @@ class SampleBufferProcessor {
     static let windowSampleSize = 2 * halfWindowSize + 1
 
     static let lensCount = 5
-    static let boxesCount = 5
-    static let movementsPerFrame = 1
-    static let ignoreRaidus = 100
-    static let maxHistory = 500
-
-    class CandidateBox {
-        var position: CGPoint
-        var available: Bool
-
-        init(_ position: CGPoint) {
-//            print("candidate: \(position)")
-            self.position = position
-            self.available = true
-        }
-
-        func match(with lens: HistoryLens) -> Bool {
-            if available {
-                let distance = hypot(self.position.x - lens.poiPos.x, self.position.y - lens.poiPos.y)
-                if distance < CGFloat(movementsPerFrame * lens.cyclesFound) {
-                    return true
-                }
-            }
-            return false
-        }
-
-        func assigned(to lens: HistoryLens) {
-            lens.cyclesFound = 0
-            lens.poiPos = position
-            self.available = false
-        }
-
-        func close(with candidate: CandidateBox) -> Bool {
-            let distance = self.position.distance(with: candidate.position)
-            if distance < CGFloat(SampleBufferProcessor.ignoreRaidus) {
-                return true
-            } else {
-                return false
-            }
-        }
-    }
 
     func updateBoundingBoxes(boundingBoxes: [Int: BoundingBox]) {
-        let sortedBoxes = boundingBoxes.sorted { (arg0, arg1) -> Bool in
-            let (_, value1) = arg0
-            let (_, value2) = arg1
-            return value1.getSize() > value2.getSize()
-            }.prefix(SampleBufferProcessor.boxesCount * 2)
-
-        let sortedCandidates = sortedBoxes.map { (arg0) -> CandidateBox in
-            let (_, value) = arg0
-            let poiX = CGFloat(Int(Double(value.x_start + value.x_end) / Constants.decimation / Constants.decimationCcl / 2))
-            let poiY = CGFloat(Int(Double(value.y_start + value.y_end) / Constants.decimation / Constants.decimationCcl / 2))
-            return CandidateBox(CGPoint(x: poiX, y: poiY))
-        }
-
-        var selectedCandidates = [CandidateBox]()
-
-        for candidate in sortedCandidates {
-            var close = false
-            for selectedCandidate in selectedCandidates {
-                if selectedCandidate.close(with: candidate) {
-                    close = true
-                    break
-                }
-            }
-            if !close {
-                selectedCandidates.append(candidate)
-            }
-        }
-
-        delegate.historyLenses = delegate.historyLenses.sorted(by: { (lens0, lens1) -> Bool in
-            return lens0.cyclesFound < lens1.cyclesFound
-        })
-
-        var newHistoryLenses = [HistoryLens]()
-
-        for lens in delegate.historyLenses {
-            lens.cyclesFound += 1
-            var matchedCandidate: CandidateBox?
-            for candidate in selectedCandidates {
-                if candidate.match(with: lens) {
-                    matchedCandidate = candidate
-                    break
-                }
-
-            }
-            if let candidate = matchedCandidate {
-                candidate.assigned(to: lens)
-                eventLogger?.recordMessage(dict: ["lensPos": lens.poiPos])
-            }
-            var close = false
-            for existedLens in newHistoryLenses {
-                if (existedLens.poiPos.distance(with: lens.poiPos) < CGFloat(SampleBufferProcessor.ignoreRaidus)) {
-                    close = true
-                    break
-                }
-            }
-            if (close || lens.cyclesFound > SampleBufferProcessor.maxHistory) {
-                // if this lens is too close to another lens or haven't been updated for a long time
-                let newLens = createHistoryLens()
-                newLens.poiPos = CGPoint(x: Int.random(in: 0..<Constants.videoWidth), y: Int.random(in: 0..<Constants.videoHeight))
-                newHistoryLenses.append(newLens)
-            } else {
-                newHistoryLenses.append(lens)
-            }
+        print(boundingBoxes)
+        let processedHistoryLenses = FrameLensProcessor.processFrame(currentLenses: delegate.historyLenses, boxes: Array(boundingBoxes.values))
+        var newHistoryLenses: [HistoryLens]
+        if processedHistoryLenses.count < SampleBufferProcessor.lensCount {
+            let moreLensCount = SampleBufferProcessor.lensCount - processedHistoryLenses.count
+            newHistoryLenses = processedHistoryLenses + (0..<moreLensCount).map{ _ in createHistoryLens() }
+        } else {
+            newHistoryLenses = processedHistoryLenses
         }
         delegate.historyLenses = newHistoryLenses
     }
