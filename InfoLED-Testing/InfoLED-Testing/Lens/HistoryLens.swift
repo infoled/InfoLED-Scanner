@@ -66,7 +66,7 @@ class HistoryLens: Lens {
 
     init(windowSize: Int, poiSize: CGSize, eventLogger: EventLogger?) {
         self.eventLogger = eventLogger
-        super.init(position: CGPoint.zero, text: "loading", size: CGSize.zero)
+        super.init(position: CGPoint.zero, data: [], size: CGSize.zero)
         let processorLogger = self.eventLogger?.Logger { [weak self] () -> Dictionary<String, Any> in
             ["position": self!.poiPos]
         }
@@ -115,17 +115,14 @@ class HistoryLens: Lens {
             let lensPixelInt = Int(lensPixel * 1000)
             imageProcessingQueue.sync {
                 if (self.historyProcessor.processNewPixel(pixel: (lensPixelInt, lensPixelInt, lensPixelInt), frameDuration: frameDuration, frameId: frameId) || self.processCount == 2000) {
-                    var notification: String!;
                     let packet = self.historyProcessor.getPopularPacket()
-                    let tagFound = packet != nil
-                    if let validPacket = packet {
-                        notification = "\(HistoryProcessor.packetString(packet: validPacket))"
-                    } else {
-                        notification = "tag not found"
-                    }
                     DispatchQueue.main.async {
-                        self.text = notification
-                        self.detected = tagFound
+                        if let validPacket = packet {
+                            self.data = validPacket
+                            self.detected = true
+                        } else {
+                            self.detected = false
+                        }
                     }
                 }
                 self.processCount += 1

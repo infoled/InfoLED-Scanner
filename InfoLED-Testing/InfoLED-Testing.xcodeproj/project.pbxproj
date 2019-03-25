@@ -47,7 +47,6 @@
 		8CD6444222471BF000802CB4 /* FlowGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443822471B3F00802CB4 /* FlowGraph.swift */; };
 		8CD6444322471BF000802CB4 /* FrameLensProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443922471B3F00802CB4 /* FrameLensProcessor.swift */; };
 		8CD6444422471BF000802CB4 /* BoundingBoxConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443A22471B3F00802CB4 /* BoundingBoxConverter.swift */; };
-		8CD6444622471BFA00802CB4 /* LensNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443322471B3C00802CB4 /* LensNode.swift */; };
 		8CD6444722471BFA00802CB4 /* HistoryLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443422471B3C00802CB4 /* HistoryLens.swift */; };
 		8CD6444822471BFA00802CB4 /* Lens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443522471B3C00802CB4 /* Lens.swift */; };
 		8CD6444922471BFA00802CB4 /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */; };
@@ -175,7 +174,6 @@
 		8CD6442D22471B3800802CB4 /* ImageDiff.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageDiff.metal; sourceTree = "<group>"; };
 		8CD6442E22471B3800802CB4 /* SampleBufferProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleBufferProcessor.swift; sourceTree = "<group>"; };
 		8CD6442F22471B3800802CB4 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
-		8CD6443322471B3C00802CB4 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
 		8CD6443422471B3C00802CB4 /* HistoryLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryLens.swift; sourceTree = "<group>"; };
 		8CD6443522471B3C00802CB4 /* Lens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lens.swift; sourceTree = "<group>"; };
 		8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
@@ -382,7 +380,6 @@
 		8CD6443722471B3C00802CB4 /* Lens */ = {
 			isa = PBXGroup;
 			children = (
-				8CD6443322471B3C00802CB4 /* LensNode.swift */,
 				8CD6443422471B3C00802CB4 /* HistoryLens.swift */,
 				8CD6443522471B3C00802CB4 /* Lens.swift */,
 				8CD6443622471B3C00802CB4 /* HistoryProcessor.swift */,
@@ -471,7 +468,6 @@
 				8CD6444422471BF000802CB4 /* BoundingBoxConverter.swift in Sources */,
 				8CD6444722471BFA00802CB4 /* HistoryLens.swift in Sources */,
 				8CD6444E22471C0200802CB4 /* FpsCounter.swift in Sources */,
-				8CD6444622471BFA00802CB4 /* LensNode.swift in Sources */,
 				8CD6444322471BF000802CB4 /* FrameLensProcessor.swift in Sources */,
 				8CD6444A22471C0200802CB4 /* MTLDeviceExtension.swift in Sources */,
 				8CD6444B22471C0200802CB4 /* ILSImageDiff.swift in Sources */,

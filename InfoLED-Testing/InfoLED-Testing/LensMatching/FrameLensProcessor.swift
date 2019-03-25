@@ -55,7 +55,7 @@ class FrameBlob: CustomStringConvertible {
 }
 
 class FrameLens: FrameBlob{
-    static let MissingLimit = 30
+    static let MissingLimit = 240
 
     var history: Int
     var missing: Int
@@ -99,7 +99,7 @@ class FrameLens: FrameBlob{
         } else {
             if self.history != 0 {
                 self.missing += 1
-                if self.missing > self.history || self.missing > FrameLens.MissingLimit {
+                if self.missing > (self.history * 2) || self.missing > FrameLens.MissingLimit {
                     self.history = 0
                     self.missing = 0
                 }
@@ -108,18 +108,18 @@ class FrameLens: FrameBlob{
     }
 
     func lensWeight() -> Float {
-        return (log(Float(history) + 1) + 1) / (log(Float(missing) + 1) + 1)
+        return (log(Float(2 * history) + 1) + 1) / (log(Float(missing) + 1) + 1)
     }
 
     func costToBlob(blob: FrameBlob?) -> Float {
         if let blob = blob {
             if history != 0 {
-                return lensWeight() * (distance(with:blob) + abs(Float(self.size - blob.size)))
+                return lensWeight() * (distance(with:blob) + abs(Float(self.size - blob.size)) / 2) / log(Float(missing))
             } else {
                 return 0
             }
         } else {
-            let noMatchWeight = Float(100.0)
+            let noMatchWeight = Float(300.0)
             return lensWeight() * noMatchWeight
         }
     }

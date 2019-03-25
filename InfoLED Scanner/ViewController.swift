@@ -72,7 +72,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var lensViewWidth: NSLayoutConstraint!
 
 
-    var lensScene: LedLens!
+    var lensScene: LensScene!
 
     var previewLayer:AVCaptureVideoPreviewLayer?
     let captureSession = AVCaptureSession()
@@ -85,7 +85,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         super.viewDidLoad()
 
         // Update UI elements
-        lensScene = lensView.scene as? LedLens
+        lensScene = lensView.scene as? LensScene
 
         // Adjust video settings
         captureSession.sessionPreset = AVCaptureSession.Preset(rawValue: convertFromAVCaptureSessionPreset(AVCaptureSession.Preset.inputPriority))

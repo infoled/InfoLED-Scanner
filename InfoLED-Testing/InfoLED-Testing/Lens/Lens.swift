@@ -14,13 +14,13 @@ import UIKit
 
 class Lens {
     public var position : CGPoint
-    public var text : String
+    public var data : [Int]
     public var size : CGSize
     public var detected: Bool = false
 
-    public init(position: CGPoint, text: String, size: CGSize) {
+    public init(position: CGPoint, data: [Int], size: CGSize) {
         self.position = position
-        self.text = text
+        self.data = data
         self.size = size
     }
 }

@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-class LedLens: SKScene {
+class LensScene: SKScene {
 
     public var lenses : [Lens] = []
     private var lensNodes : [LensNode] = []
@@ -26,7 +26,7 @@ class LedLens: SKScene {
             }
             currentNode.position = CGPoint(x: currentLens.position.x, y: self.size.height - currentLens.position.y)
             currentNode.setSize(size: currentLens.size)
-            currentNode.setLabelText(text: currentLens.text)
+            currentNode.setData(data: currentLens.data)
             currentNode.setAvailable(available: currentLens.detected)
         }
         if lensNodes.count > lenses.count {

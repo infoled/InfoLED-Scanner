@@ -47,7 +47,7 @@
                                     <constraint firstItem="Dmm-aZ-PXL" firstAttribute="leading" secondItem="14B-jm-ksX" secondAttribute="leading" id="sqM-bF-0ZA"/>
                                 </constraints>
                             </view>
-                            <skView contentMode="scaleToFill" allowsTransparency="YES" sceneName="LedLens.sks" translatesAutoresizingMaskIntoConstraints="NO" id="EWw-Ni-rZf">
+                            <skView contentMode="scaleToFill" allowsTransparency="YES" sceneName="LensScene.sks" translatesAutoresizingMaskIntoConstraints="NO" id="EWw-Ni-rZf">
                                 <rect key="frame" x="27" y="128" width="360" height="640"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="640" id="8th-pT-EtU"/>

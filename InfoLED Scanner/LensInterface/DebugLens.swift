@@ -1,14 +1,15 @@
+
 //
-//  LensNode.swift
+//  DebugLens.swift
 //  InfoLED Scanner
 //
-//  Created by Jackie Yang on 2/8/19.
+//  Created by Jackie Yang on 3/24/19.
 //  Copyright © 2019 yangjunrui. All rights reserved.
 //
 
 import SpriteKit
 
-class LensNode : SKNode {
+class DebugLens: SKNode, LensObjectProtocol {
     private var lensLabel: SKLabelNode
     var lensBracket: SKShapeNode
     var size: CGSize
@@ -31,7 +32,10 @@ class LensNode : SKNode {
         fatalError("init(coder:) has not been implemented")
     }
 
-    #if os(iOS)
+    func setData(data: [Int]) {
+        setLabelText(text: HistoryProcessor.packetString(packet: data))
+    }
+
     func setLabelText(text: String) {
         if #available(iOS 11.0, *) {
             let attributedText = NSMutableAttributedString(string: text)
@@ -47,7 +51,6 @@ class LensNode : SKNode {
             self.lensLabel.text = text
         }
     }
-    #endif
 
     func setSize(size: CGSize) {
         if size == self.size {
