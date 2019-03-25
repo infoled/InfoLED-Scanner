@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Particle_SDK
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let config = Bundle.main.infoDictionary!
+        let particleClientSecret = config["ParticleClientSecret"] as! String
+        let particleClientId = config["ParticleClientId"] as! String
+        let particleAccount = config["ParticleAccount"] as! String
+        let particlePassword = config["ParticlePassword"] as! String
+        ParticleCloud.sharedInstance().oAuthClientId = particleClientId
+        ParticleCloud.sharedInstance().oAuthClientSecret = particleClientSecret
+        ParticleCloud.sharedInstance().login(withUser: particleAccount, password: particlePassword) { (error) in
+            guard error == nil else {
+                print(error!)
+                return
+            }
+            print("Logged into Particle Cloud")
+        }
         return true
     }
 

@@ -5,6 +5,9 @@
       location = "group:InfoLED-Testing/InfoLED-Testing.xcodeproj">
    </FileRef>
    <FileRef
-      location = "container:InfoLED Scanner.xcodeproj">
+      location = "group:InfoLED Scanner.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

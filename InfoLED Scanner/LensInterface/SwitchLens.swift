@@ -19,6 +19,10 @@ class SwitchLens: SKNode, LensObjectProtocol {
     var switchId: UInt8!
     var switchState: Bool!
 
+    var appliance: ParticleAppliance?
+
+    let DeviceIds = [0: "230030000647373034353237"]
+
     required init(size: CGSize) {
         self.lensLabel = SKLabelNode()
         self.lensLabel.position = CGPoint(x: -size.width / 2, y: 0)
@@ -39,6 +43,9 @@ class SwitchLens: SKNode, LensObjectProtocol {
         self.switchState = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
         self.switchId = UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
         setLabelText(text: "Switchmate[\(switchId ?? 99)][\(switchState ?? false)]")
+        if let deviceId = DeviceIds[Int(switchId)] {
+            self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
+        }
     }
 
     func setLabelText(text: String) {
@@ -75,6 +82,31 @@ class SwitchLens: SKNode, LensObjectProtocol {
             self.lensBracket.strokeColor = .green
         } else {
             self.lensBracket.strokeColor = .gray
+        }
+    }
+}
+
+extension SwitchLens {
+    override var isUserInteractionEnabled: Bool {
+        set {
+            // ignore
+        }
+        get {
+            return true
+        }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if self.appliance?.status == .Initialized {
+            self.appliance?.device.callFunction("setSwitch", withArguments: nil, completion: { (number, error) in
+                guard error == nil else {
+                    print(error!)
+                    return
+                }
+            })
         }
     }
 }

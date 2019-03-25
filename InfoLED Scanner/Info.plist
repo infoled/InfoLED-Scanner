@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ParticleClientSecret</key>
+	<string>$(PARTICLE_CLIENT_SECRET)</string>
+	<key>ParticleClientId</key>
+	<string>$(PARTICLE_CLIENT_ID)</string>
+	<key>ParticleAccount</key>
+	<string>$(PARTICLE_ACCOUNT)</string>
+	<key>ParticlePassword</key>
+	<string>$(PARTICLE_PASSWORD)</string>
 	<key>NSCameraUsageDescription</key>
 	<string>&quot;Used to scan InfoLED&quot;</string>
 	<key>CFBundleDevelopmentRegion</key>

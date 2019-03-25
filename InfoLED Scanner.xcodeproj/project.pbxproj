@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03CABBBE4BBF81FFDF480C51 /* Pods_InfoLED_ScannerUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5BEB5BA2479B51BC1AD7DAE /* Pods_InfoLED_ScannerUITests.framework */; };
+		3D342E055BA2304BC552A874 /* Pods_InfoLED_ScannerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7125C887D12D417B94EBE0 /* Pods_InfoLED_ScannerTests.framework */; };
+		5EA320359BDFB3844387B388 /* Pods_InfoLED_Scanner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 358AA2A1348289144F971F9B /* Pods_InfoLED_Scanner.framework */; };
 		8C0152C621BE939200049838 /* CcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0152C521BE939200049838 /* CcLabel.swift */; };
 		8C0A93A52208F61F007E71E2 /* LensScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8C0A93A42208F61F007E71E2 /* LensScene.sks */; };
 		8C0A93A72208F698007E71E2 /* LensScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0A93A62208F698007E71E2 /* LensScene.swift */; };
@@ -80,6 +83,9 @@
 		8CD64427224702C700802CB4 /* BoundingBoxConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD64426224702C700802CB4 /* BoundingBoxConverter.swift */; };
 		8CD64454224879C800802CB4 /* DebugLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD64453224879C800802CB4 /* DebugLens.swift */; };
 		8CD644562248A1A900802CB4 /* SwitchLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD644552248A1A900802CB4 /* SwitchLens.swift */; };
+		8CD6445E2248B3D700802CB4 /* secret.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 8CD6445B2248B3D700802CB4 /* secret.xcconfig */; };
+		8CD644622248BBF700802CB4 /* ParticleAppliancesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD644612248BBF700802CB4 /* ParticleAppliancesManager.swift */; };
+		8CD644642248BC4C00802CB4 /* ParticleAppliance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD644632248BC4C00802CB4 /* ParticleAppliance.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,6 +190,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1366511913559A9151392AE6 /* Pods-InfoLED ScannerUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED ScannerUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED ScannerUITests/Pods-InfoLED ScannerUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		358AA2A1348289144F971F9B /* Pods_InfoLED_Scanner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InfoLED_Scanner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5828379CADF051A875E3CA7C /* Pods-InfoLED Scanner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED Scanner.release.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED Scanner/Pods-InfoLED Scanner.release.xcconfig"; sourceTree = "<group>"; };
+		8361038EFA1653112F28A80D /* Pods-InfoLED ScannerUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED ScannerUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED ScannerUITests/Pods-InfoLED ScannerUITests.release.xcconfig"; sourceTree = "<group>"; };
 		8C0152C521BE939200049838 /* CcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CcLabel.swift; sourceTree = "<group>"; };
 		8C0A93A42208F61F007E71E2 /* LensScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LensScene.sks; sourceTree = "<group>"; };
 		8C0A93A62208F698007E71E2 /* LensScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensScene.swift; sourceTree = "<group>"; };
@@ -275,7 +285,15 @@
 		8CD64426224702C700802CB4 /* BoundingBoxConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxConverter.swift; sourceTree = "<group>"; };
 		8CD64453224879C800802CB4 /* DebugLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLens.swift; sourceTree = "<group>"; };
 		8CD644552248A1A900802CB4 /* SwitchLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchLens.swift; sourceTree = "<group>"; };
+		8CD6445B2248B3D700802CB4 /* secret.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = secret.xcconfig; sourceTree = "<group>"; };
+		8CD644612248BBF700802CB4 /* ParticleAppliancesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleAppliancesManager.swift; sourceTree = "<group>"; };
+		8CD644632248BC4C00802CB4 /* ParticleAppliance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleAppliance.swift; sourceTree = "<group>"; };
 		8CF22846222E42EB005283DC /* IMG_5792.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5792.MOV; sourceTree = "<group>"; };
+		952C3ED949F64F59A4EE9A69 /* Pods-InfoLED ScannerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED ScannerTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED ScannerTests/Pods-InfoLED ScannerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AD7125C887D12D417B94EBE0 /* Pods_InfoLED_ScannerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InfoLED_ScannerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFB4E45E47CDBF8A07F73E97 /* Pods-InfoLED Scanner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED Scanner.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED Scanner/Pods-InfoLED Scanner.debug.xcconfig"; sourceTree = "<group>"; };
+		D3A0BD24396044B7F7F5AEAC /* Pods-InfoLED ScannerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InfoLED ScannerTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-InfoLED ScannerTests/Pods-InfoLED ScannerTests.release.xcconfig"; sourceTree = "<group>"; };
+		E5BEB5BA2479B51BC1AD7DAE /* Pods_InfoLED_ScannerUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InfoLED_ScannerUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +301,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EA320359BDFB3844387B388 /* Pods_InfoLED_Scanner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +309,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D342E055BA2304BC552A874 /* Pods_InfoLED_ScannerTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,12 +317,36 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03CABBBE4BBF81FFDF480C51 /* Pods_InfoLED_ScannerUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3D514F2853BD712F22697B69 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CFB4E45E47CDBF8A07F73E97 /* Pods-InfoLED Scanner.debug.xcconfig */,
+				5828379CADF051A875E3CA7C /* Pods-InfoLED Scanner.release.xcconfig */,
+				952C3ED949F64F59A4EE9A69 /* Pods-InfoLED ScannerTests.debug.xcconfig */,
+				D3A0BD24396044B7F7F5AEAC /* Pods-InfoLED ScannerTests.release.xcconfig */,
+				1366511913559A9151392AE6 /* Pods-InfoLED ScannerUITests.debug.xcconfig */,
+				8361038EFA1653112F28A80D /* Pods-InfoLED ScannerUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		822FE2CC5B1BCE46592BABA8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				358AA2A1348289144F971F9B /* Pods_InfoLED_Scanner.framework */,
+				AD7125C887D12D417B94EBE0 /* Pods_InfoLED_ScannerTests.framework */,
+				E5BEB5BA2479B51BC1AD7DAE /* Pods_InfoLED_ScannerUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		8C30B8B9222FAF9D00D22358 /* 03-05 */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,11 +383,14 @@
 		8C3747491C99921100EDDF23 = {
 			isa = PBXGroup;
 			children = (
+				8CD6445A2248B3D700802CB4 /* BuildConfig */,
 				8C657363221FA2A00099B5A8 /* InfoLED TestData */,
 				8C3747541C99921100EDDF23 /* InfoLED Scanner */,
 				8C37476C1C99921200EDDF23 /* InfoLED ScannerTests */,
 				8C3747771C99921200EDDF23 /* InfoLED ScannerUITests */,
 				8C3747531C99921100EDDF23 /* Products */,
+				3D514F2853BD712F22697B69 /* Pods */,
+				822FE2CC5B1BCE46592BABA8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -360,6 +407,7 @@
 		8C3747541C99921100EDDF23 /* InfoLED Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				8CD644572248B1FC00802CB4 /* DeviceCommunication */,
 				8CD644522248789A00802CB4 /* LensInterface */,
 				8CD6443C22471B4900802CB4 /* Shared */,
 				8C9A8EC72246041C00E1B444 /* External */,
@@ -558,6 +606,24 @@
 			path = LensInterface;
 			sourceTree = "<group>";
 		};
+		8CD644572248B1FC00802CB4 /* DeviceCommunication */ = {
+			isa = PBXGroup;
+			children = (
+				8CD644612248BBF700802CB4 /* ParticleAppliancesManager.swift */,
+				8CD644632248BC4C00802CB4 /* ParticleAppliance.swift */,
+			);
+			path = DeviceCommunication;
+			sourceTree = "<group>";
+		};
+		8CD6445A2248B3D700802CB4 /* BuildConfig */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6445B2248B3D700802CB4 /* secret.xcconfig */,
+			);
+			name = BuildConfig;
+			path = "InfoLED Scanner/BuildConfig";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -565,9 +631,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8C37477D1C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED Scanner" */;
 			buildPhases = (
+				790119A645ACA14B63250607 /* [CP] Check Pods Manifest.lock */,
 				8C37474E1C99921100EDDF23 /* Sources */,
 				8C37474F1C99921100EDDF23 /* Frameworks */,
 				8C3747501C99921100EDDF23 /* Resources */,
+				2BF5E521B77C370797F1F630 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -582,6 +650,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8C3747801C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerTests" */;
 			buildPhases = (
+				358F37997CFDF7FD556E94BE /* [CP] Check Pods Manifest.lock */,
 				8C3747651C99921200EDDF23 /* Sources */,
 				8C3747661C99921200EDDF23 /* Frameworks */,
 				8C3747671C99921200EDDF23 /* Resources */,
@@ -604,6 +673,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8C3747831C99921200EDDF23 /* Build configuration list for PBXNativeTarget "InfoLED ScannerUITests" */;
 			buildPhases = (
+				2C64AD4E37C0D97F17B05D30 /* [CP] Check Pods Manifest.lock */,
 				8C3747701C99921200EDDF23 /* Sources */,
 				8C3747711C99921200EDDF23 /* Frameworks */,
 				8C3747721C99921200EDDF23 /* Resources */,
@@ -676,6 +746,7 @@
 				8C0A93A52208F61F007E71E2 /* LensScene.sks in Resources */,
 				8C3747601C99921100EDDF23 /* Assets.xcassets in Resources */,
 				8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */,
+				8CD6445E2248B3D700802CB4 /* secret.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -695,6 +766,83 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2BF5E521B77C370797F1F630 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-InfoLED Scanner/Pods-InfoLED Scanner-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
+				"${BUILT_PRODUCTS_DIR}/Particle-SDK/Particle_SDK.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Particle_SDK.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-InfoLED Scanner/Pods-InfoLED Scanner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2C64AD4E37C0D97F17B05D30 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InfoLED ScannerUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		358F37997CFDF7FD556E94BE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InfoLED ScannerTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		790119A645ACA14B63250607 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InfoLED Scanner-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8C37474E1C99921100EDDF23 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -710,6 +858,7 @@
 				8CBB8BE01CED5A0100C2C280 /* FpsCounter.swift in Sources */,
 				8C3747581C99921100EDDF23 /* ViewController.swift in Sources */,
 				8C9A8EC32246034400E1B444 /* FrameLensProcessor.swift in Sources */,
+				8CD644622248BBF700802CB4 /* ParticleAppliancesManager.swift in Sources */,
 				8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
 				8C9A8EC12245F8ED00E1B444 /* FlowGraph.swift in Sources */,
@@ -718,6 +867,7 @@
 				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
 				8CAEEDB222437E6D0043440A /* Lens.swift in Sources */,
 				8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */,
+				8CD644642248BC4C00802CB4 /* ParticleAppliance.swift in Sources */,
 				8CD22B7122121B120086B704 /* Constants.swift in Sources */,
 				8C37475E1C99921100EDDF23 /* InfoLED_Scanner.xcdatamodeld in Sources */,
 				8C17ADE122274A6F0011A24F /* EventLogger.swift in Sources */,
@@ -778,6 +928,7 @@
 /* Begin XCBuildConfiguration section */
 		8C37477B1C99921200EDDF23 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8CD6445B2248B3D700802CB4 /* secret.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -822,7 +973,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -833,6 +984,7 @@
 		};
 		8C37477C1C99921200EDDF23 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8CD6445B2248B3D700802CB4 /* secret.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -871,7 +1023,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -882,6 +1034,7 @@
 		};
 		8C37477E1C99921200EDDF23 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CFB4E45E47CDBF8A07F73E97 /* Pods-InfoLED Scanner.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
@@ -897,6 +1050,7 @@
 		};
 		8C37477F1C99921200EDDF23 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5828379CADF051A875E3CA7C /* Pods-InfoLED Scanner.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
@@ -912,6 +1066,7 @@
 		};
 		8C3747811C99921200EDDF23 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 952C3ED949F64F59A4EE9A69 /* Pods-InfoLED ScannerTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = "InfoLED ScannerTests/Info.plist";
@@ -926,6 +1081,7 @@
 		};
 		8C3747821C99921200EDDF23 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D3A0BD24396044B7F7F5AEAC /* Pods-InfoLED ScannerTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = "InfoLED ScannerTests/Info.plist";
@@ -940,6 +1096,7 @@
 		};
 		8C3747841C99921200EDDF23 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1366511913559A9151392AE6 /* Pods-InfoLED ScannerUITests.debug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "InfoLED ScannerUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -954,6 +1111,7 @@
 		};
 		8C3747851C99921200EDDF23 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8361038EFA1653112F28A80D /* Pods-InfoLED ScannerUITests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "InfoLED ScannerUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

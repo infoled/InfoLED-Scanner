@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_5" orientation="portrait">
+    <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -18,11 +18,11 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="14B-jm-ksX">
-                                <rect key="frame" x="27" y="128" width="360" height="640"/>
+                                <rect key="frame" x="7.6666666666666572" y="86" width="360" height="640"/>
                                 <subviews>
                                     <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="Dmm-aZ-PXL">
                                         <rect key="frame" x="0.0" y="0.0" width="360" height="640"/>
@@ -34,6 +34,13 @@
                                             <constraint firstAttribute="width" constant="100" id="uxp-ao-39A"/>
                                         </constraints>
                                     </imageView>
+                                    <skView contentMode="scaleToFill" misplaced="YES" allowsTransparency="YES" sceneName="LensScene.sks" translatesAutoresizingMaskIntoConstraints="NO" id="EWw-Ni-rZf">
+                                        <rect key="frame" x="0.0" y="0.0" width="360" height="640"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="640" id="8th-pT-EtU"/>
+                                            <constraint firstAttribute="width" constant="360" id="c3Z-kn-PwI"/>
+                                        </constraints>
+                                    </skView>
                                 </subviews>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -41,34 +48,29 @@
                                     <constraint firstAttribute="height" constant="640" id="KmW-JC-p7N"/>
                                     <constraint firstItem="JsE-Lp-LDa" firstAttribute="centerX" secondItem="14B-jm-ksX" secondAttribute="leading" constant="180" id="LnR-qD-xgw"/>
                                     <constraint firstAttribute="width" constant="360" id="NoN-bm-Ffm"/>
+                                    <constraint firstItem="EWw-Ni-rZf" firstAttribute="centerY" secondItem="14B-jm-ksX" secondAttribute="centerY" constant="-90" id="OJC-cB-iCQ"/>
                                     <constraint firstAttribute="bottom" secondItem="Dmm-aZ-PXL" secondAttribute="bottom" id="R17-I5-Lbl"/>
+                                    <constraint firstItem="EWw-Ni-rZf" firstAttribute="centerX" secondItem="14B-jm-ksX" secondAttribute="centerX" id="hne-Xc-EyK"/>
                                     <constraint firstAttribute="trailing" secondItem="Dmm-aZ-PXL" secondAttribute="trailing" id="pIv-wm-gKI"/>
                                     <constraint firstItem="Dmm-aZ-PXL" firstAttribute="top" secondItem="14B-jm-ksX" secondAttribute="top" id="pSa-h9-FnV"/>
                                     <constraint firstItem="Dmm-aZ-PXL" firstAttribute="leading" secondItem="14B-jm-ksX" secondAttribute="leading" id="sqM-bF-0ZA"/>
                                 </constraints>
                             </view>
-                            <skView contentMode="scaleToFill" allowsTransparency="YES" sceneName="LensScene.sks" translatesAutoresizingMaskIntoConstraints="NO" id="EWw-Ni-rZf">
-                                <rect key="frame" x="27" y="128" width="360" height="640"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="640" id="8th-pT-EtU"/>
-                                    <constraint firstAttribute="width" constant="360" id="c3Z-kn-PwI"/>
-                                </constraints>
-                            </skView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kvJ-8w-qf1">
-                                <rect key="frame" x="187.66666666666666" y="812" width="39" height="30"/>
+                                <rect key="frame" x="168" y="728" width="39" height="30"/>
                                 <state key="normal" title="Scan!"/>
                                 <connections>
                                     <action selector="startScanning:" destination="BYZ-38-t0r" eventType="touchUpInside" id="rs8-Fl-5hT"/>
                                 </connections>
                             </button>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tbr-EC-vRm">
-                                <rect key="frame" x="20" y="840" width="374" height="2"/>
+                                <rect key="frame" x="16" y="756" width="343" height="2"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="2" id="SvQ-SO-jYE"/>
                                 </constraints>
                             </progressView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UDb-mP-1sA">
-                                <rect key="frame" x="20" y="44" width="42" height="21"/>
+                                <rect key="frame" x="16" y="44" width="42" height="21"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -77,9 +79,7 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="EWw-Ni-rZf" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4ry-9v-eGE"/>
                             <constraint firstItem="14B-jm-ksX" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="BDs-51-ZJP"/>
-                            <constraint firstItem="EWw-Ni-rZf" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Bba-qE-hHf"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Tbr-EC-vRm" secondAttribute="bottom" constant="20" id="IZ7-9N-xGA"/>
                             <constraint firstItem="UDb-mP-1sA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="Kr8-zB-mmx"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="kvJ-8w-qf1" secondAttribute="bottom" constant="20" id="p0R-EP-nsY"/>
