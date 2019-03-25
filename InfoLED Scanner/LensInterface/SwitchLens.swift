@@ -1,6 +1,5 @@
-
 //
-//  DebugLens.swift
+//  SwitchLens.swift
 //  InfoLED Scanner
 //
 //  Created by Jackie Yang on 3/24/19.
@@ -9,14 +8,16 @@
 
 import SpriteKit
 
-class DebugLens: SKNode, LensObjectProtocol {
+class SwitchLens: SKNode, LensObjectProtocol {
     static func checkData(data: [Int]) -> Bool {
-        return true
+        return Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
     private var lensLabel: SKLabelNode
     var lensBracket: SKShapeNode
     var size: CGSize
+    var switchId: UInt8!
+    var switchState: Bool!
 
     required init(size: CGSize) {
         self.lensLabel = SKLabelNode()
@@ -37,7 +38,9 @@ class DebugLens: SKNode, LensObjectProtocol {
     }
 
     func setData(data: [Int]) {
-        setLabelText(text: HistoryProcessor.packetString(packet: data))
+        self.switchState = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
+        self.switchId = UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
+        setLabelText(text: "Switchmate[\(switchId ?? 99)][\(switchState ?? false)]")
     }
 
     func setLabelText(text: String) {

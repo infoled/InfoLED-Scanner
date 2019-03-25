@@ -79,6 +79,7 @@
 		8CD22B7122121B120086B704 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD22B7022121B120086B704 /* Constants.swift */; };
 		8CD64427224702C700802CB4 /* BoundingBoxConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD64426224702C700802CB4 /* BoundingBoxConverter.swift */; };
 		8CD64454224879C800802CB4 /* DebugLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD64453224879C800802CB4 /* DebugLens.swift */; };
+		8CD644562248A1A900802CB4 /* SwitchLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD644552248A1A900802CB4 /* SwitchLens.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -273,6 +274,7 @@
 		8CD22B7022121B120086B704 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		8CD64426224702C700802CB4 /* BoundingBoxConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxConverter.swift; sourceTree = "<group>"; };
 		8CD64453224879C800802CB4 /* DebugLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLens.swift; sourceTree = "<group>"; };
+		8CD644552248A1A900802CB4 /* SwitchLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchLens.swift; sourceTree = "<group>"; };
 		8CF22846222E42EB005283DC /* IMG_5792.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5792.MOV; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -551,6 +553,7 @@
 				8C0A93A62208F698007E71E2 /* LensScene.swift */,
 				8CD22B6C220E36960086B704 /* LensNode.swift */,
 				8CD64453224879C800802CB4 /* DebugLens.swift */,
+				8CD644552248A1A900802CB4 /* SwitchLens.swift */,
 			);
 			path = LensInterface;
 			sourceTree = "<group>";
@@ -700,6 +703,7 @@
 				8CD64427224702C700802CB4 /* BoundingBoxConverter.swift in Sources */,
 				8C657362221F912E0099B5A8 /* SampleBufferProcessor.swift in Sources */,
 				8CD64454224879C800802CB4 /* DebugLens.swift in Sources */,
+				8CD644562248A1A900802CB4 /* SwitchLens.swift in Sources */,
 				8CBB8BE21CED5A2D00C2C280 /* Queue.swift in Sources */,
 				8CD22B6D220E36960086B704 /* LensNode.swift in Sources */,
 				8C12E5F81EAAE5F6007AE85A /* ILSImageDiff.swift in Sources */,

@@ -59,6 +59,14 @@ class HistoryProcessor {
         })
     }
 
+    static func packetToInt<T: RandomAccessCollection>(packet: T) -> Int where T.Iterator.Element == Int {
+        if packet.count == 1 {
+            return packet.last!
+        } else {
+            return 2 * packetToInt(packet:packet.dropLast(1)) + packet.last!
+        }
+    }
+
     func processNewPixel(pixel: (Int, Int, Int), frameDuration: Double?, frameId: Int) -> Bool {
         cleanUpTimer += 1
         if (cleanUpTimer > HistoryProcessor.cleanUpLimit) {

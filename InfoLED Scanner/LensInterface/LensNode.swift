@@ -8,15 +8,21 @@
 
 import SpriteKit
 
-protocol LensObjectProtocol {
+protocol LensObjectProtocol: AnyObject {
+    init(size: CGSize)
+
     func setData(data: [Int])
     func setSize(size: CGSize)
     func setAvailable(available: Bool)
+    static func checkData(data: [Int]) -> Bool
 }
+
+let possibleRepresentations: [LensObjectProtocol.Type] = [SwitchLens.self, DebugLens.self]
 
 class LensNode: SKNode {
     var size: CGSize
     var object: LensObjectProtocol & SKNode
+    var data: [Int]?
 
     init(size: CGSize) {
         self.object = DebugLens(size: size)
@@ -30,7 +36,27 @@ class LensNode: SKNode {
     }
 
     func setData(data: [Int]) {
-        object.setData(data: data)
+        if self.data != data {
+            self.setDifferentData(data: data)
+        }
+    }
+
+    func setDifferentData(data: [Int]) {
+        for representation in possibleRepresentations {
+            if (representation.checkData(data: data)) {
+                if (!object.isKind(of: representation)) {
+                    switchRepresentation(type: representation)
+                }
+                break
+            }
+        }
+        self.object.setData(data: data)
+    }
+
+    func switchRepresentation(type: LensObjectProtocol.Type) {
+        self.object.removeFromParent()
+        self.object = type.init(size: size) as! SKNode & LensObjectProtocol
+        self.addChild(self.object)
     }
 
     func setSize(size: CGSize) {
