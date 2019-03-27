@@ -8,30 +8,121 @@
 
 import SpriteKit
 
+let IconSize = CGSize(width: 50, height: 50)
+
+class SwitchIcon: SKNode {
+    var part1: SKSpriteNode
+    var part2_bright: SKSpriteNode
+    var part2_dark: SKSpriteNode
+    var spinner: SKSpriteNode
+
+    var internalState: SwitchLens.SwitchState
+    var state: SwitchLens.SwitchState {
+        set(value) {
+            let fadeIn = SKAction.fadeIn(withDuration: 0.3)
+            let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+            applyEffectForState(state: internalState, effect: fadeOut)
+            applyEffectForState(state: value, effect: fadeIn)
+
+            internalState = value
+        }
+        get {
+            return internalState
+        }
+    }
+
+    func applyEffectForState(state: SwitchLens.SwitchState, effect: SKAction) {
+        switch state {
+        case .loading:
+            self.spinner.removeAllActions()
+            self.spinner.run(effect)
+        case .on:
+            self.part1.removeAllActions()
+            self.part1.run(effect)
+            self.part2_bright.removeAllActions()
+            self.part2_bright.run(effect)
+        case .off:
+            self.part1.removeAllActions()
+            self.part1.run(effect)
+            self.part2_dark.removeAllActions()
+            self.part2_dark.run(effect)
+        }
+    }
+
+    override init() {
+        let size = CGSize(width: 50, height: 50)
+        part1 = SKSpriteNode(texture: SKTexture(imageNamed: "light-p1"))
+        part1.size = size
+        part2_bright = SKSpriteNode(texture: SKTexture(imageNamed: "light-p2-bright"))
+        part2_bright.size = size
+        part2_dark = SKSpriteNode(texture: SKTexture(imageNamed: "light-p2-dark"))
+        part2_dark.size = size
+        spinner = SKSpriteNode(texture: SKTexture(imageNamed: "spinner"))
+        spinner.size = size
+        part1.alpha = 0
+        part2_bright.alpha = 0
+        part2_dark.alpha = 0
+        spinner.alpha = 1
+        spinner.run(SKAction.rotate(byAngle: 360, duration: 1.0))
+        self.internalState = .loading
+        super.init()
+        self.addChild(part1)
+        self.addChild(part2_bright)
+        self.addChild(part2_dark)
+        self.addChild(spinner)
+        self.state = .loading
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 class SwitchLens: SKNode, LensObjectProtocol {
     static func checkData(data: [Int]) -> Bool {
         return Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
     private var lensLabel: SKLabelNode
-    var lensBracket: SKShapeNode
+    var lensBracket: SKShapeNode?
+    var lensIcon: SwitchIcon
     var size: CGSize
     var switchId: UInt8!
-    var switchState: Bool!
+    var internalSwitchState: SwitchState
+    var switchState: SwitchState {
+        get {
+            return internalSwitchState
+        }
+        set(value) {
+            if value != internalSwitchState {
+                self.lensIcon.state = value
+            }
+            internalSwitchState = value
+        }
+    }
+
+    enum SwitchState {
+        case loading
+        case on
+        case off
+    }
 
     var appliance: ParticleAppliance?
 
     let DeviceIds = [0: "230030000647373034353237"]
 
-    required init(size: CGSize) {
+    required init(size inputSize: CGSize) {
+        let size = IconSize
         self.lensLabel = SKLabelNode()
-        self.lensLabel.position = CGPoint(x: 0, y: size.width / 2)
         self.lensLabel.verticalAlignmentMode = .bottom
-        self.lensBracket = SKShapeNode(rectOf: size)
+        self.lensIcon = SwitchIcon()
         self.size = size
+        self.internalSwitchState = .loading
         super.init()
         self.addChild(lensLabel)
-        self.addChild(lensBracket)
+        self.addChild(lensIcon)
+        self.setSize(size: size)
+        self.switchState = .loading
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -39,9 +130,10 @@ class SwitchLens: SKNode, LensObjectProtocol {
     }
 
     func setData(data: [Int]) {
-        self.switchState = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
+        let lightOn = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
+        self.switchState = lightOn ? .on : .off
         self.switchId = UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
-        setLabelText(text: "Switchmate[\(switchId ?? 99)][\(switchState ?? false)]")
+        setLabelText(text: "Switchmate[\(switchId ?? 99)][\(switchState)]")
         if let deviceId = DeviceIds[Int(switchId)] {
             self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
         }
@@ -65,22 +157,27 @@ class SwitchLens: SKNode, LensObjectProtocol {
         }
     }
 
-    func setSize(size: CGSize) {
-        if size == self.size {
-            return
+    func setSize(size inputSize: CGSize) {
+        let size = IconSize
+        if lensBracket != nil {
+            if size == self.size {
+                return
+            }
+            lensBracket?.removeFromParent()
         }
-        lensBracket.removeFromParent()
-        lensBracket = SKShapeNode(rectOf: size)
-        self.addChild(lensBracket)
-        self.lensLabel.position.y = -size.height / 2
+        self.lensBracket = SKShapeNode(rectOf: CGSize(width: size.width + 10, height: size.height + 10), cornerRadius: 5)
+        self.lensBracket!.fillColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+        self.lensBracket?.zPosition = -10
+        self.addChild(lensBracket!)
+        self.lensLabel.position.y = size.height / 2 + 10
     }
 
     func setAvailable(available: Bool) {
         self.lensLabel.isHidden = !available
         if available {
-            self.lensBracket.strokeColor = .green
+            self.lensBracket?.strokeColor = .green
         } else {
-            self.lensBracket.strokeColor = .gray
+            self.lensBracket?.strokeColor = .gray
         }
     }
 }
