@@ -114,7 +114,7 @@ class FrameLens: FrameBlob{
     func costToBlob(blob: FrameBlob?) -> Float {
         if let blob = blob {
             if history != 0 {
-                return lensWeight() * (distance(with:blob) + abs(Float(self.size - blob.size)) / 2) / log(Float(missing))
+                return lensWeight() * (distance(with:blob) + abs(Float(self.size - blob.size)) / 2) / log(Float(missing + 1) + 1)
             } else {
                 return 0
             }
