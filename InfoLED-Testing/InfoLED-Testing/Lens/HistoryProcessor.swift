@@ -60,7 +60,9 @@ class HistoryProcessor {
     }
 
     static func packetToInt<T: RandomAccessCollection>(packet: T) -> Int where T.Iterator.Element == Int {
-        if packet.count == 1 {
+        if packet.count == 0 {
+            return 0
+        } else if packet.count == 1 {
             return packet.last!
         } else {
             return 2 * packetToInt(packet:packet.dropLast(1)) + packet.last!
