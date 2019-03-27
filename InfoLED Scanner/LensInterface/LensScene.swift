@@ -8,6 +8,8 @@
 
 import SpriteKit
 
+let IconSize = CGSize(width: 50, height: 50)
+
 class LensScene: SKScene {
 
     public var lenses : [Lens] = []

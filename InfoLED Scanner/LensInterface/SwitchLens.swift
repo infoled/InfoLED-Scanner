@@ -8,8 +8,6 @@
 
 import SpriteKit
 
-let IconSize = CGSize(width: 50, height: 50)
-
 class SwitchIcon: SKNode {
     var part1: SKSpriteNode
     var part2_bright: SKSpriteNode
@@ -50,7 +48,7 @@ class SwitchIcon: SKNode {
     }
 
     override init() {
-        let size = CGSize(width: 50, height: 50)
+        let size = IconSize
         part1 = SKSpriteNode(texture: SKTexture(imageNamed: "light-p1"))
         part1.size = size
         part2_bright = SKSpriteNode(texture: SKTexture(imageNamed: "light-p2-bright"))
@@ -165,7 +163,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
             }
             lensBracket?.removeFromParent()
         }
-        self.lensBracket = SKShapeNode(rectOf: CGSize(width: size.width + 10, height: size.height + 10), cornerRadius: 5)
+        self.lensBracket = SKShapeNode(rectOf: CGSize(width: size.width + 10, height: size.height + 10), cornerRadius: 10)
         self.lensBracket!.fillColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         self.lensBracket?.zPosition = -10
         self.addChild(lensBracket!)

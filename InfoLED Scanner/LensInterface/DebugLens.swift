@@ -62,7 +62,7 @@ class DebugLens: SKNode, LensObjectProtocol {
         lensBracket.removeFromParent()
         lensBracket = SKShapeNode(rectOf: size)
         self.addChild(lensBracket)
-        self.lensLabel.position.y = -size.height / 2
+        self.lensLabel.position.y = size.height / 2
     }
 
     func setAvailable(available: Bool) {
