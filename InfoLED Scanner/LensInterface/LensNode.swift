@@ -8,21 +8,19 @@
 
 import SpriteKit
 
-protocol LensObjectProtocol: AnyObject {
-    init(size: CGSize)
-
-    func setData(data: [Int])
-    func setSize(size: CGSize)
-    func setAvailable(available: Bool)
-    static func checkData(data: [Int]) -> Bool
-}
-
-let possibleRepresentations: [LensObjectProtocol.Type] = [SwitchLens.self, DebugLens.self]
+let possibleRepresentations: [LensObjectProtocol.Type] = [SwitchLens.self, ButtonLens.self, DebugLens.self]
+//let possibleRepresentations: [LensObjectProtocol.Type] = [DebugLens.self]
 
 class LensNode: SKNode {
     var size: CGSize
     var object: LensObjectProtocol & SKNode
     var data: [Int]?
+
+    var lensScene: LensScene {
+        get {
+            return self.scene! as! LensScene
+        }
+    }
 
     init(size: CGSize) {
         self.object = DebugLens(size: size)
@@ -42,12 +40,20 @@ class LensNode: SKNode {
     }
 
     func setDifferentData(data: [Int]) {
-        for representation in possibleRepresentations {
-            if (representation.checkData(data: data)) {
-                if (!object.isKind(of: representation)) {
-                    switchRepresentation(type: representation)
+        if let device = lensScene.requestDevice(data: data) {
+            self.object.removeFromParent()
+            device.removeFromParent()
+            self.addChild(device)
+            self.object = device
+            self.object.position = CGPoint(x: 0, y: 0)
+        } else {
+            for representation in possibleRepresentations {
+                if (representation.checkData(data: data)) {
+                    if (!object.isKind(of: representation)) {
+                        switchRepresentation(type: representation)
+                    }
+                    break
                 }
-                break
             }
         }
         self.object.setData(data: data)
@@ -55,7 +61,21 @@ class LensNode: SKNode {
 
     func switchRepresentation(type: LensObjectProtocol.Type) {
         self.object.removeFromParent()
+        if object.self is LensInputDeviceProtocol {
+            self.lensScene.addChild(self.object)
+            self.object.position = self.position
+        }
+        if object.self is LensOutputDeviceProtocol {
+            self.lensScene.addChild(self.object)
+            self.object.position = self.position
+        }
         self.object = type.init(size: size) as! SKNode & LensObjectProtocol
+        if type is LensInputDeviceProtocol.Type {
+            self.lensScene.addInputLens(node: self.object as! SKNode & LensInputDeviceProtocol)
+        }
+        if type is LensOutputDeviceProtocol.Type {
+            self.lensScene.addOutputLens(node: self.object as! SKNode & LensOutputDeviceProtocol)
+        }
         self.addChild(self.object)
     }
 

@@ -127,11 +127,21 @@ class SwitchLens: SKNode, LensObjectProtocol {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func getDeviceId(data: [Int]) -> UInt8 {
+        return UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
+    }
+
+    override var description: String {
+        get {
+            return "Switchmate[\(switchId ?? 99)][\(switchState)]"
+        }
+    }
+
     func setData(data: [Int]) {
         let lightOn = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
         self.switchState = lightOn ? .on : .off
-        self.switchId = UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
-        setLabelText(text: "Switchmate[\(switchId ?? 99)][\(switchState)]")
+        self.switchId = getDeviceId(data: data)
+        setLabelText(text: description)
         if let deviceId = DeviceIds[Int(switchId)] {
             self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
         }
@@ -178,29 +188,32 @@ class SwitchLens: SKNode, LensObjectProtocol {
             self.lensBracket?.strokeColor = .gray
         }
     }
-}
 
-extension SwitchLens {
-    override var isUserInteractionEnabled: Bool {
-        set {
-            // ignore
-        }
-        get {
-            return true
-        }
-    }
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    }
-
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    func toggle() {
         if self.appliance?.status == .Initialized {
-            self.appliance?.device.callFunction("setSwitch", withArguments: nil, completion: { (number, error) in
+            self.appliance?.device?.callFunction("setSwitch", withArguments: nil, completion: { (number, error) in
                 guard error == nil else {
                     print(error!)
                     return
                 }
             })
         }
+    }
+}
+
+extension SwitchLens: LensOutputDeviceProtocol {
+    func checkDataDevice(data: [Int]) -> Bool {
+        if (SwitchLens.checkData(data: data)) {
+            return getDeviceId(data: data) == self.switchId
+        }
+        return false
+    }
+
+    func input(data: String) {
+        toggle()
+    }
+
+    func touch() {
+        toggle()
     }
 }

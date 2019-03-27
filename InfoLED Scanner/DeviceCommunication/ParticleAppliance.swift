@@ -17,7 +17,7 @@ class ParticleAppliance {
         case Initialized
     }
     var status: Status = .Loading
-    var device: ParticleDevice!
+    var device: ParticleDevice?
 
     init(deviceId: String) {
         self.deviceId = deviceId

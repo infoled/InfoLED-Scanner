@@ -80,7 +80,7 @@ class ButtonLens: SKNode, LensObjectProtocol {
     var lensBracket: SKShapeNode?
     var lensIcon: ButtonIcon
     var size: CGSize
-    var switchId: UInt8!
+    var buttonId: UInt8!
     var internalButtonState: ButtonState
     var buttonState: ButtonState {
         get {
@@ -102,6 +102,11 @@ class ButtonLens: SKNode, LensObjectProtocol {
     }
 
     var appliance: ParticleAppliance?
+
+    var subscriberId: Any?
+
+    var linkedDevices = [SKNode & LensOutputDeviceProtocol]()
+    var linkedDeviceLinks = [SKNode: SKShapeNode]()
 
     let DeviceIds = [0: "40003b001247363336383437"]
 
@@ -125,6 +130,16 @@ class ButtonLens: SKNode, LensObjectProtocol {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override var description: String {
+        get {
+            return "Button[\(buttonId ?? 99)][\(buttonState)]"
+        }
+    }
+
+    func getDeviceId(data: [Int]) -> UInt8 {
+        return UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
+    }
+
     func setData(data: [Int]) {
         let wifiStatus = data[14] == 1
         let batteryStatus = data[15] == 1
@@ -138,9 +153,9 @@ class ButtonLens: SKNode, LensObjectProtocol {
             buttonState = .ready
             setLabelText(text: "", label: self.warningLabel)
         }
-        self.switchId = UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
-        setLabelText(text: "Button[\(switchId ?? 99)][\(buttonState)]", label: self.lensLabel)
-        if let deviceId = DeviceIds[Int(switchId)] {
+        self.buttonId = getDeviceId(data: data)
+        setLabelText(text: description, label: self.lensLabel)
+        if let deviceId = DeviceIds[Int(buttonId)] {
             self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
         }
     }
@@ -191,20 +206,62 @@ class ButtonLens: SKNode, LensObjectProtocol {
     }
 }
 
-extension ButtonLens {
-    override var isUserInteractionEnabled: Bool {
-        set {
-            // ignore
+extension ButtonLens: LensInputDeviceProtocol {
+    func subscribe() -> Bool {
+        guard let appliance = self.appliance else {
+            return false
         }
-        get {
-            return true
+        guard let device = appliance.device else {
+            return false
+        }
+        subscriberId = device.subscribeToEvents(withPrefix: "button") { [unowned self] (event, error) in
+            guard error == nil else {
+                print(error!)
+                return
+            }
+            if (event?.data == "on_release") {
+                for linkedDevice in self.linkedDevices {
+                    linkedDevice.input(data: (event?.data!)!)
+                }
+            }
+        }
+        return subscriberId != nil
+    }
+
+    func addLinked(device: SKNode & LensOutputDeviceProtocol) -> Bool {
+        if (subscriberId == nil) {
+            _ = subscribe()
+        }
+        guard subscriberId != nil else {
+            return false
+        }
+        linkedDevices.append(device)
+        let link = SKShapeNode()
+        link.strokeColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+        link.lineWidth = 5
+        linkedDeviceLinks[device] = link
+        addChild(link)
+        return true
+    }
+
+    func updateLinks() {
+        for device in linkedDevices {
+            let position = device.convert(CGPoint(x: 0, y: 0), to: self)
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: position)
+            linkedDeviceLinks[device]?.path = path
         }
     }
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    func checkDataDevice(data: [Int]) -> Bool {
+        if (ButtonLens.checkData(data: data)) {
+            return getDeviceId(data: data) == self.buttonId
+        }
+        return false
     }
 
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    func touch() {
         if self.appliance?.status == .Initialized {
             switch self.buttonState {
             case .noNetwork:
@@ -212,7 +269,7 @@ extension ButtonLens {
                 let alertAction = UIAlertAction(title: "Connect", style: .default)
                 {
                     (UIAlertAction) -> Void in
-                    self.appliance?.device.callFunction("setWifiState", withArguments: ["on"], completion: { (number, error) in
+                    self.appliance?.device?.callFunction("setWifiState", withArguments: ["on"], completion: { (number, error) in
                         guard error == nil else {
                             print(error!)
                             return
@@ -223,7 +280,6 @@ extension ButtonLens {
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
                 {
                     (UIAlertAction) -> Void in
-
                 }
                 alert.addAction(cancelAction)
                 UIApplication.shared.keyWindow?.rootViewController!.present(alert, animated: true)
