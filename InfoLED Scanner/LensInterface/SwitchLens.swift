@@ -78,7 +78,9 @@ class SwitchIcon: SKNode {
 
 class SwitchLens: SKNode, LensObjectProtocol {
     static func checkData(data: [Int]) -> Bool {
-        return Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        let checkDevice = Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        let checkId = deviceIds.keys.contains(Int(getDeviceId(data: data)))
+        return checkDevice && checkId
     }
 
     private var lensLabel: SKLabelNode
@@ -107,7 +109,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
 
     var appliance: ParticleAppliance?
 
-    let DeviceIds = [0: "230030000647373034353237"]
+    static let deviceIds = [0: "230030000647373034353237"]
 
     required init(size inputSize: CGSize) {
         let size = IconSize
@@ -127,7 +129,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func getDeviceId(data: [Int]) -> UInt8 {
+    static func getDeviceId(data: [Int]) -> UInt8 {
         return UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
     }
 
@@ -140,9 +142,9 @@ class SwitchLens: SKNode, LensObjectProtocol {
     func setData(data: [Int]) {
         let lightOn = HistoryProcessor.packetToInt(packet: Array(data.suffix(2))) == 1
         self.switchState = lightOn ? .on : .off
-        self.switchId = getDeviceId(data: data)
+        self.switchId = SwitchLens.getDeviceId(data: data)
         setLabelText(text: description)
-        if let deviceId = DeviceIds[Int(switchId)] {
+        if let deviceId = SwitchLens.deviceIds[Int(switchId)] {
             self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
         }
     }
@@ -204,7 +206,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
 extension SwitchLens: LensOutputDeviceProtocol {
     func checkDataDevice(data: [Int]) -> Bool {
         if (SwitchLens.checkData(data: data)) {
-            return getDeviceId(data: data) == self.switchId
+            return SwitchLens.getDeviceId(data: data) == self.switchId
         }
         return false
     }

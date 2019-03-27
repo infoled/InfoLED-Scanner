@@ -72,7 +72,9 @@ class ButtonIcon: SKNode {
 
 class ButtonLens: SKNode, LensObjectProtocol {
     static func checkData(data: [Int]) -> Bool {
-        return Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        let checkDevice = Array(data.prefix(12)) == [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        let checkId = deviceIds.keys.contains(Int(getDeviceId(data: data)))
+        return checkDevice && checkId
     }
 
     private var lensLabel: SKLabelNode
@@ -108,7 +110,7 @@ class ButtonLens: SKNode, LensObjectProtocol {
     var linkedDevices = [SKNode & LensOutputDeviceProtocol]()
     var linkedDeviceLinks = [SKNode: SKShapeNode]()
 
-    let DeviceIds = [0: "40003b001247363336383437"]
+    static let deviceIds = [0: "40003b001247363336383437"]
 
     required init(size inputSize: CGSize) {
         let size = IconSize
@@ -136,7 +138,7 @@ class ButtonLens: SKNode, LensObjectProtocol {
         }
     }
 
-    func getDeviceId(data: [Int]) -> UInt8 {
+    static func getDeviceId(data: [Int]) -> UInt8 {
         return UInt8(HistoryProcessor.packetToInt(packet: Array(data.dropLast(2).suffix(2))))
     }
 
@@ -153,9 +155,9 @@ class ButtonLens: SKNode, LensObjectProtocol {
             buttonState = .ready
             setLabelText(text: "", label: self.warningLabel)
         }
-        self.buttonId = getDeviceId(data: data)
+        self.buttonId = ButtonLens.getDeviceId(data: data)
         setLabelText(text: description, label: self.lensLabel)
-        if let deviceId = DeviceIds[Int(buttonId)] {
+        if let deviceId = ButtonLens.deviceIds[Int(buttonId)] {
             self.appliance = ParticleAppliancesManager.defaultManager[deviceId]
         }
     }
@@ -256,7 +258,7 @@ extension ButtonLens: LensInputDeviceProtocol {
 
     func checkDataDevice(data: [Int]) -> Bool {
         if (ButtonLens.checkData(data: data)) {
-            return getDeviceId(data: data) == self.buttonId
+            return ButtonLens.getDeviceId(data: data) == self.buttonId
         }
         return false
     }
