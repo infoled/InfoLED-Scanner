@@ -233,15 +233,16 @@ class HistoryProcessor {
     }
 
     func getPopularPacket() -> [Int]? {
-        let counts = verifiedPackets.reduce(into: [:]) {(result, packet) in
-            result[packet.0, default: Double(0)] += packet.1
-        }
-
-        if let (value, _) = counts.max(by: { $0.1 < $1.1 }) {
-            return value
-        } else {
-            return nil
-        }
+//        let counts = verifiedPackets.reduce(into: [:]) {(result, packet) in
+//            result[packet.0, default: Double(0)] += packet.1
+//        }
+//
+//        if let (value, _) = counts.max(by: { $0.1 < $1.1 }) {
+//            return value
+//        } else {
+//            return nil
+//        }
+        return verifiedPackets.last?.0
     }
 
     func cleanUp() {
