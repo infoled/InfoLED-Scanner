@@ -20,9 +20,8 @@ class DebugLens: SKNode, LensObjectProtocol {
 
     required init(size: CGSize) {
         self.lensLabel = SKLabelNode()
-        self.lensLabel.position = CGPoint(x: -size.width / 2, y: 0)
+        self.lensLabel.position = CGPoint(x: 0, y: size.width / 2)
         self.lensLabel.verticalAlignmentMode = .bottom
-        self.lensLabel.zRotation = CGFloat.pi / 2
         self.lensBracket = SKShapeNode(rectOf: size)
         self.size = size
         super.init()
@@ -46,7 +45,7 @@ class DebugLens: SKNode, LensObjectProtocol {
                 attributedText.addAttributes([
                     .foregroundColor: UIColor.white,
                     .strokeColor: UIColor.black,
-                    .font: UIFont(name: "Menlo", size: 10)!,
+                    .font: UIFont(name: "Menlo", size: 15)!,
                     .strokeWidth: -2.0
                     ], range: entireRange)
                 self.lensLabel.attributedText = attributedText
@@ -63,7 +62,7 @@ class DebugLens: SKNode, LensObjectProtocol {
         lensBracket.removeFromParent()
         lensBracket = SKShapeNode(rectOf: size)
         self.addChild(lensBracket)
-        self.lensLabel.position.y = size.height / 2
+        self.lensLabel.position.y = -size.height / 2
     }
 
     func setAvailable(available: Bool) {

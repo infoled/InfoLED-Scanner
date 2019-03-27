@@ -155,19 +155,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             CGAffineTransform.init(rotationAngle: .pi / 2)
                 .scaledBy(x: videoViewScaleFactor, y: videoViewScaleFactor)
 
-        lensViewWidth.constant = CGFloat(Constants.videoWidth) / UIScreen.main.scale
-        lensViewHeight.constant = CGFloat(Constants.videoHeight) / UIScreen.main.scale
-
-        let lensViewScaleFactor = CGFloat(Constants.videoWidth) / UIScreen.main.bounds.height
-
-        lensView.transform =
-            CGAffineTransform.init(rotationAngle: .pi / 2)
-                .scaledBy(x: lensViewScaleFactor, y: lensViewScaleFactor)
-
-//        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-//        previewLayer?.videoGravity = AVLayerVideoGravityResize;
-//        videoPreviewView.layer.addSublayer(previewLayer!)
-
         captureSession.startRunning()
     }
 
