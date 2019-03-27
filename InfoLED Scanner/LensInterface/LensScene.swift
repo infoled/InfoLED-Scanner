@@ -39,15 +39,23 @@ class LensScene: SKScene {
         return nil
     }
 
+    var realSize: CGSize {
+        get {
+            let width = self.size.width
+            let height = self.size.width * 640 / 360
+            return CGSize(width: width, height: height)
+        }
+    }
+
     func convert(size: CGSize) -> CGSize {
-        let displayHeight = size.width / CGFloat(Constants.videoWidth) * UIScreen.main.scale * self.size.height
-        let displayWidth = size.height / CGFloat(Constants.videoHeight) * UIScreen.main.scale * self.size.width
+        let displayHeight = size.width / CGFloat(Constants.videoWidth) * UIScreen.main.scale * realSize.height
+        let displayWidth = size.height / CGFloat(Constants.videoHeight) * UIScreen.main.scale * realSize.width
         return CGSize(width: displayWidth, height: displayHeight)
     }
 
     func convert(position: CGPoint) -> CGPoint {
-        let displayY = (1 - position.x / CGFloat(Constants.videoWidth) * UIScreen.main.scale) * size.height
-        let displayX = (1 - position.y / CGFloat(Constants.videoHeight) * UIScreen.main.scale) * size.width
+        let displayY = self.size.height - position.x / CGFloat(Constants.videoWidth) * UIScreen.main.scale * realSize.height
+        let displayX = (1 - position.y / CGFloat(Constants.videoHeight) * UIScreen.main.scale) * realSize.width
         return CGPoint(x: displayX, y: displayY)
     }
 
