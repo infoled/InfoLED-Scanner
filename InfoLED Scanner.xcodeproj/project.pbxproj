@@ -19,6 +19,7 @@
 		8C17ADE122274A6F0011A24F /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C17ADE022274A6F0011A24F /* EventLogger.swift */; };
 		8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */; };
 		8C2CC33C224B6FAC00981CD6 /* LensProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2CC33B224B6FAC00981CD6 /* LensProtocol.swift */; };
+		8C2CC33E224C211100981CD6 /* RecentLenses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2CC33D224C211100981CD6 /* RecentLenses.swift */; };
 		8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747551C99921100EDDF23 /* AppDelegate.swift */; };
 		8C3747581C99921100EDDF23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747571C99921100EDDF23 /* ViewController.swift */; };
 		8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747591C99921100EDDF23 /* Main.storyboard */; };
@@ -207,6 +208,7 @@
 		8C17ADE322290B490011A24F /* IMG_5696.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_5696.MOV; sourceTree = "<group>"; };
 		8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryProcessor.swift; sourceTree = "<group>"; };
 		8C2CC33B224B6FAC00981CD6 /* LensProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensProtocol.swift; sourceTree = "<group>"; };
+		8C2CC33D224C211100981CD6 /* RecentLenses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentLenses.swift; sourceTree = "<group>"; };
 		8C30B8BB222FAF9D00D22358 /* 100cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 100cm.MOV; path = "InfoLED TestData/03-05/2x/100cm.MOV"; sourceTree = SOURCE_ROOT; };
 		8C30B8BC222FAF9D00D22358 /* 20cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 20cm.MOV; path = "InfoLED TestData/03-05/2x/20cm.MOV"; sourceTree = SOURCE_ROOT; };
 		8C30B8BD222FAF9D00D22358 /* 80cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 80cm.MOV; path = "InfoLED TestData/03-05/2x/80cm.MOV"; sourceTree = SOURCE_ROOT; };
@@ -608,6 +610,7 @@
 				8CD644552248A1A900802CB4 /* SwitchLens.swift */,
 				8C89E677224B4D2100C8A79A /* ButtonLens.swift */,
 				8C2CC33B224B6FAC00981CD6 /* LensProtocol.swift */,
+				8C2CC33D224C211100981CD6 /* RecentLenses.swift */,
 			);
 			path = LensInterface;
 			sourceTree = "<group>";
@@ -873,6 +876,7 @@
 				8C9A8EC12245F8ED00E1B444 /* FlowGraph.swift in Sources */,
 				8C0152C621BE939200049838 /* CcLabel.swift in Sources */,
 				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,
+				8C2CC33E224C211100981CD6 /* RecentLenses.swift in Sources */,
 				8C12E5FA1EAAEC69007AE85A /* ImageDiff.metal in Sources */,
 				8CAEEDB222437E6D0043440A /* Lens.swift in Sources */,
 				8CD22B6F221219740086B704 /* HistoryLens.swift in Sources */,

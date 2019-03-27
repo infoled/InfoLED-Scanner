@@ -37,15 +37,17 @@ class LensNode: SKNode {
         if self.data != data {
             self.setDifferentData(data: data)
         }
+        self.data = data
     }
 
     func setDifferentData(data: [Int]) {
+        removeRepresentation()
         if let device = lensScene.requestDevice(data: data) {
-            self.object.removeFromParent()
-            device.removeFromParent()
-            self.addChild(device)
             self.object = device
-            self.object.position = CGPoint(x: 0, y: 0)
+            self.lensScene.claimDevice(device: device, for: self)
+            let distance = device.position.distance(to: CGPoint(x: 0, y: 0))
+            let time = distance / LensMovementSpeed
+            device.run(SKAction.move(to: CGPoint(x: 0, y: 0), duration: TimeInterval(time)))
         } else {
             for representation in possibleRepresentations {
                 if (representation.checkData(data: data)) {
@@ -59,16 +61,15 @@ class LensNode: SKNode {
         self.object.setData(data: data)
     }
 
+    func removeRepresentation() {
+        if object.self is LensInputDeviceProtocol || object.self is LensOutputDeviceProtocol {
+            self.lensScene.unclaimDevice(device: self.object as! SKNode & LensDeviceProtocol)
+        } else {
+            self.object.removeFromParent()
+        }
+    }
+
     func switchRepresentation(type: LensObjectProtocol.Type) {
-        self.object.removeFromParent()
-        if object.self is LensInputDeviceProtocol {
-            self.lensScene.addChild(self.object)
-            self.object.position = self.position
-        }
-        if object.self is LensOutputDeviceProtocol {
-            self.lensScene.addChild(self.object)
-            self.object.position = self.position
-        }
         self.object = type.init(size: size) as! SKNode & LensObjectProtocol
         if type is LensInputDeviceProtocol.Type {
             self.lensScene.addInputLens(node: self.object as! SKNode & LensInputDeviceProtocol)

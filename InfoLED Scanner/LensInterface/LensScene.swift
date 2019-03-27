@@ -14,6 +14,7 @@ class LensScene: SKScene {
 
     public var lenses : [Lens] = []
     private var lensNodes : [LensNode] = []
+    private var recentLensesNode: RecentLenses!;
 
     private var connectionLine: SKShapeNode?
     private var connectionTouch: UITouch?
@@ -21,6 +22,27 @@ class LensScene: SKScene {
 
     private var inputLensNodes = [SKNode & LensInputDeviceProtocol]()
     private var outputLensNodes = [SKNode & LensOutputDeviceProtocol]()
+
+    override func sceneDidLoad() {
+        recentLensesNode = RecentLenses(size: self.size)
+        addChild(recentLensesNode)
+        recentLensesNode.position = CGPoint(x: self.size.width / 4, y: recentLensesNode.size.height / 2)
+    }
+
+    func unclaimDevice(device: SKNode & LensDeviceProtocol) {
+        device.removeAllActions()
+        device.move(toParent: recentLensesNode)
+        device.zPosition = 10
+        recentLensesNode.recentDevices.append(device)
+    }
+
+    func claimDevice(device: SKNode & LensDeviceProtocol, for node: SKNode) {
+        device.removeAllActions()
+        recentLensesNode.recentDevices.removeAll { (recentDevice) -> Bool in
+            return recentDevice == device
+        }
+        device.move(toParent: node)
+    }
 
     func addInputLens(node: SKNode & LensInputDeviceProtocol) {
         inputLensNodes.append(node)
@@ -70,10 +92,10 @@ class LensScene: SKScene {
                 lensNodes.append(currentNode)
                 self.addChild(currentNode)
             }
-            currentNode.position = convert(position: currentLens.position)
             currentNode.setSize(size: convert(size: currentLens.size))
             currentNode.setData(data: currentLens.data)
             currentNode.setAvailable(available: currentLens.detected)
+            currentNode.position = convert(position: currentLens.position)
         }
         if lensNodes.count > lenses.count {
             lensNodes.dropFirst(lenses.count).forEach { (node) in
@@ -84,6 +106,7 @@ class LensScene: SKScene {
         for input in inputLensNodes {
             input.updateLinks()
         }
+        recentLensesNode.updateDevicePositions()
     }
 }
 
