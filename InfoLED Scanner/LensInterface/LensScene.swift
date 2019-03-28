@@ -33,14 +33,12 @@ class LensScene: SKScene {
         device.removeAllActions()
         device.move(toParent: recentLensesNode)
         device.zPosition = 10
-        recentLensesNode.recentDevices.append(device)
+        recentLensesNode.addRecentDevice(device: device)
     }
 
     func claimDevice(device: SKNode & LensDeviceProtocol, for node: SKNode) {
         device.removeAllActions()
-        recentLensesNode.recentDevices.removeAll { (recentDevice) -> Bool in
-            return recentDevice == device
-        }
+        recentLensesNode.removeRecentDevice(device: device)
         device.move(toParent: node)
     }
 

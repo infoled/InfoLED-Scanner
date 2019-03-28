@@ -20,7 +20,8 @@ class RecentLenses: SKNode {
     var bracketNode: SKShapeNode
     var size: CGSize
 
-    var recentDevices = [SKNode & LensDeviceProtocol]()
+    private var recentDevices = Set<SKNode>()
+    private var recentDeviceAddedTime = [SKNode: NSDate]()
     let maxDevices = 5
 
     init(size parentSize: CGSize) {
@@ -31,6 +32,16 @@ class RecentLenses: SKNode {
         addChild(self.bracketNode)
     }
 
+    func addRecentDevice(device: LensDevice) {
+        recentDevices.insert(device)
+        recentDeviceAddedTime[device] = NSDate()
+    }
+
+    func removeRecentDevice(device: LensDevice) {
+        recentDevices.remove(device)
+        recentDeviceAddedTime.removeValue(forKey: device)
+    }
+
     var devicePositions: [CGPoint] {
         let spacing = IconSize.width + 10
         let offset =  -spacing * CGFloat(recentDevices.count) / 2
@@ -38,13 +49,15 @@ class RecentLenses: SKNode {
     }
 
     func updateDevicePositions() {
-        if recentDevices.count > maxDevices {
-            recentDevices = recentDevices.suffix(maxDevices)
+        while recentDevices.count > maxDevices {
+            recentDevices.remove(recentDevices.first!)
         }
         for (device, position) in zip(recentDevices, devicePositions) {
-            let distance = position.distance(to: device.position)
-            let time = distance / LensMovementSpeed
-            device.run(SKAction.move(to: position, duration: TimeInterval(time)))
+            if (recentDeviceAddedTime[device]!.timeIntervalSinceNow < -1.0) {
+                let distance = position.distance(to: device.position)
+                let time = distance / LensMovementSpeed
+                device.run(SKAction.move(to: position, duration: TimeInterval(time)))
+            }
         }
     }
     

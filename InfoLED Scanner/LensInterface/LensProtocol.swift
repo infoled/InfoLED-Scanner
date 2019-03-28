@@ -17,6 +17,8 @@ protocol LensObjectProtocol: AnyObject {
     static func checkData(data: [Int]) -> Bool
 }
 
+typealias LensDevice = SKNode & LensDeviceProtocol
+
 protocol LensDeviceProtocol: LensObjectProtocol {
     func checkDataDevice(data: [Int]) -> Bool
     func touch()
