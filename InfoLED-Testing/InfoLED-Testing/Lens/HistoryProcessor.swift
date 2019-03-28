@@ -83,7 +83,7 @@ class HistoryProcessor {
                 return true
             }
         } else {
-            print("wierd behavior, probably no tag");
+//            print("wierd behavior, probably no tag");
         }
         return false
     }
@@ -169,7 +169,6 @@ class HistoryProcessor {
             let indices = Array(frameLevels.startIndex...frameLevels.endIndex - totalPacketLength)
 
             var result = [(Int, Int)]()
-            print(indices)
             for index in indices {
                 let subarray = frameLevels[index ..< (index + HistoryProcessor.preambleLength)]
                 if (subarray == ArraySlice<Int>(HistoryProcessor.preamble)) {

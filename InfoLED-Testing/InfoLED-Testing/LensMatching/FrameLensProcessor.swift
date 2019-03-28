@@ -13,6 +13,8 @@ import Cocoa
 import UIKit
 #endif
 
+fileprivate let Debug = false;
+
 class FrameBlob: CustomStringConvertible {
     var x: Float
     var y: Float
@@ -195,13 +197,17 @@ class FrameLensProcessor {
             for j in blobs.indices {
                 let blobNode = blobsBegin + j
                 if matchedFlow[blobNode] > 0 {
-                    print("lens[\(i)] = \(frameLenses[i]) --> blob[\(j)] = \(blobs[j])")
+                    if Debug {
+                        print("lens[\(i)] = \(frameLenses[i]) --> blob[\(j)] = \(blobs[j])")
+                    }
                     frameLenses[i].assign(blob: blobs[j])
                 }
             }
             let lensShadowNode = lensShadowsBegin + i
             if matchedFlow[lensShadowNode] > 0 {
-                print("lens[\(i)] = \(frameLenses[i]) --> lensShadow[\(lensShadowNode)]")
+                if Debug {
+                    print("lens[\(i)] = \(frameLenses[i]) --> lensShadow[\(lensShadowNode)]")
+                }
                 frameLenses[i].assign(blob: nil)
             }
         }
@@ -212,7 +218,9 @@ class FrameLensProcessor {
                 result.append(historyLens)
             }
         }
-        print(result)
+        if Debug {
+            print(result)
+        }
         return result
     }
 }

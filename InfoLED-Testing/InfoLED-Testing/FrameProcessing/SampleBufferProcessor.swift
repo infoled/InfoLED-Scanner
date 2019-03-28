@@ -463,7 +463,6 @@ class SampleBufferProcessor {
     static let lensCount = 5
 
     func updateBoundingBoxes(boundingBoxes: [Int: BoundingBox]) {
-        print(boundingBoxes)
         let processedHistoryLenses = FrameLensProcessor.processFrame(currentLenses: delegate.historyLenses, boxes: Array(boundingBoxes.values))
         var newHistoryLenses: [HistoryLens]
         if processedHistoryLenses.count < SampleBufferProcessor.lensCount {

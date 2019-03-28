@@ -209,7 +209,7 @@ extension ViewController : MTKViewDelegate {
     func draw(in view: MTKView) {
         DispatchQueue.main.async {
             self.fpsLabel.text = "\(self.fpsCounter.getFps())";
-            print("\(self.fpsCounter.getFps())")
+//            print("\(self.fpsCounter.getFps())")
         }
         if let currentDrawable = metalPreviewLayer.currentDrawable {
             self.bufferProcessor.copyDisplayTextureSync(to: currentDrawable)
