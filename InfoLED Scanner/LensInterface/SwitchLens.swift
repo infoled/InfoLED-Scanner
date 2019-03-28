@@ -135,7 +135,8 @@ class SwitchLens: SKNode, LensObjectProtocol {
 
     override var description: String {
         get {
-            return "Switchmate[\(switchId ?? 99)][\(switchState)]"
+//            return "Switchmate[\(switchId ?? 99)][\(switchState)]"
+            return "Switch[\(switchState)]"
         }
     }
 

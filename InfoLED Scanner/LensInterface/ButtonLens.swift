@@ -134,7 +134,8 @@ class ButtonLens: SKNode, LensObjectProtocol {
 
     override var description: String {
         get {
-            return "Button[\(buttonId ?? 99)][\(buttonState)]"
+//            return "Button[\(buttonId ?? 99)][\(buttonState)]"
+            return "Button[\(buttonState)]"
         }
     }
 
