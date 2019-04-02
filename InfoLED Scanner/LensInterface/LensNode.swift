@@ -41,21 +41,22 @@ class LensNode: SKNode {
     }
 
     func setDifferentData(data: [Int]) {
-        removeRepresentation()
-        if let device = lensScene.requestDevice(data: data) {
-            self.object = device
-            self.lensScene.claimDevice(device: device, for: self)
-            let distance = device.position.distance(to: CGPoint(x: 0, y: 0))
-            let time = distance / LensMovementSpeed
-            device.run(SKAction.move(to: CGPoint(x: 0, y: 0), duration: TimeInterval(time)))
-        } else {
-            for representation in possibleRepresentations {
-                if (representation.checkData(data: data)) {
-                    if (!object.isKind(of: representation)) {
+        for representation in possibleRepresentations {
+            if (representation.checkData(data: data)) {
+                if (!object.isKind(of: representation)) {
+                    removeRepresentation()
+                    if let device = lensScene.requestDevice(data: data) {
+                        self.object = device
+                        self.lensScene.claimDevice(device: device, for: self)
+                        let distance = device.position.distance(to: CGPoint(x: 0, y: 0))
+                        let time = distance / LensMovementSpeed
+                        device.run(SKAction.move(to: CGPoint(x: 0, y: 0), duration: TimeInterval(time)))
+                    } else {
                         switchRepresentation(type: representation)
                     }
-                    break
+
                 }
+                break
             }
         }
         self.object.setData(data: data)

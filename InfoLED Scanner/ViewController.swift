@@ -130,7 +130,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             cameraDevice!.activeVideoMaxFrameDuration = frameDuration
             cameraDevice!.activeVideoMinFrameDuration = frameDuration
 
-            cameraDevice!.setExposureTargetBias(-4.5, completionHandler: nil)
+            cameraDevice!.setExposureTargetBias(-3.5, completionHandler: nil)
 
             unlockCameraSettings()
 

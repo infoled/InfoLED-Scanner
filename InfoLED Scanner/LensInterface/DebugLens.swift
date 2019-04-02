@@ -34,7 +34,7 @@ class DebugLens: SKNode, LensObjectProtocol {
     }
 
     func setData(data: [Int]) {
-        setLabelText(text: HistoryProcessor.packetString(packet: data))
+//        setLabelText(text: HistoryProcessor.packetString(packet: data))
     }
 
     func setLabelText(text: String) {
