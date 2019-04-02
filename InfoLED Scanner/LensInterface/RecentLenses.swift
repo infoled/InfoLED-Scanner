@@ -43,8 +43,8 @@ class RecentLenses: SKNode {
     }
 
     var devicePositions: [CGPoint] {
-        let spacing = IconSize.width + 10
-        let offset =  -spacing * CGFloat(recentDevices.count) / 2
+        let spacing = IconSize.width + 20
+        let offset =  -spacing * CGFloat(recentDevices.count - 1) / 2
         return Array((0..<recentDevices.count).map{CGPoint(x: CGFloat($0) * spacing + offset, y: 0)})
     }
 

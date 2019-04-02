@@ -291,7 +291,12 @@ extension ButtonLens: LensInputDeviceProtocol {
                 }
                 self.buttonState = .loading
             case .lowBattery:
-                let alert = UIAlertController(title: "Low Battery", message: "Your smart button is low on battery", preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: "Low Battery", message: "Your smart button is low on battery. Please flip to the back of the device and replace the battery.", preferredStyle: .actionSheet)
+                let replaceAction = UIAlertAction(title: "I will replace the battery", style: .default)
+                {
+                    (UIAlertAction) -> Void in
+                }
+                alert.addAction(replaceAction)
                 let alertAction = UIAlertAction(title: "Video walkthrough", style: .default)
                 {
                     (UIAlertAction) -> Void in
