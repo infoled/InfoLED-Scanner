@@ -109,7 +109,10 @@ class SwitchLens: SKNode, LensObjectProtocol {
 
     var appliance: ParticleAppliance?
 
-    static let deviceIds = [0: "230030000647373034353237"]
+    static let deviceIds = [
+        0: "230030000647373034353237",
+        1: "250044001447363336383438"
+    ]
 
     required init(size inputSize: CGSize) {
         let size = IconSize
@@ -135,8 +138,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
 
     override var description: String {
         get {
-//            return "Switchmate[\(switchId ?? 99)][\(switchState)]"
-            return "Switch[\(switchState)]"
+            return "Switch \(switchId ?? 99)[\(switchState)]"
         }
     }
 
