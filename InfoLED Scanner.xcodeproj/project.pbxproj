@@ -20,6 +20,7 @@
 		8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C22D26121AA5FC20084DA77 /* HistoryProcessor.swift */; };
 		8C2CC33C224B6FAC00981CD6 /* LensProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2CC33B224B6FAC00981CD6 /* LensProtocol.swift */; };
 		8C2CC33E224C211100981CD6 /* RecentLenses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2CC33D224C211100981CD6 /* RecentLenses.swift */; };
+		8C35C390225785600008501C /* SensorLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C35C38F225785600008501C /* SensorLens.swift */; };
 		8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747551C99921100EDDF23 /* AppDelegate.swift */; };
 		8C3747581C99921100EDDF23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3747571C99921100EDDF23 /* ViewController.swift */; };
 		8C37475B1C99921100EDDF23 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3747591C99921100EDDF23 /* Main.storyboard */; };
@@ -219,6 +220,7 @@
 		8C30B8C3222FAF9D00D22358 /* 50cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 50cm.MOV; path = "InfoLED TestData/03-05/1x/50cm.MOV"; sourceTree = SOURCE_ROOT; };
 		8C30B8C4222FAF9D00D22358 /* 20cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 20cm.MOV; path = "InfoLED TestData/03-05/1x/20cm.MOV"; sourceTree = SOURCE_ROOT; };
 		8C30B8C5222FAF9D00D22358 /* 40cm.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = 40cm.MOV; path = "InfoLED TestData/03-05/1x/40cm.MOV"; sourceTree = SOURCE_ROOT; };
+		8C35C38F225785600008501C /* SensorLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorLens.swift; sourceTree = "<group>"; };
 		8C3747521C99921100EDDF23 /* InfoLED Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "InfoLED Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3747551C99921100EDDF23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3747571C99921100EDDF23 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -609,6 +611,7 @@
 				8CD64453224879C800802CB4 /* DebugLens.swift */,
 				8CD644552248A1A900802CB4 /* SwitchLens.swift */,
 				8C89E677224B4D2100C8A79A /* ButtonLens.swift */,
+				8C35C38F225785600008501C /* SensorLens.swift */,
 				8C2CC33B224B6FAC00981CD6 /* LensProtocol.swift */,
 				8C2CC33D224C211100981CD6 /* RecentLenses.swift */,
 			);
@@ -873,6 +876,7 @@
 				8CD644622248BBF700802CB4 /* ParticleAppliancesManager.swift in Sources */,
 				8C22D26221AA5FC20084DA77 /* HistoryProcessor.swift in Sources */,
 				8C3747561C99921100EDDF23 /* AppDelegate.swift in Sources */,
+				8C35C390225785600008501C /* SensorLens.swift in Sources */,
 				8C9A8EC12245F8ED00E1B444 /* FlowGraph.swift in Sources */,
 				8C0152C621BE939200049838 /* CcLabel.swift in Sources */,
 				8C12E5FC1EAC07A1007AE85A /* MTLDeviceExtension.swift in Sources */,

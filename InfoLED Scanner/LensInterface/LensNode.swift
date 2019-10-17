@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-let possibleRepresentations: [LensObjectProtocol.Type] = [SwitchLens.self, ButtonLens.self, DebugLens.self]
+let possibleRepresentations: [LensObjectProtocol.Type] = [SwitchLens.self, ButtonLens.self, SensorLens.self, DebugLens.self]
 //let possibleRepresentations: [LensObjectProtocol.Type] = [DebugLens.self]
 
 class LensNode: SKNode {

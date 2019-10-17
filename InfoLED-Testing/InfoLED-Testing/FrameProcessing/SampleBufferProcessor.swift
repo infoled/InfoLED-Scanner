@@ -225,7 +225,7 @@ class SampleBufferProcessor {
         dilateKernel = MPSImageAreaMax(device: metalDevice, kernelWidth: 9, kernelHeight: 9)
         resize2Kernel = MPSImageLanczosScale(device: self.metalDevice)
 
-        var brightValue: [Float] = [8.0]
+        var brightValue: [Float] = [16.0]
         brightKernel = MPSImageConvolution(device: metalDevice, kernelWidth: 1, kernelHeight: 1, weights: &brightValue)
 
         addKernel = MPSImageAdd(device: metalDevice)

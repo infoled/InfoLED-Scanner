@@ -45,8 +45,8 @@ class DebugLens: SKNode, LensObjectProtocol {
                 attributedText.addAttributes([
                     .foregroundColor: UIColor.white,
                     .strokeColor: UIColor.black,
-                    .font: UIFont(name: "Menlo", size: 15)!,
-                    .strokeWidth: -2.0
+                    .font: UIFont(name: "Menlo-Bold", size: 20)!,
+                    .strokeWidth: -5.0
                     ], range: entireRange)
                 self.lensLabel.attributedText = attributedText
             } else {
