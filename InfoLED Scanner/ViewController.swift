@@ -143,6 +143,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         bufferProcessor = SampleBufferProcessor(delegate: self)
 
         metalPreviewLayer.delegate = self
+        metalPreviewLayer.framebufferOnly = false
         metalPreviewLayer.device = self.bufferProcessor.metalDevice
         metalPreviewLayer.colorPixelFormat = .bgra8Unorm
 

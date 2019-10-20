@@ -98,6 +98,7 @@ class SwitchLens: SKNode, LensObjectProtocol {
                 self.lensIcon.state = value
             }
             internalSwitchState = value
+            setLabelText(text: description)
         }
     }
 
