@@ -287,6 +287,7 @@
 		8CAEEDB122437E6D0043440A /* Lens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lens.swift; sourceTree = "<group>"; };
 		8CBB8BDF1CED5A0100C2C280 /* FpsCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FpsCounter.swift; sourceTree = "<group>"; };
 		8CBB8BE11CED5A2D00C2C280 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		8CC71A08235BF4380052ADE7 /* InfoLED Scanner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "InfoLED Scanner.entitlements"; sourceTree = "<group>"; };
 		8CD22B6C220E36960086B704 /* LensNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensNode.swift; sourceTree = "<group>"; };
 		8CD22B6E221219740086B704 /* HistoryLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryLens.swift; sourceTree = "<group>"; };
 		8CD22B7022121B120086B704 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -415,6 +416,7 @@
 		8C3747541C99921100EDDF23 /* InfoLED Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				8CC71A08235BF4380052ADE7 /* InfoLED Scanner.entitlements */,
 				8CD644572248B1FC00802CB4 /* DeviceCommunication */,
 				8CD644522248789A00802CB4 /* LensInterface */,
 				8CD6443C22471B4900802CB4 /* Shared */,
@@ -714,6 +716,7 @@
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 38RXH56U3G;
 						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
 					};
 					8C3747681C99921200EDDF23 = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -1056,12 +1059,18 @@
 			baseConfigurationReference = CFB4E45E47CDBF8A07F73E97 /* Pods-InfoLED Scanner.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "InfoLED Scanner/InfoLED Scanner.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jackieyang.InfoLED-Scanner-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};
@@ -1072,12 +1081,18 @@
 			baseConfigurationReference = 5828379CADF051A875E3CA7C /* Pods-InfoLED Scanner.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "InfoLED Scanner/InfoLED Scanner.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 38RXH56U3G;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "InfoLED Scanner/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.yangjunrui.InfoLED-Scanner";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jackieyang.InfoLED-Scanner-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};

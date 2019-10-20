@@ -2,16 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ParticleClientSecret</key>
-	<string>$(PARTICLE_CLIENT_SECRET)</string>
-	<key>ParticleClientId</key>
-	<string>$(PARTICLE_CLIENT_ID)</string>
-	<key>ParticleAccount</key>
-	<string>$(PARTICLE_ACCOUNT)</string>
-	<key>ParticlePassword</key>
-	<string>$(PARTICLE_PASSWORD)</string>
-	<key>NSCameraUsageDescription</key>
-	<string>&quot;Used to scan InfoLED&quot;</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -29,9 +19,19 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>"Used to scan InfoLED"</string>
+	<key>ParticleAccount</key>
+	<string>$(PARTICLE_ACCOUNT)</string>
+	<key>ParticleClientId</key>
+	<string>$(PARTICLE_CLIENT_ID)</string>
+	<key>ParticleClientSecret</key>
+	<string>$(PARTICLE_CLIENT_SECRET)</string>
+	<key>ParticlePassword</key>
+	<string>$(PARTICLE_PASSWORD)</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
